@@ -1,3 +1,5 @@
+// server.js 
+
 require('dotenv').config(); // Load environment variables from .env file
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -24,12 +26,14 @@ app.use((err, req, res, next) => {
 
 // Start server
 const PORT = process.env.PORT || 3000; // Use the port defined in .env or default to 3000
+const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
+
 sequelize.sync()
   .then(() => {
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
-      console.log(`Employer endpoints: http://localhost:${PORT}/api/employers`);
-      console.log(`Candidate endpoints: http://localhost:${PORT}/api/candidates`);
+      console.log(`Employer endpoints: ${BASE_URL}/api/employers`);
+      console.log(`Candidate endpoints: ${BASE_URL}/api/candidates`);
     });
   })
   .catch((err) => {

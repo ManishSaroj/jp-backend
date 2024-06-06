@@ -1,4 +1,3 @@
-// models/EmployerModel.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db.config');
 
@@ -28,6 +27,18 @@ const Employer = sequelize.define('Employer', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  termsAgreed: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false, // Changed default value to false
+    validate: {
+      termsAgreedCheck(value) { // Define the validation function
+        if (!value) {
+          throw new Error('Terms and conditions must be agreed to sign up.');
+        }
+      },
+    },
+  },
   emailVerified: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
@@ -37,6 +48,10 @@ const Employer = sequelize.define('Employer', {
     allowNull: true,
   },
   tokenCreatedAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+  tokenExpiration: {
     type: DataTypes.DATE,
     allowNull: true,
   },

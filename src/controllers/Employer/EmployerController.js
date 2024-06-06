@@ -1,21 +1,18 @@
-const Employer = require('../models/EmployerModel');
+const Employer = require('../../models/EmployerModel');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
-const transporter = require('../config/nodemailer.config');
-const { Op } = require('sequelize');
-const { employerVerificationEmail } = require('../emailTemplates/employerVerify'); 
-
-const generateResponse = (res, status, message, data = null, error = null) => {
-  res.status(status).json({ message, data, error, success: status >= 200 && status < 300 });
-};
+const transporter = require('../../config/nodemailer.config');
+const { employerVerificationEmail } = require('../../emailTemplates/employerVerify'); 
+const { generateResponse } = require('../../utils/responseUtils')
 
 const sendVerificationEmail = async (employer) => {
   const verificationToken = crypto.randomBytes(32).toString('hex');
   const tokenExpiration = new Date(Date.now() + 5 * 60 * 1000); // Token expires in 5 minutes
-  const verificationLink = `${process.env.BASE_URL}/verify-email?token=${verificationToken}&userType=employer`;
+  const verificationLink = `${process.env.FRONTEND_BASE_URL}/verify-email?token=${verificationToken}&email=${employer.email}&userType=employer`;
+  console.log(verificationLink);
 
   try {
-    const emailContent = employerVerificationEmail(employer.companyName, verificationLink); // Get the email template
+    const emailContent = employerVerificationEmail(employer.username, verificationLink); // Get the email template
 
     await transporter.sendMail({
       from: `"Aplakaam" <${process.env.EMAIL_USER}>`,
@@ -29,12 +26,12 @@ const sendVerificationEmail = async (employer) => {
 
   } catch (error) {
     console.error('Error sending verification email:', error);
-    // Handle error
+    throw new Error('Failed to send verification email');
   }
 };
 
 const registerEmployer = async (req, res) => {
-  const { username, email, password, phone_number } = req.body;
+  const { username, email, password, phone_number, terms_agreed } = req.body;
 
   try {
     const existingEmployer = await Employer.findOne({ where: { email } });
@@ -48,6 +45,7 @@ const registerEmployer = async (req, res) => {
       email,
       password: hashedPassword,
       phone_number,
+      termsAgreed: terms_agreed, 
       emailVerified: false, // Add this line to set emailVerified to false initially
     });
 
@@ -68,9 +66,9 @@ const loginEmployer = async (req, res) => {
       return generateResponse(res, 404, 'Employer not found');
     }
 
-    // if (!employer.emailVerified) {
-    //   return generateResponse(res, 403, 'Email not verified. Please verify your email before logging in.');
-    // }
+    if (!employer.emailVerified) {
+      return generateResponse(res, 403, 'Email not verified. Please verify your email before logging in.');
+    }
 
     const isMatch = await bcrypt.compare(password, employer.password);
     if (!isMatch) {
@@ -87,7 +85,7 @@ const loginEmployer = async (req, res) => {
 const resendVerificationEmail = async (req, res) => {
   const { email } = req.body;
   try {
-    const employer = await employer.findOne({ where: { email } });
+    const employer = await Employer.findOne({ where: { email } });
     if (!employer) {
       return generateResponse(res, 404, 'Employer not found');
     }
@@ -105,9 +103,51 @@ const resendVerificationEmail = async (req, res) => {
   }
 };
 
+const verifyEmployerEmail = async (req, res) => {
+  const { token, email } = req.query;
+
+  try {
+    // First, find the employer by email
+    const employer = await Employer.findOne({ where: { email } });
+
+    if (!employer) {
+      return generateResponse(res, 404, 'Employer not found');
+    }
+
+    // If the email is already verified, return a relevant message
+    if (employer.emailVerified) {
+      return generateResponse(res, 200, 'Email already verified');
+    }
+
+    // If a token is provided, verify it
+    if (token) {
+      // Check if the token matches and is not expired
+      if (employer.verificationToken === token && new Date(employer.tokenExpiration) > new Date()) {
+        await employer.update({
+          emailVerified: true,
+          verificationToken: null,
+          tokenExpiration: null,
+        });
+        return generateResponse(res, 200, 'Email verified successfully');
+      } else {
+        // If the token is invalid or expired
+        return generateResponse(res, 400, 'Invalid or expired verification token');
+      }
+    } else {
+      // If no token is provided
+      return generateResponse(res, 400, 'Verification token is required');
+    }
+  } catch (error) {
+    console.error('Error verifying email:', error);
+    return generateResponse(res, 500, 'Server error', null, error.message);
+  }
+};
+
+
 
 module.exports = {
   registerEmployer,
   loginEmployer,
-  resendVerificationEmail
+  resendVerificationEmail,
+  verifyEmployerEmail
 };
