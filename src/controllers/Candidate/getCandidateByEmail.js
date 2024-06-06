@@ -9,11 +9,14 @@ const getCandidateByEmail = async (req, res) => {
     if (!candidate) {
       return generateResponse(res, 404, 'Candidate not found');
     }
-    return generateResponse(res, 200, 'Candidate found', candidate);
+
+    generateResponse(res, 200, 'Candidate found successfully', { candidate });
   } catch (error) {
-    console.error('Error fetching candidate data:', error);
-    return generateResponse(res, 500, 'Internal Server Error', null, error.message);
+    console.error('Error fetching candidate by email:', error);
+    generateResponse(res, 500, 'Server error', null, error.message);
   }
 };
 
-module.exports = getCandidateByEmail;
+module.exports = {
+  getCandidateByEmail,
+};

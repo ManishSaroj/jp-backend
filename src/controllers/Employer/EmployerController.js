@@ -1,6 +1,7 @@
 const Employer = require('../../models/EmployerModel');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 const transporter = require('../../config/nodemailer.config');
 const { employerVerificationEmail } = require('../../emailTemplates/employerVerify'); 
 const { generateResponse } = require('../../utils/responseUtils')
@@ -75,7 +76,9 @@ const loginEmployer = async (req, res) => {
       return generateResponse(res, 400, 'Invalid credentials');
     }
 
-    generateResponse(res, 200, 'Employer logged in successfully', { employer });
+    const token = jwt.sign({ id: employer.eid }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
+
+    generateResponse(res, 200, 'Employer logged in successfully', { employer, token });
   } catch (error) {
     console.error('Error logging in employer:', error);
     generateResponse(res, 500, 'Server error', null, error.message);

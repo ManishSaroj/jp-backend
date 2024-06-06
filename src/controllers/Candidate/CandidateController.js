@@ -1,6 +1,7 @@
 const Candidate = require('../../models/CandidateModel');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 const transporter = require('../../config/nodemailer.config');
 const { candidateVerificationEmail } = require('../../emailTemplates/candidateVerify');
 const { generateResponse } = require('../../utils/responseUtils');
@@ -56,6 +57,7 @@ const registerCandidate = async (req, res) => {
   }
 };
 
+
 const loginCandidate = async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -73,12 +75,15 @@ const loginCandidate = async (req, res) => {
       return generateResponse(res, 400, 'Invalid credentials');
     }
 
-    generateResponse(res, 200, 'Candidate logged in successfully', { candidate });
+    const token = jwt.sign({ id: candidate.cid }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
+
+    generateResponse(res, 200, 'Candidate logged in successfully', { candidate, token });
   } catch (error) {
     console.error('Error logging in candidate:', error);
     generateResponse(res, 500, 'Server error', null, error.message);
   }
 };
+
 
 const resendVerificationEmail = async (req, res) => {
   const { email } = req.body;
