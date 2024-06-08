@@ -75,14 +75,30 @@ const loginCandidate = async (req, res) => {
       return generateResponse(res, 400, 'Invalid credentials');
     }
 
-    const token = jwt.sign({ id: candidate.cid }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
+    const token = jwt.sign(
+      {
+        id: candidate.cid,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN }
+    );
 
-    generateResponse(res, 200, 'Candidate logged in successfully', { candidate, token });
+    const cookieMaxAge = parseInt(process.env.JWT_COOKIE_EXPIRES_IN, 10) * 1000; // Convert to milliseconds
+
+    res.cookie('sessionToken', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: cookieMaxAge,
+      sameSite: 'strict', // Add this for better security
+    });
+
+    generateResponse(res, 200, 'Candidate logged in successfully', { candidate });
   } catch (error) {
     console.error('Error logging in candidate:', error);
     generateResponse(res, 500, 'Server error', null, error.message);
   }
 };
+
 
 
 const resendVerificationEmail = async (req, res) => {
@@ -145,6 +161,9 @@ const verifyCandidateEmail = async (req, res) => {
     return generateResponse(res, 500, 'Server error', null, error.message);
   }
 };
+
+
+
 
 
 module.exports = {

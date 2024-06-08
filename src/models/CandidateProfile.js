@@ -1,3 +1,4 @@
+// CandidateProfileModel.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db.config');
 const Candidate = require('./CandidateModel');
@@ -8,13 +9,21 @@ const CandidateProfile = sequelize.define('CandidateProfile', {
     primaryKey: true,
     autoIncrement: true,
   },
-  email: {
-    type: DataTypes.STRING,
+  cid: {
+    type: DataTypes.INTEGER,
     allowNull: false,
     references: {
       model: Candidate,
-      key: 'email',
+      key: 'cid',
     },
+  },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  username: {
+    type: DataTypes.STRING,
+    allowNull: false,
   },
   name: {
     type: DataTypes.STRING,
@@ -72,35 +81,11 @@ const CandidateProfile = sequelize.define('CandidateProfile', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  facebook: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  twitter: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
   linkedIn: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  whatsapp: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  instagram: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  pinterest: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  tumblr: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  youtube: {
+  github: {
     type: DataTypes.STRING,
     allowNull: true,
   },
@@ -108,8 +93,7 @@ const CandidateProfile = sequelize.define('CandidateProfile', {
   timestamps: false,
 });
 
-// Define the association
-Candidate.hasOne(CandidateProfile, { foreignKey: 'email' });
-CandidateProfile.belongsTo(Candidate, { foreignKey: 'email' });
+Candidate.hasOne(CandidateProfile, { foreignKey: 'cid' }); // One-to-One relationship
+CandidateProfile.belongsTo(Candidate, { foreignKey: 'cid' }); // Required for bi-directional association
 
 module.exports = CandidateProfile;

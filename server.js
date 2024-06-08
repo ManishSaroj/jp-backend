@@ -3,20 +3,29 @@
 require('dotenv').config(); // Load environment variables from .env file
 const express = require('express');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const sequelize = require('./src/config/db.config');
 const employerRoutes = require('./src/routes/employerRoutes');
 const candidateRoutes = require('./src/routes/candidateRoutes');
+const authRoutes = require('./src/routes/authRoutes'); 
+const logoutRoutes = require('./src/routes/logoutRoutes');
 
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_BASE_URL, 
+  credentials: true,
+}));
 app.use(bodyParser.json());
+app.use(cookieParser());
 
 // Routes
 app.use('/api/employers', employerRoutes);
 app.use('/api/candidates', candidateRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/logout', logoutRoutes); 
 
 // Global error handler
 app.use((err, req, res, next) => {
@@ -34,6 +43,8 @@ sequelize.sync()
       console.log(`Server is running on port ${PORT}`);
       console.log(`Employer endpoints: ${BASE_URL}/api/employers`);
       console.log(`Candidate endpoints: ${BASE_URL}/api/candidates`);
+      console.log(`Authentication endpoints: ${BASE_URL}/api/auth`);
+      console.log(`Logout endpoint: ${BASE_URL}/api/logout`);
     });
   })
   .catch((err) => {

@@ -1,6 +1,7 @@
+// CandidateProfileController.js
 const Candidate = require('../../models/CandidateModel');
 const CandidateProfile = require('../../models/CandidateProfile');
-const { generateResponse } = require('../../utils/responseUtils')
+const { generateResponse } = require('../../utils/responseUtils');
 
 const createCandidateProfile = async (req, res) => {
     const {
@@ -19,14 +20,8 @@ const createCandidateProfile = async (req, res) => {
         city,
         postcode,
         fullAddress,
-        facebook,
-        twitter,
         linkedIn,
-        whatsapp,
-        instagram,
-        pinterest,
-        tumblr,
-        youtube,
+        github
     } = req.body;
 
     try {
@@ -56,20 +51,14 @@ const createCandidateProfile = async (req, res) => {
             city,
             postcode,
             fullAddress,
-            facebook,
-            twitter,
             linkedIn,
-            whatsapp,
-            instagram,
-            pinterest,
-            tumblr,
-            youtube,
+            github
         });
 
-        generateResponse(res, 201, 'Candidate profile created successfully', { profile: newProfile });
+        return generateResponse(res, 201, 'Candidate profile created successfully', { profile: newProfile });
     } catch (error) {
         console.error('Error creating candidate profile:', error);
-        generateResponse(res, 500, 'Server error', null, error.message);
+        return generateResponse(res, 500, 'Server error', null, error.message);
     }
 };
 
