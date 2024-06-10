@@ -19,7 +19,7 @@ router.get('/verify-email', verifyCandidateEmail);
 router.post('/resend-email', resendVerificationEmail);
 router.get('/me', checkAuth, getCandidate);
 router.post('/profile',checkAuth, createOrUpdateCandidateProfile);
-router.get('/profile', checkAuth, getCandidateProfile);
+router.get('/get-profile', checkAuth, getCandidateProfile);
 router.post('/resumes', checkAuth, storeResume);
 
 

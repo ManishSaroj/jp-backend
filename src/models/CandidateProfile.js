@@ -70,7 +70,7 @@ const CandidateProfile = sequelize.define('CandidateProfile', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  postcode: {
+  pincode: {
     type: DataTypes.STRING,
     allowNull: false,
   },
