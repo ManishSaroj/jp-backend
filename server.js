@@ -11,6 +11,7 @@ const candidateRoutes = require('./src/routes/candidateRoutes');
 const authRoutes = require('./src/routes/authRoutes'); 
 const logoutRoutes = require('./src/routes/logoutRoutes');
 
+
 const app = express();
 
 // Middleware
@@ -26,6 +27,7 @@ app.use('/api/employers', employerRoutes);
 app.use('/api/candidates', candidateRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/logout', logoutRoutes); 
+
 
 // Global error handler
 app.use((err, req, res, next) => {
@@ -45,6 +47,8 @@ sequelize.sync()
       console.log(`Candidate endpoints: ${BASE_URL}/api/candidates`);
       console.log(`Authentication endpoints: ${BASE_URL}/api/auth`);
       console.log(`Logout endpoint: ${BASE_URL}/api/logout`);
+      console.log(`Candidate Profile endpoint: ${BASE_URL}/api/candidates/profile`);
+      console.log(`Candidate Resume endpoints: ${BASE_URL}/api/candidates/resumes`);
     });
   })
   .catch((err) => {

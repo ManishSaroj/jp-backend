@@ -11,7 +11,7 @@ const checkAuth = (req, res, next) => {
 
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
       if (err) {
-        return res.status(402).json({ success: false, message: "Invalid token" });
+        return res.status(401).json({ success: false, message: "Invalid token" });
       }
 
       req.user = decoded; // Attach the decoded user information to the request object

@@ -1,11 +1,11 @@
 // employerVerifyEmailTemplates.js
 
-const employerVerificationEmail = (username, link) => {
+const employerVerificationEmail = (company_name, link) => {
     return `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f8f8f8; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1);">
         <div style="background-color: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); position: relative;">
           <h1 style="color: #007bff; text-align: center; margin-top: 20px;">Welcome to <span style="color: #333333;">Aplakaam!</span></h1>
-          <p style="color: #333333; line-height: 1.6;">Hello ${username},</p>
+          <p style="color: #333333; line-height: 1.6;">Hello ${company_name},</p>
           <p style="color: #555555; line-height: 1.6;">Thank you for signing up with Aplakaam, your ultimate job portal. To complete your registration and unlock all the features, please verify your email address by clicking the button below:</p>
           <div style="text-align: center; margin: 20px 0;">
             <a href="${link}" style="background: linear-gradient(to right, #4d94ff, #007bff); color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">Verify Email Address</a>

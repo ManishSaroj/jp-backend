@@ -13,7 +13,7 @@ const sendVerificationEmail = async (employer) => {
   console.log(verificationLink);
 
   try {
-    const emailContent = employerVerificationEmail(employer.username, verificationLink); // Get the email template
+    const emailContent = employerVerificationEmail(employer.company_name, verificationLink); // Get the email template
 
     await transporter.sendMail({
       from: `"Aplakaam" <${process.env.EMAIL_USER}>`,
@@ -32,7 +32,7 @@ const sendVerificationEmail = async (employer) => {
 };
 
 const registerEmployer = async (req, res) => {
-  const { username, email, password, phone_number, terms_agreed } = req.body;
+  const { company_name, email, password, phone_number, terms_agreed } = req.body;
 
   try {
     const existingEmployer = await Employer.findOne({ where: { email } });
@@ -42,7 +42,7 @@ const registerEmployer = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newEmployer = await Employer.create({
-      username,
+      company_name,
       email,
       password: hashedPassword,
       phone_number,

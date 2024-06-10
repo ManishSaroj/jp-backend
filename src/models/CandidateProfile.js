@@ -17,19 +17,15 @@ const CandidateProfile = sequelize.define('CandidateProfile', {
       key: 'cid',
     },
   },
+  candidate_name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  phone_number: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
   email: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  username: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  phone: {
     type: DataTypes.STRING,
     allowNull: false,
   },
@@ -41,9 +37,10 @@ const CandidateProfile = sequelize.define('CandidateProfile', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  language: {
-    type: DataTypes.STRING,
+  languages: {
+    type: DataTypes.JSON, // Changed to DataTypes.JSON
     allowNull: false,
+    defaultValue: [] // Set a default value
   },
   jobCategory: {
     type: DataTypes.STRING,
@@ -78,6 +75,10 @@ const CandidateProfile = sequelize.define('CandidateProfile', {
     allowNull: false,
   },
   fullAddress: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  description: {
     type: DataTypes.STRING,
     allowNull: false,
   },

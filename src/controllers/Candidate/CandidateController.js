@@ -13,7 +13,7 @@ const sendVerificationEmail = async (candidate) => {
   console.log(verificationLink);
 
   try {
-    const emailContent = candidateVerificationEmail(candidate.username, verificationLink); // Get the email template
+    const emailContent = candidateVerificationEmail(candidate.candidate_name, verificationLink); // Get the email template
 
     await transporter.sendMail({
       from: `"Aplakaam" <${process.env.EMAIL_USER}>`,
@@ -30,7 +30,7 @@ const sendVerificationEmail = async (candidate) => {
 };
 
 const registerCandidate = async (req, res) => {
-  const { username, email, password, phone_number, terms_agreed } = req.body;
+  const { candidate_name, email, password, phone_number, terms_agreed } = req.body;
 
   try {
     const existingCandidate = await Candidate.findOne({ where: { email } });
@@ -40,7 +40,7 @@ const registerCandidate = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newCandidate = await Candidate.create({
-      username,
+      candidate_name,
       email,
       password: hashedPassword,
       phone_number,
@@ -90,6 +90,7 @@ const loginCandidate = async (req, res) => {
       secure: process.env.NODE_ENV === 'production',
       maxAge: cookieMaxAge,
       sameSite: 'strict', // Add this for better security
+      // domain: process.env.COOKIE_DOMAIN,
     });
 
     generateResponse(res, 200, 'Candidate logged in successfully', { candidate });

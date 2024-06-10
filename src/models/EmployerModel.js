@@ -7,7 +7,7 @@ const Employer = sequelize.define('Employer', {
     primaryKey: true,
     autoIncrement: true,
   },
-  username: {
+  company_name: {
     type: DataTypes.STRING,
     allowNull: false,
   },
