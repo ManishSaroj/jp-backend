@@ -1,4 +1,5 @@
 const Candidate = require('../../models/CandidateModel');
+const CandidateProfile = require('../../models/CandidateProfile');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
@@ -46,6 +47,14 @@ const registerCandidate = async (req, res) => {
       phone_number,
       termsAgreed: terms_agreed,
       emailVerified: false, // Add this line to set emailVerified to false initially
+    });
+
+     // Create a new CandidateProfile record
+     const candidateProfile = await CandidateProfile.create({
+      cid: newCandidate.cid,
+      email,
+      candidate_name,
+      phone_number,
     });
 
     await sendVerificationEmail(newCandidate);

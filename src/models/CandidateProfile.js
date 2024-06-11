@@ -35,20 +35,20 @@ const CandidateProfile = sequelize.define('CandidateProfile', {
   },
   qualification: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   languages: {
     type: DataTypes.JSON, // Changed to DataTypes.JSON
-    allowNull: false,
-    defaultValue: [] // Set a default value
+    allowNull: true,
+    defaultValue: "" // Set a default value
   },
   jobCategory: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   experience: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   currentSalary: {
     type: DataTypes.STRING,
@@ -60,27 +60,27 @@ const CandidateProfile = sequelize.define('CandidateProfile', {
   },
   age: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
   },
   country: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   city: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   pincode: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   fullAddress: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   description: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   linkedIn: {
     type: DataTypes.STRING,
