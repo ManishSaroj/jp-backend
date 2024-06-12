@@ -1,80 +1,164 @@
-const { Resume, Education, Experience } = require('../../models/ResumeModal');
-const Candidate = require('../../models/CandidateModel')
-// const { getCandidate } = require('./getCandidate');
+const { Resume, Education, Experience, Project, Certification } = require('../../models/ResumeModal');
+const Candidate = require('../../models/CandidateModel');
+const { generateResponse } = require('../../utils/responseUtils');
 
-const storeResume = async (req, res) => {
+// Create a new resume
+async function createResume(req, res) {
   try {
-    const candidateId = req.user.id; // Extract user ID from the token
-    const candidate = await Candidate.findByPk(candidateId);
-
-    if (!candidate) {
-        return res.status(404).json({ success: false, message: 'Candidate not found' });
+    // Check if user is authenticated
+    if (!req.user || !req.user.id) {
+      return generateResponse(res, 401, 'Unauthorized: User not authenticated');
     }
-    
-    const { name, workingAs, email, phone, linkedIn, gitHub, address, skills, education, experience } = req.body;
 
-    const resume = await Resume.create({
-      cid: candidateId,
-      name,
-      workingAs,
-      email,
-      phone,
-      linkedIn,
-      gitHub,
-      address,
-      skills,
+    const cid = req.user.id; // Get the cid from the decoded JWT payload
+
+    // Check if the candidate exists
+    const candidate = await Candidate.findOne({ where: { cid } });
+    if (!candidate) {
+      return generateResponse(res, 404, 'Candidate not found');
+    }
+
+    // Add CID to the request body before creating the resume
+    req.body.cid = cid;
+    const resume = await Resume.create(req.body, {
+      include: [Education, Experience, Project, Certification]
     });
-
-    await Education.bulkCreate(education.map(edu => ({ ...edu, resumeId: resume.resumeId })));
-    await Experience.bulkCreate(experience.map(exp => ({ ...exp, resumeId: resume.resumeId })));
-
-    res.status(201).json({ success: true, message: 'Resume stored successfully' });
+    res.status(201).json(resume);
   } catch (error) {
-    console.error('Error storing resume:', error);
-    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    res.status(400).json({ message: error.message });
   }
-};
+}
 
-const updateResume = async (req, res) => {
+// Update an existing resume
+async function updateResume(req, res) {
+  const { id } = req.params;
   try {
-    const candidateId = req.user.id; // Extract user ID from the token
-    const candidate = await Candidate.findByPk(candidateId);
-
-    if (!candidate) {
-      return res.status(404).json({ success: false, message: 'Candidate not found' });
+    // Check if user is authenticated
+    if (!req.user || !req.user.id) {
+      return generateResponse(res, 401, 'Unauthorized: User not authenticated');
     }
 
-    const resumeId = req.params.resumeId;
-    const { name, workingAs, email, phone, linkedIn, gitHub, address, skills, education, experience } = req.body;
+    const cid = req.user.id; // Get the cid from the decoded JWT payload
 
-    await Resume.update(
-      {
-        name,
-        workingAs,
-        email,
-        phone,
-        linkedIn,
-        gitHub,
-        address,
-        skills,
-      },
-      { where: { resumeId } }
-    );
+    // Check if the candidate exists
+    const candidate = await Candidate.findOne({ where: { cid } });
+    if (!candidate) {
+      return generateResponse(res, 404, 'Candidate not found');
+    }
 
-    await Education.destroy({ where: { resumeId } });
-    await Experience.destroy({ where: { resumeId } });
+    // Find the resume by ID and CID
+    const resume = await Resume.findOne({ where: { resumeId: id, cid } });
+    if (!resume) {
+      return generateResponse(res, 404, 'Resume not found');
+    }
 
-    await Education.bulkCreate(education.map(edu => ({ ...edu, resumeId })));
-    await Experience.bulkCreate(experience.map(exp => ({ ...exp, resumeId })));
-
-    res.status(200).json({ success: true, message: 'Resume updated successfully' });
+    // Update the resume
+    const [updated] = await Resume.update(req.body, {
+      where: { resumeId: id, cid }
+    });
+    if (updated) {
+      const updatedResume = await Resume.findOne({ where: { resumeId: id, cid } });
+      return res.status(200).json({ resume: updatedResume });
+    }
+    throw new Error('Resume not found');
   } catch (error) {
-    console.error('Error updating resume:', error);
-    res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    return res.status(500).send(error.message);
   }
-};
+}
+
+// Delete a resume
+async function deleteResume(req, res) {
+  const { id } = req.params;
+  try {
+    // Check if user is authenticated
+    if (!req.user || !req.user.id) {
+      return generateResponse(res, 401, 'Unauthorized: User not authenticated');
+    }
+
+    const cid = req.user.id; // Get the cid from the decoded JWT payload
+
+    // Check if the candidate exists
+    const candidate = await Candidate.findOne({ where: { cid } });
+    if (!candidate) {
+      return generateResponse(res, 404, 'Candidate not found');
+    }
+
+    // Delete the resume by ID and CID
+    const deleted = await Resume.destroy({
+      where: { resumeId: id, cid }
+    });
+    if (deleted) {
+      return res.status(204).send("Resume deleted successfully");
+    }
+    throw new Error("Resume not found");
+  } catch (error) {
+    return res.status(500).send(error.message);
+  }
+}
+
+// Get all resumes
+async function getAllResumes(req, res) {
+  try {
+    // Check if user is authenticated
+    if (!req.user || !req.user.id) {
+      return generateResponse(res, 401, 'Unauthorized: User not authenticated');
+    }
+
+    const cid = req.user.id; // Get the cid from the decoded JWT payload
+
+    // Check if the candidate exists
+    const candidate = await Candidate.findOne({ where: { cid } });
+    if (!candidate) {
+      return generateResponse(res, 404, 'Candidate not found');
+    }
+
+    // Find all resumes by CID
+    const resumes = await Resume.findAll({
+      where: { cid },
+      include: [Education, Experience, Project, Certification]
+    });
+    res.status(200).json(resumes);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
+// Get a single resume by ID
+async function getResumeById(req, res) {
+  const { id } = req.params;
+  try {
+    // Check if user is authenticated
+    if (!req.user || !req.user.id) {
+      return generateResponse(res, 401, 'Unauthorized: User not authenticated');
+    }
+
+    const cid = req.user.id; // Get the cid from the decoded JWT payload
+
+    // Check if the candidate exists
+    const candidate = await Candidate.findOne({ where: { cid } });
+    if (!candidate) {
+      return generateResponse(res, 404, 'Candidate not found');
+    }
+
+    // Find the resume by ID and CID
+    const resume = await Resume.findOne({
+      where: { resumeId: id, cid },
+      include: [Education, Experience, Project, Certification]
+    });
+    if (resume) {
+      res.status(200).json(resume);
+    } else {
+      res.status(404).json({ message: 'Resume not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
 
 module.exports = {
-  storeResume,
+  createResume,
   updateResume,
+  deleteResume,
+  getAllResumes,
+  getResumeById
 };

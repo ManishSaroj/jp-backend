@@ -42,6 +42,10 @@ const CandidateProfile = sequelize.define('CandidateProfile', {
     allowNull: true,
     defaultValue: "" // Set a default value
   },
+  jobrole: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   jobCategory: {
     type: DataTypes.STRING,
     allowNull: true,
