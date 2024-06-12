@@ -9,7 +9,7 @@ const {
 const  checkAuth = require('../middlewares/authMiddleware');
 const { getCandidate, changePassword } = require('../controllers/Candidate/getCandidate');
 const { createOrUpdateCandidateProfile, getCandidateProfile } = require('../controllers/Candidate/CandidateProfileController');
-const { createResume, updateResume, deleteResume, getAllResumes, getResumeById } = require('../controllers/Candidate/resumeController');
+const { createResume, updateResume, deleteResume, getAllResumes, getResumeById, getResumeByCandidateId } = require('../controllers/Candidate/resumeController');
 
 const router = express.Router();
 
@@ -28,6 +28,7 @@ router.put('/resumes/:id', checkAuth, updateResume);
 router.delete('/resumes/:id', checkAuth, deleteResume);
 router.get('/resumes', checkAuth, getAllResumes);
 router.get('/resumes/:id', checkAuth, getResumeById);
+router.get('/resumes/:id', checkAuth, getResumeByCandidateId);
 
 
 

@@ -20,15 +20,15 @@ const Resume = sequelize.define('CandidateResume', {
   },
   name: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
-  workingAs: {
+  WorkingAs: {
     type: DataTypes.STRING,
     allowNull: true,
   },
   email: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
     unique: true,
     validate: {
       isEmail: true,
@@ -36,13 +36,13 @@ const Resume = sequelize.define('CandidateResume', {
   },
   phone: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
-  linkedIn: {
+  LinkedIn: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  gitHub: {
+  GitHub: {
     type: DataTypes.STRING,
     allowNull: true,
   },
@@ -104,7 +104,7 @@ const Education = sequelize.define('CandidateEducation', {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  score: {
+  Score: {
     type: DataTypes.STRING,
     allowNull: true,
   },
