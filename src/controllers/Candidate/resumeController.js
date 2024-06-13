@@ -3,6 +3,7 @@ const Candidate = require('../../models/CandidateModel');
 const { generateResponse } = require('../../utils/responseUtils');
 
 // Create a new resume
+// Create a new resume or update an existing resume
 async function createResume(req, res) {
   try {
     // Check if user is authenticated
@@ -20,42 +21,44 @@ async function createResume(req, res) {
 
     // Check if the candidate already has a resume
     const existingResume = await Resume.findOne({ where: { cid } });
+
     if (existingResume) {
-      // Update the existing resume instead of creating a new one
+      // Update the existing resume
       await updateResume({ ...req, params: { id: existingResume.resumeId } }, res);
-      return;
+    } else {
+      // Create a new resume
+
+      // Add CID and isSaved to the request body before creating the resume
+      req.body.cid = cid;
+      req.body.isSaved = req.body.isSaved || false; // Default to false if not provided
+
+      // Create the resume
+      const resume = await Resume.create(req.body);
+
+      // Create associated models
+      if (req.body.education) {
+        await Promise.all(req.body.education.map(edu => Education.create({ ...edu, resumeId: resume.resumeId, cid })));
+      }
+
+      if (req.body.experience) {
+        await Promise.all(req.body.experience.map(exp => Experience.create({ ...exp, resumeId: resume.resumeId, cid })));
+      }
+
+      if (req.body.projects) {
+        await Promise.all(req.body.projects.map(proj => Project.create({ ...proj, resumeId: resume.resumeId, cid })));
+      }
+
+      if (req.body.certifications) {
+        await Promise.all(req.body.certifications.map(cert => Certification.create({ ...cert, resumeId: resume.resumeId, cid })));
+      }
+
+      const createdResume = await Resume.findOne({
+        where: { resumeId: resume.resumeId },
+        include: [Education, Experience, Project, Certification]
+      });
+
+      res.status(201).json(createdResume);
     }
-
-    // Add CID and isSaved to the request body before creating the resume
-    req.body.cid = cid;
-    req.body.isSaved = req.body.isSaved || false; // Default to false if not provided
-
-    // Create the resume
-    const resume = await Resume.create(req.body);
-
-    // Create associated models
-    if (req.body.education) {
-      await Promise.all(req.body.education.map(edu => Education.create({ ...edu, resumeId: resume.resumeId, cid })));
-    }
-
-    if (req.body.experience) {
-      await Promise.all(req.body.experience.map(exp => Experience.create({ ...exp, resumeId: resume.resumeId, cid })));
-    }
-
-    if (req.body.projects) {
-      await Promise.all(req.body.projects.map(proj => Project.create({ ...proj, resumeId: resume.resumeId, cid })));
-    }
-
-    if (req.body.certifications) {
-      await Promise.all(req.body.certifications.map(cert => Certification.create({ ...cert, resumeId: resume.resumeId, cid })));
-    }
-
-    const createdResume = await Resume.findOne({
-      where: { resumeId: resume.resumeId },
-      include: [Education, Experience, Project, Certification]
-    });
-
-    res.status(201).json(createdResume);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

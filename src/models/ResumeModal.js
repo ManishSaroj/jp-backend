@@ -29,10 +29,6 @@ const Resume = sequelize.define('CandidateResume', {
   email: {
     type: DataTypes.STRING,
     allowNull: true,
-    unique: true,
-    validate: {
-      isEmail: true,
-    },
   },
   phone: {
     type: DataTypes.STRING,
@@ -72,7 +68,7 @@ const Education = sequelize.define('CandidateEducation', {
   },
   resumeId: {
     type: DataTypes.INTEGER,
-    allowNull: false, 
+    allowNull: false,
     references: {
       model: Resume,  // Reference to the Resume model
       key: 'resumeId',
@@ -125,7 +121,7 @@ const Experience = sequelize.define('CandidateExperience', {
   },
   resumeId: {
     type: DataTypes.INTEGER,
-    allowNull: false, 
+    allowNull: false,
     references: {
       model: Resume,  // Reference to the Resume model
       key: 'resumeId',
@@ -174,7 +170,7 @@ const Project = sequelize.define('CandidateProject', {
   },
   resumeId: {
     type: DataTypes.INTEGER,
-    allowNull: false, 
+    allowNull: false,
     references: {
       model: Resume,  // Reference to the Resume model
       key: 'resumeId',
@@ -211,7 +207,7 @@ const Certification = sequelize.define('CandidateCertification', {
   },
   resumeId: {
     type: DataTypes.INTEGER,
-    allowNull: false, 
+    allowNull: false,
     references: {
       model: Resume,  // Reference to the Resume model
       key: 'resumeId',
