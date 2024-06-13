@@ -29,10 +29,7 @@ const Resume = sequelize.define('CandidateResume', {
   email: {
     type: DataTypes.STRING,
     allowNull: true,
-    unique: true,
-    validate: {
-      isEmail: true,
-    },
+    
   },
   phone: {
     type: DataTypes.STRING,
