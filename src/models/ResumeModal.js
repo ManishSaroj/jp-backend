@@ -146,11 +146,11 @@ const Experience = sequelize.define('CandidateExperience', {
     allowNull: false,
   },
   startDate: {
-    type: DataTypes.DATE,
+    type: DataTypes.INTEGER,
     allowNull: false,
   },
   endDate: {
-    type: DataTypes.DATE,
+    type: DataTypes.INTEGER,
     allowNull: true,
   },
   expdescription: {

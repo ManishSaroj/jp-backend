@@ -66,7 +66,6 @@ const registerCandidate = async (req, res) => {
   }
 };
 
-
 const loginCandidate = async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -109,8 +108,6 @@ const loginCandidate = async (req, res) => {
     generateResponse(res, 500, 'Server error', null, error.message);
   }
 };
-
-
 
 const resendVerificationEmail = async (req, res) => {
   const { email } = req.body;
@@ -173,14 +170,9 @@ const verifyCandidateEmail = async (req, res) => {
   }
 };
 
-
-
-
-
 module.exports = {
   registerCandidate,
   loginCandidate,
   resendVerificationEmail,
   verifyCandidateEmail,
 };
-

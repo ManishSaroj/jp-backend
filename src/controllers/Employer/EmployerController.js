@@ -1,4 +1,5 @@
 const Employer = require('../../models/EmployerModel');
+const EmployerProfile = require('../../models/EmployerProfile');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
@@ -21,7 +22,6 @@ const sendVerificationEmail = async (employer) => {
       subject: 'Welcome to Aplakaam - Verify Your Email Address',
       html: emailContent, // Use the email template content
     });
-
     // Update the employer's verification token and token expiration in the database
     await employer.update({ verificationToken, tokenExpiration });
   } catch (error) {
@@ -47,6 +47,14 @@ const registerEmployer = async (req, res) => {
       phone_number,
       termsAgreed: terms_agreed, 
       emailVerified: false, // Add this line to set emailVerified to false initially
+    });
+
+    // Create a new EmployerProfile record
+    const employerProfile = await EmployerProfile.create({
+      eid: newEmployer.eid,
+      email,
+      company_name,
+      phone_number,
     });
 
     await sendVerificationEmail(newEmployer);
@@ -161,8 +169,6 @@ const verifyEmployerEmail = async (req, res) => {
     return generateResponse(res, 500, 'Server error', null, error.message);
   }
 };
-
-
 
 module.exports = {
   registerEmployer,
