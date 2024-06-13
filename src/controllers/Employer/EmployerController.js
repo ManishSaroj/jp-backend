@@ -1,4 +1,5 @@
 const Employer = require('../../models/EmployerModel');
+const EmployerProfile = require('../../models/EmployerProfile');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
@@ -21,10 +22,8 @@ const sendVerificationEmail = async (employer) => {
       subject: 'Welcome to Aplakaam - Verify Your Email Address',
       html: emailContent, // Use the email template content
     });
-
     // Update the employer's verification token and token expiration in the database
     await employer.update({ verificationToken, tokenExpiration });
-
   } catch (error) {
     console.error('Error sending verification email:', error);
     throw new Error('Failed to send verification email');
@@ -48,6 +47,14 @@ const registerEmployer = async (req, res) => {
       phone_number,
       termsAgreed: terms_agreed, 
       emailVerified: false, // Add this line to set emailVerified to false initially
+    });
+
+    // Create a new EmployerProfile record
+    const employerProfile = await EmployerProfile.create({
+      eid: newEmployer.eid,
+      email,
+      company_name,
+      phone_number,
     });
 
     await sendVerificationEmail(newEmployer);
@@ -76,7 +83,24 @@ const loginEmployer = async (req, res) => {
       return generateResponse(res, 400, 'Invalid credentials');
     }
 
-    const token = jwt.sign({ id: employer.eid }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
+    const token = jwt.sign(
+      { 
+        id: employer.eid,
+        role: 'employer',
+      }, 
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN }
+    );
+
+    const cookieMaxAge = parseInt(process.env.JWT_COOKIE_EXPIRES_IN, 10) * 1000; // Convert to milliseconds
+
+    res.cookie('sessionToken', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: cookieMaxAge,
+      sameSite: 'strict', // Add this for better security
+      // domain: process.env.COOKIE_DOMAIN,
+    });
 
     generateResponse(res, 200, 'Employer logged in successfully', { employer, token });
   } catch (error) {
@@ -145,8 +169,6 @@ const verifyEmployerEmail = async (req, res) => {
     return generateResponse(res, 500, 'Server error', null, error.message);
   }
 };
-
-
 
 module.exports = {
   registerEmployer,
