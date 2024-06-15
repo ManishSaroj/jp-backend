@@ -28,8 +28,12 @@ const EmployerJobPost = sequelize.define('EmployerJobPost', {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    offeredSalary: {
-        type: DataTypes.STRING,
+    minSalary: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+    maxSalary: {
+        type: DataTypes.INTEGER,
         allowNull: false,
     },
     experience: {
@@ -80,12 +84,20 @@ const EmployerJobPost = sequelize.define('EmployerJobPost', {
         type: DataTypes.TEXT,
         allowNull: false,
     },
+    jobReq: {
+        type: DataTypes.JSON,
+        allowNull: false,
+    },
+    jobRes: {
+        type: DataTypes.JSON,
+        allowNull: false,
+    },
     startDate: {
-        type: DataTypes.DATE,
+        type: DataTypes.DATEONLY,
         allowNull: false,
     },
     endDate: {
-        type: DataTypes.DATE,
+        type: DataTypes.DATEONLY,
         allowNull: false,
     }
 }, {

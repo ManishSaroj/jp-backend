@@ -7,7 +7,8 @@ const createJobPost = async (req, res) => {
         jobTitle,
         jobCategory,
         jobType,
-        offeredSalary,
+        minSalary,
+        maxSalary,
         experience,
         qualification,
         gender,
@@ -20,6 +21,8 @@ const createJobPost = async (req, res) => {
         completeAddress,
         skills,
         description,
+        jobReq,
+        jobRes,
         startDate,
         endDate
     } = req.body;
@@ -43,7 +46,8 @@ const createJobPost = async (req, res) => {
             jobTitle,
             jobCategory,
             jobType,
-            offeredSalary,
+            minSalary,
+            maxSalary,
             experience,
             qualification,
             gender,
@@ -56,6 +60,8 @@ const createJobPost = async (req, res) => {
             completeAddress,
             skills,
             description,
+            jobReq,
+            jobRes,
             startDate: new Date(startDate),
             endDate: new Date(endDate)
         });
@@ -67,6 +73,53 @@ const createJobPost = async (req, res) => {
     }
 };
 
+const getEmployerJobPosts = async (req, res) => {
+    try {
+        // Check if the user is authenticated and get the employer ID
+        if (!req.user || !req.user.id) {
+            return generateResponse(res, 401, 'Unauthorized: User not authenticated');
+        }
+
+        const eid = req.user.id;
+
+        // Check if the employer exists
+        const employer = await Employer.findOne({ where: { eid } });
+        if (!employer) {
+            return generateResponse(res, 404, 'Employer not found');
+        }
+
+        // Retrieve job posts for the employer
+        const jobPosts = await EmployerJobPost.findAll({ where: { eid } });
+
+        if (jobPosts.length === 0) {
+            return generateResponse(res, 404, 'No job posts found for this employer');
+        }
+
+        return generateResponse(res, 200, 'Job posts retrieved successfully', { jobPosts });
+    } catch (error) {
+        console.error('Error retrieving job posts for employer:', error);
+        return generateResponse(res, 500, 'Server error', null, error.message);
+    }
+};
+
+const getAllJobPosts = async (req, res) => {
+    try {
+        // Retrieve all job posts
+        const jobPosts = await EmployerJobPost.findAll();
+
+        if (jobPosts.length === 0) {
+            return generateResponse(res, 404, 'No job posts found');
+        }
+
+        return generateResponse(res, 200, 'Job posts retrieved successfully', { jobPosts });
+    } catch (error) {
+        console.error('Error retrieving job posts:', error);
+        return generateResponse(res, 500, 'Server error', null, error.message);
+    }
+};
+
 module.exports = {
     createJobPost,
+    getEmployerJobPosts,
+    getAllJobPosts,
 };
