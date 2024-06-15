@@ -36,12 +36,16 @@ const EmployerJobPost = sequelize.define('EmployerJobPost', {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
+    salaryFrequency: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
     experience: {
         type: DataTypes.STRING,
         allowNull: false,
     },
     qualification: {
-        type: DataTypes.STRING,
+        type: DataTypes.JSON,
         allowNull: false,
     },
     gender: {
@@ -52,7 +56,7 @@ const EmployerJobPost = sequelize.define('EmployerJobPost', {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    city: {
+    state: {
         type: DataTypes.STRING,
         allowNull: false,
     },
@@ -99,6 +103,11 @@ const EmployerJobPost = sequelize.define('EmployerJobPost', {
     endDate: {
         type: DataTypes.DATEONLY,
         allowNull: false,
+    },
+    createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: sequelize.literal('CURRENT_TIMESTAMP'), 
     }
 }, {
     timestamps: false,

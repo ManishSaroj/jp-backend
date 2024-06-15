@@ -49,6 +49,8 @@ sequelize.sync()
       console.log(`Logout endpoint: ${BASE_URL}/api/logout`);
       console.log(`Candidate Profile endpoint: ${BASE_URL}/api/candidates/profile`);
       console.log(`Candidate Resume endpoints: ${BASE_URL}/api/candidates/resumes`);
+      console.log(`Employer Profile endpoints: ${BASE_URL}/api/employers/profile`);
+      console.log(`Employer JobPost endpoints: ${BASE_URL}/api/employers/getAll-jobposts`);
     });
   })
   .catch((err) => {
