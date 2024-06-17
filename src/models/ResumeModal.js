@@ -1,9 +1,9 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/db.config');
+const { candidateSequelize } = require('../config/db.config');
 const Candidate = require('./CandidateModel');
 
 // Resume Model
-const Resume = sequelize.define('CandidateResume', {
+const Resume = candidateSequelize.define('CandidateResume', {
   resumeId: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -60,7 +60,7 @@ const Resume = sequelize.define('CandidateResume', {
 
 
 // Education Model
-const Education = sequelize.define('CandidateEducation', {
+const Education = candidateSequelize.define('CandidateEducation', {
   educationId: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -113,7 +113,7 @@ const Education = sequelize.define('CandidateEducation', {
 });
 
 // Experience Model
-const Experience = sequelize.define('CandidateExperience', {
+const Experience = candidateSequelize.define('CandidateExperience', {
   experienceId: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -162,7 +162,7 @@ const Experience = sequelize.define('CandidateExperience', {
 });
 
 // Project Model
-const Project = sequelize.define('CandidateProject', {
+const Project = candidateSequelize.define('CandidateProject', {
   projectId: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -199,7 +199,7 @@ const Project = sequelize.define('CandidateProject', {
 });
 
 // Certification Model
-const Certification = sequelize.define('CandidateCertification', {
+const Certification = candidateSequelize.define('CandidateCertification', {
   certificationId: {
     type: DataTypes.INTEGER,
     primaryKey: true,

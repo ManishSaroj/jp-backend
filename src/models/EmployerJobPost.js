@@ -1,8 +1,8 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/db.config');
+const { employerSequelize } = require('../config/db.config');
 const Employer = require('./EmployerModel');
 
-const EmployerJobPost = sequelize.define('EmployerJobPost', {
+const EmployerJobPost = employerSequelize.define('EmployerJobPost', {
     jobpostId: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -107,7 +107,7 @@ const EmployerJobPost = sequelize.define('EmployerJobPost', {
     createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
-        defaultValue: sequelize.literal('CURRENT_TIMESTAMP'), 
+        defaultValue: employerSequelize.literal('CURRENT_TIMESTAMP'), 
     }
 }, {
     timestamps: false,

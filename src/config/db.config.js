@@ -1,32 +1,56 @@
-// config/db.config.js
-
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
-// Create a new Sequelize instance
-const sequelize = new Sequelize(
-  process.env.DB_NAME, 
-  process.env.DB_USER, 
-  process.env.DB_PASSWORD, 
+// Create a new Sequelize instance for the candidate database
+const candidateSequelize = new Sequelize(
+  process.env.CANDIDATE_DB_NAME,
+  process.env.CANDIDATE_DB_USER,
+  process.env.CANDIDATE_DB_PASSWORD,
   {
-    host: process.env.DB_HOST,
-    dialect: process.env.DB_DIALECT,
+    host: process.env.CANDIDATE_DB_HOST,
+    dialect: process.env.CANDIDATE_DB_DIALECT,
     logging: false // Disable logging by default, you can set it to true for debugging
   }
 );
 
-// Test the database connection
-async function testDatabaseConnection() {
+// Create a new Sequelize instance for the employer database
+const employerSequelize = new Sequelize(
+  process.env.EMPLOYER_DB_NAME,
+  process.env.EMPLOYER_DB_USER,
+  process.env.EMPLOYER_DB_PASSWORD,
+  {
+    host: process.env.EMPLOYER_DB_HOST,
+    dialect: process.env.EMPLOYER_DB_DIALECT,
+    logging: false // Disable logging by default, you can set it to true for debugging
+  }
+);
+
+// Test the candidate database connection
+async function testCandidateDatabaseConnection() {
   try {
-    await sequelize.authenticate();
-    console.log('Database connection has been established successfully.');
+    await candidateSequelize.authenticate();
+    console.log('Candidate database connection has been established successfully.');
   } catch (error) {
-    console.error('Unable to connect to the database:', error);
+    console.error('Unable to connect to the candidate database:', error);
   }
 }
 
-// Call the function to test the database connection
-testDatabaseConnection();
+// Test the employer database connection
+async function testEmployerDatabaseConnection() {
+  try {
+    await employerSequelize.authenticate();
+    console.log('Employer database connection has been established successfully.');
+  } catch (error) {
+    console.error('Unable to connect to the employer database:', error);
+  }
+}
 
-// Export the sequelize instance
-module.exports = sequelize;
+// Call the functions to test the database connections
+testCandidateDatabaseConnection();
+testEmployerDatabaseConnection();
+
+// Export the Sequelize instances
+module.exports = {
+  candidateSequelize,
+  employerSequelize
+};
