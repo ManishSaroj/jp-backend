@@ -1,9 +1,9 @@
 // CandidateProfileModel.js
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/db.config');
+const { candidateSequelize } = require('../config/db.config');
 const Candidate = require('./CandidateModel');
 
-const CandidateProfile = sequelize.define('CandidateProfile', {
+const CandidateProfile = candidateSequelize.define('CandidateProfile', {
   profileId: {
     type: DataTypes.INTEGER,
     primaryKey: true,

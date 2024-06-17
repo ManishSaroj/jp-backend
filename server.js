@@ -1,16 +1,13 @@
-// server.js 
-
 require('dotenv').config(); // Load environment variables from .env file
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
-const sequelize = require('./src/config/db.config');
+const { candidateSequelize, employerSequelize } = require('./src/config/db.config'); // Import both Sequelize instances
 const employerRoutes = require('./src/routes/employerRoutes');
 const candidateRoutes = require('./src/routes/candidateRoutes');
 const authRoutes = require('./src/routes/authRoutes'); 
 const logoutRoutes = require('./src/routes/logoutRoutes');
-
 
 const app = express();
 
@@ -28,7 +25,6 @@ app.use('/api/candidates', candidateRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/logout', logoutRoutes); 
 
-
 // Global error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -39,7 +35,8 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 3000; // Use the port defined in .env or default to 3000
 const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
 
-sequelize.sync()
+// Sync both candidate and employer databases
+Promise.all([candidateSequelize.sync(), employerSequelize.sync()])
   .then(() => {
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
@@ -49,6 +46,9 @@ sequelize.sync()
       console.log(`Logout endpoint: ${BASE_URL}/api/logout`);
       console.log(`Candidate Profile endpoint: ${BASE_URL}/api/candidates/profile`);
       console.log(`Candidate Resume endpoints: ${BASE_URL}/api/candidates/resumes`);
+      console.log(`Employer Profile endpoints: ${BASE_URL}/api/employers/profile`);
+      console.log(`Employer JobPost endpoints: ${BASE_URL}/api/employers/getAll-jobposts`);
+      console.log(`Employer Me endpoints: ${BASE_URL}/api/employers/me`);
     });
   })
   .catch((err) => {
