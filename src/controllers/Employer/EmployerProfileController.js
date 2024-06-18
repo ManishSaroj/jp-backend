@@ -25,6 +25,7 @@ const createOrUpdateEmployerProfile = async (req, res) => {
     } = req.body;
 
     const { id: eid } = req.user;
+    let updatedFields;
 
     try {
         const employer = await Employer.findByPk(eid);
@@ -47,11 +48,21 @@ const createOrUpdateEmployerProfile = async (req, res) => {
                 description,
                 linkedin,
                 github,
-                company_logo: req.files['company_logo'] ? req.files['company_logo'][0].buffer : employerProfile.company_logo,
-                company_banner: req.files['company_banner'] ? req.files['company_banner'][0].buffer : employerProfile.company_banner,
+                // company_logo: req.files['company_logo'] ? req.files['company_logo'][0].buffer : employerProfile.company_logo,
+                // company_banner: req.files['company_banner'] ? req.files['company_banner'][0].buffer : employerProfile.company_banner,
             });
 
-            await employer.update({ company_name });
+            if (req.files && req.files['company_logo']) {
+                updatedFields.company_logo = req.files['company_logo'][0].buffer;
+            }
+    
+            if (req.files && req.files['company_banner']) {
+                updatedFields.company_banner = req.files['company_banner'][0].buffer;
+            }
+    
+            await employerProfile.update(updatedFields);
+
+            await employer.update({ company_name, phone_number });
 
             const updatedProfile = await EmployerProfile.findOne({ where: { eid } });
 

@@ -68,7 +68,7 @@ const createOrUpdateCandidateProfile = async (req, res) => {
             });
 
             // Update the candidate_name in the Candidate model
-            await candidate.update({ candidate_name });
+            await candidate.update({ candidate_name, phone_number });
 
             return generateResponse(res, 200, 'Candidate profile updated successfully', { profile: candidateProfile });
         } else {
