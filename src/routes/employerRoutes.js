@@ -7,7 +7,7 @@ const {
  } = require('../controllers/Employer/EmployerController');
 const  checkAuth = require('../middlewares/authMiddleware');
 const { getEmployer, changePassword } = require('../controllers/Employer/getEmployer');
-const { createOrUpdateEmployerProfile, getEmployerProfile } = require('../controllers/Employer/EmployerProfileController');
+const { createOrUpdateEmployerProfile, getEmployerProfile, uploadImages } = require('../controllers/Employer/EmployerProfileController');
 const { createJobPost, getEmployerJobPosts, getAllJobPosts } = require('../controllers/Employer/EmployerJobPost');
 
 const router = express.Router();
@@ -18,7 +18,7 @@ router.get('/verify-email', verifyEmployerEmail);
 router.post('/resend-email', resendVerificationEmail);
 router.get('/me', checkAuth, getEmployer);
 router.post('/change-password', checkAuth, changePassword)
-router.post('/profile',checkAuth, createOrUpdateEmployerProfile);
+router.post('/profile',checkAuth, uploadImages , createOrUpdateEmployerProfile);
 router.get('/get-profile', checkAuth, getEmployerProfile);
 
 router.post('/create-jobpost',checkAuth, createJobPost);

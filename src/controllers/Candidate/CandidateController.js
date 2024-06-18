@@ -1,34 +1,9 @@
 const Candidate = require('../../models/CandidateModel');
 const CandidateProfile = require('../../models/CandidateProfile');
 const bcrypt = require('bcryptjs');
-const crypto = require('crypto');
-const jwt = require('jsonwebtoken');
-const transporter = require('../../config/nodemailer.config');
-const { candidateVerificationEmail } = require('../../emailTemplates/candidateVerify');
 const { generateResponse } = require('../../utils/responseUtils');
-
-const sendVerificationEmail = async (candidate) => {
-  const verificationToken = crypto.randomBytes(32).toString('hex');
-  const tokenExpiration = new Date(Date.now() + 5 * 60 * 1000); // Token expires in 5 minutes
-  const verificationLink = `${process.env.FRONTEND_BASE_URL}/verify-email?token=${verificationToken}&email=${candidate.email}&userType=candidate`;
-  console.log(verificationLink);
-
-  try {
-    const emailContent = candidateVerificationEmail(candidate.candidate_name, verificationLink); // Get the email template
-
-    await transporter.sendMail({
-      from: `"Aplakaam" <${process.env.EMAIL_USER}>`,
-      to: candidate.email,
-      subject: 'Welcome to Aplakaam - Verify Your Email Address',
-      html: emailContent, // Use the email template content
-    });
-    // Update the candidate's verification token and token expiration in the database
-    await candidate.update({ verificationToken, tokenExpiration });
-  } catch (error) {
-    console.error('Error sending verification email:', error);
-    throw new Error('Failed to send verification email');
-  }
-};
+const { sendVerificationEmail } = require('../../utils/verifyEmailUtils')
+const { generateToken, setTokenCookie } = require('../../utils/jwtUtils');
 
 const registerCandidate = async (req, res) => {
   const { candidate_name, email, password, phone_number, terms_agreed } = req.body;
@@ -57,7 +32,7 @@ const registerCandidate = async (req, res) => {
       phone_number,
     });
 
-    await sendVerificationEmail(newCandidate);
+    await sendVerificationEmail(newCandidate, 'candidate');
 
     generateResponse(res, 201, 'Candidate registered successfully. Verification email sent.', { candidate: newCandidate });
   } catch (error) {
@@ -83,24 +58,13 @@ const loginCandidate = async (req, res) => {
       return generateResponse(res, 400, 'Invalid credentials');
     }
 
-    const token = jwt.sign(
-      {
-        id: candidate.cid,
-        role: 'candidate',
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN }
-    );
-
-    const cookieMaxAge = parseInt(process.env.JWT_COOKIE_EXPIRES_IN, 10) * 1000; // Convert to milliseconds
-
-    res.cookie('sessionToken', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: cookieMaxAge,
-      sameSite: 'strict', // Add this for better security
-      // domain: process.env.COOKIE_DOMAIN,
+    // jwt cookie token for check auth
+    const token = generateToken({
+      id: candidate.cid,
+      role: 'candidate',
     });
+  
+    setTokenCookie(res, token);
 
     generateResponse(res, 200, 'Candidate logged in successfully', { candidate });
   } catch (error) {
@@ -121,7 +85,7 @@ const resendVerificationEmail = async (req, res) => {
       return generateResponse(res, 400, 'Email already verified');
     }
 
-    await sendVerificationEmail(candidate);
+    await sendVerificationEmail(candidate, 'candidate');
 
     generateResponse(res, 200, 'Verification email resent successfully');
   } catch (error) {
