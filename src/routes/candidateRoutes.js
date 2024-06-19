@@ -8,6 +8,7 @@ const {
 } = require('../controllers/Candidate/CandidateController');
 const  checkAuth = require('../middlewares/authMiddleware');
 const { getCandidate, changePassword } = require('../controllers/Candidate/getCandidate');
+const { requestPasswordReset, resetPassword  } = require('../controllers/Candidate/resetPasswordController');
 const { createOrUpdateCandidateProfile, getCandidateProfile } = require('../controllers/Candidate/CandidateProfileController');
 const { createResume, updateResume, deleteResume, getAllResumes, getResumeById, getResumeByCandidateId } = require('../controllers/Candidate/resumeController');
 
@@ -30,6 +31,8 @@ router.get('/resumes', checkAuth, getAllResumes);
 router.get('/resumes/:id', checkAuth, getResumeById);
 router.get('/resumes/:id', checkAuth, getResumeByCandidateId);
 
-
+// Password reset routes
+router.post('/request-password-reset', requestPasswordReset);
+router.post('/reset-password', resetPassword);
 
 module.exports = router;

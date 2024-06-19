@@ -55,6 +55,18 @@ const Employer = employerSequelize.define('Employer', {
     type: DataTypes.DATE,
     allowNull: true,
   },
+  passwordResetToken: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  resetTokenCreatedAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+  passwordResetExpiration: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
 }, {
   timestamps: false,
 });
