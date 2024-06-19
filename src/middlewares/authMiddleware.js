@@ -1,10 +1,11 @@
 // authMiddleware.js
-
+require('dotenv').config();
 const jwt = require('jsonwebtoken');
+const COOKIE_NAME = process.env.COOKIE_NAME || 'sessionToken';
 
 const checkAuth = (req, res, next) => {
   try {
-    const token = req.cookies.sessionToken;
+    const token = req.cookies[COOKIE_NAME];
     if (!token) {
       return res.status(401).json({ success: false, message: "Not authenticated" });
     }

@@ -60,6 +60,14 @@ const EmployerProfile = employerSequelize.define('EmployerProfile', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  company_logo: {
+    type: DataTypes.BLOB('long'),
+    allowNull: true,
+  },
+  company_banner: {
+    type: DataTypes.BLOB('long'),
+    allowNull: true,
+  },
 }, {
   timestamps: false,
 });
