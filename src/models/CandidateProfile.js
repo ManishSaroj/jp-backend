@@ -94,6 +94,14 @@ const CandidateProfile = candidateSequelize.define('CandidateProfile', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  candidate_image: {
+    type: DataTypes.BLOB('long'),
+    allowNull: true,
+  },
+  candidate_banner: {
+    type: DataTypes.BLOB('long'),
+    allowNull: true,
+  },
 }, {
   timestamps: false,
 });

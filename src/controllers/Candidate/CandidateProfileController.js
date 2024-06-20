@@ -3,6 +3,11 @@
 const Candidate = require('../../models/CandidateModel');
 const CandidateProfile = require('../../models/CandidateProfile');
 const { generateResponse } = require('../../utils/responseUtils');
+const multer = require('multer');
+
+// Multer storage configuration
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 const createOrUpdateCandidateProfile = async (req, res) => {
     const {
@@ -27,78 +32,66 @@ const createOrUpdateCandidateProfile = async (req, res) => {
         github
     } = req.body;
 
+    const { id: cid } = req.user;
+
     try {
-        if (!req.user || !req.user.id) {
-            return generateResponse(res, 401, 'Unauthorized: User not authenticated');
-        }
-
-        const cid = req.user.id;
-
-        // Check if the candidate exists
-        const candidate = await Candidate.findOne({ where: { cid } });
+        const candidate = await Candidate.findByPk(cid);
         if (!candidate) {
             return generateResponse(res, 404, 'Candidate not found');
         }
+        
+        let candidateProfile = await CandidateProfile.findOne({ where: { cid }});
 
-        // Check if a profile already exists for this candidate
-        let candidateProfile = await CandidateProfile.findOne({ where: { cid } });
+        const updatedFields = {
+            email,
+            candidate_name,
+            phone_number,
+            website,
+            qualification,
+            languages,
+            jobrole,
+            jobCategory,
+            experience,
+            currentSalary,
+            expectedSalary,
+            age,
+            country,
+            city,
+            pincode,
+            fullAddress,
+            description,
+            linkedIn,
+            github,
+        };
+
+        if (req.files && req.files['candidate_image']) {
+            updatedFields.candidate_image = req.files['candidate_image'][0].buffer;
+        }
+
+        if (req.files && req.files['candidate_banner']) {
+            updatedFields.candidate_banner = req.files['candidate_banner'][0].buffer;
+        }
 
         if (candidateProfile) {
-            // Update the existing profile
-            await candidateProfile.update({
-                email,
-                candidate_name,
-                phone_number,
-                website,
-                qualification,
-                languages,
-                jobrole,
-                jobCategory,
-                experience,
-                currentSalary,
-                expectedSalary,
-                age,
-                country,
-                city,
-                pincode,
-                fullAddress,
-                description,
-                linkedIn,
-                github
-            });
-
-            // Update the candidate_name in the Candidate model
+            await candidateProfile.update(updatedFields);
             await candidate.update({ candidate_name, phone_number });
-
-            return generateResponse(res, 200, 'Candidate profile updated successfully', { profile: candidateProfile });
         } else {
-            // Create a new profile
-            candidateProfile = await CandidateProfile.create({
-                cid,
-                email,
-                candidate_name,
-                phone_number,
-                website,
-                qualification,
-                languages,
-                jobrole,
-                jobCategory,
-                experience,
-                currentSalary,
-                expectedSalary,
-                age,
-                country,
-                city,
-                pincode,
-                fullAddress,
-                description,
-                linkedIn,
-                github
-            });
-            return generateResponse(res, 201, 'Candidate profile created successfully', { profile: candidateProfile });
+            updatedFields.cid = cid;
+            candidateProfile = await CandidateProfile.create(updatedFields);
         }
+
+        const profileData = {
+            ...candidateProfile.toJSON(),
+            candidate_image: candidateProfile.candidate_image ? candidateProfile.candidate_image.toString('base64') : null,
+            candidate_banner: candidateProfile.candidate_banner ? candidateProfile.candidate_banner.toString('base64') : null,
+        };
+
+        const status = candidateProfile.isNewRecord ? 201 : 200;
+        const message = candidateProfile.isNewRecord ? 'Candidate profile created successfully' : 'Candidate profile updated successfully';
+        return generateResponse(res, status, message, { profile: profileData });
+
     } catch (error) {
-        console.error('Error creating/updating candidate profile:', error);
+        console.log('Error creating/updating candidate profile:', error);
         return generateResponse(res, 500, 'Server error', null, error.message);
     }
 };
@@ -117,14 +110,24 @@ const getCandidateProfile = async (req, res) => {
             return generateResponse(res, 404, 'Candidate profile not found');
         }
 
-        return generateResponse(res, 200, 'Candidate profile fetched successfully', { profile: candidateProfile });
+        const profileData = {
+            ...candidateProfile.toJSON(),
+            candidate_image: candidateProfile.candidate_image ? candidateProfile.candidate_image.toString('base64') : null,
+            candidate_banner: candidateProfile.candidate_banner ? candidateProfile.candidate_banner.toString('base64') : null,
+        };
+
+        return generateResponse(res, 200, 'Candidate profile fetched successfully', { profile: profileData });
     } catch (error) {
         console.error('Error fetching candidate profile:', error);
         return generateResponse(res, 500, 'Server error', null, error.message);
     }
 };
 
+// Middleware to handle file uploads for candidate_image and candidate_banner
+const uploadImages = upload.fields([{ name: 'candidate_image', maxCount: 1 }, { name: 'candidate_banner', maxCount: 1 }]);
+
 module.exports = {
     createOrUpdateCandidateProfile,
     getCandidateProfile,
+    uploadImages,
 };
