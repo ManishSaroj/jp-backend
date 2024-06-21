@@ -54,16 +54,16 @@ const CandidateProfile = candidateSequelize.define('CandidateProfile', {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  currentSalary: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  expectedSalary: {
-    type: DataTypes.STRING,
+  dob: {
+    type: DataTypes.DATEONLY, 
     allowNull: true,
   },
   age: {
     type: DataTypes.INTEGER,
+    allowNull: true,
+  },
+  gender : {
+    type: DataTypes.STRING,
     allowNull: true,
   },
   country: {
@@ -82,7 +82,7 @@ const CandidateProfile = candidateSequelize.define('CandidateProfile', {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  description: {
+  aboutme: {
     type: DataTypes.STRING,
     allowNull: true,
   },
@@ -99,6 +99,14 @@ const CandidateProfile = candidateSequelize.define('CandidateProfile', {
     allowNull: true,
   },
   candidate_banner: {
+    type: DataTypes.BLOB('long'),
+    allowNull: true,
+  },
+  resumeFileName : {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  candidate_resume: {
     type: DataTypes.BLOB('long'),
     allowNull: true,
   },

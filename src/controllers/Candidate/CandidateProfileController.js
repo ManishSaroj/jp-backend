@@ -20,16 +20,16 @@ const createOrUpdateCandidateProfile = async (req, res) => {
         jobrole,
         jobCategory,
         experience,
-        currentSalary,
-        expectedSalary,
+        dob,
         age,
+        gender,
         country,
         city,
         pincode,
         fullAddress,
-        description,
+        aboutme,
         linkedIn,
-        github
+        github,
     } = req.body;
 
     const { id: cid } = req.user;
@@ -52,14 +52,14 @@ const createOrUpdateCandidateProfile = async (req, res) => {
             jobrole,
             jobCategory,
             experience,
-            currentSalary,
-            expectedSalary,
+            dob,
             age,
+            gender,
             country,
             city,
             pincode,
             fullAddress,
-            description,
+            aboutme,
             linkedIn,
             github,
         };
@@ -70,6 +70,11 @@ const createOrUpdateCandidateProfile = async (req, res) => {
 
         if (req.files && req.files['candidate_banner']) {
             updatedFields.candidate_banner = req.files['candidate_banner'][0].buffer;
+        }
+
+        if (req.files && req.files['candidate_resume']) {
+            updatedFields.candidate_resume = req.files['candidate_resume'][0].buffer;
+            updatedFields.resumeFileName = req.files['candidate_resume'][0].originalname; // Set resumeFileName from the uploaded file's original name
         }
 
         if (candidateProfile) {
@@ -84,6 +89,8 @@ const createOrUpdateCandidateProfile = async (req, res) => {
             ...candidateProfile.toJSON(),
             candidate_image: candidateProfile.candidate_image ? candidateProfile.candidate_image.toString('base64') : null,
             candidate_banner: candidateProfile.candidate_banner ? candidateProfile.candidate_banner.toString('base64') : null,
+            candidate_resume: candidateProfile.candidate_resume ? candidateProfile.candidate_resume.toString('base64') : null,
+            resumeFileName: candidateProfile.resumeFileName,
         };
 
         const status = candidateProfile.isNewRecord ? 201 : 200;
@@ -114,6 +121,7 @@ const getCandidateProfile = async (req, res) => {
             ...candidateProfile.toJSON(),
             candidate_image: candidateProfile.candidate_image ? candidateProfile.candidate_image.toString('base64') : null,
             candidate_banner: candidateProfile.candidate_banner ? candidateProfile.candidate_banner.toString('base64') : null,
+            candidate_resume: candidateProfile.candidate_resume ? candidateProfile.candidate_resume.toString('base64') : null,
         };
 
         return generateResponse(res, 200, 'Candidate profile fetched successfully', { profile: profileData });
@@ -124,10 +132,10 @@ const getCandidateProfile = async (req, res) => {
 };
 
 // Middleware to handle file uploads for candidate_image and candidate_banner
-const uploadImages = upload.fields([{ name: 'candidate_image', maxCount: 1 }, { name: 'candidate_banner', maxCount: 1 }]);
+const uploadFiles = upload.fields([{ name: 'candidate_image', maxCount: 1 }, { name: 'candidate_banner', maxCount: 1 }, { name: 'candidate_resume', maxCount: 1 }]);
 
 module.exports = {
     createOrUpdateCandidateProfile,
     getCandidateProfile,
-    uploadImages,
+    uploadFiles,
 };
