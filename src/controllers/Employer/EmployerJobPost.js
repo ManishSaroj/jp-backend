@@ -17,8 +17,6 @@ const createJobPost = async (req, res) => {
         state,
         location,
         email,
-        website,
-        estSince,
         completeAddress,
         skills,
         description,
@@ -57,8 +55,6 @@ const createJobPost = async (req, res) => {
             state,
             location,
             email,
-            website,
-            estSince,
             completeAddress,
             skills,
             description,
@@ -77,24 +73,17 @@ const createJobPost = async (req, res) => {
 
 const getEmployerJobPosts = async (req, res) => {
     try {
-        // Check if the user is authenticated and get the employer ID
         if (!req.user || !req.user.id) {
             return generateResponse(res, 401, 'Unauthorized: User not authenticated');
         }
 
         const eid = req.user.id;
 
-        // Check if the employer exists
-        const employer = await Employer.findOne({ where: { eid } });
-        if (!employer) {
-            return generateResponse(res, 404, 'Employer not found');
-        }
-
         // Retrieve job posts for the employer
         const jobPosts = await EmployerJobPost.findAll({ where: { eid } });
 
         if (jobPosts.length === 0) {
-            return generateResponse(res, 404, 'No job posts found for this employer');
+            return generateResponse(res, 404, 'No Job Posts found for this employer');
         }
 
         return generateResponse(res, 200, 'Job posts retrieved successfully', { jobPosts });

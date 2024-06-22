@@ -131,11 +131,32 @@ const getCandidateProfile = async (req, res) => {
     }
 };
 
+const getAllCandidateProfiles = async (req, res) => {
+    try {
+        // Fetch all candidate profiles
+        const candidateProfiles = await CandidateProfile.findAll();
+
+        // Prepare profiles data to include base64 encoded images if available
+        const profilesData = candidateProfiles.map(profile => ({
+            ...profile.toJSON(),
+            candidate_image: profile.candidate_image ? profile.candidate_image.toString('base64') : null,
+            candidate_banner: profile.candidate_banner ? profile.candidate_banner.toString('base64') : null,
+            candidate_resume: profile.candidate_resume ? profile.candidate_resume.toString('base64') : null,
+        }));
+
+        return generateResponse(res, 200, 'All candidate profiles fetched successfully', { profiles: profilesData });
+    } catch (error) {
+        console.error('Error fetching all candidate profiles:', error);
+        return generateResponse(res, 500, 'Server error', null, error.message);
+    }
+};
+
 // Middleware to handle file uploads for candidate_image and candidate_banner
 const uploadFiles = upload.fields([{ name: 'candidate_image', maxCount: 1 }, { name: 'candidate_banner', maxCount: 1 }, { name: 'candidate_resume', maxCount: 1 }]);
 
 module.exports = {
     createOrUpdateCandidateProfile,
     getCandidateProfile,
+    getAllCandidateProfiles,
     uploadFiles,
 };

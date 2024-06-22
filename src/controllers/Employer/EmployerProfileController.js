@@ -13,13 +13,16 @@ const createOrUpdateEmployerProfile = async (req, res) => {
         company_name,
         phone_number,
         company_website,
+        staffSize,
         country,
         city,
         pincode,
+        estSince,
         full_address,
         description,
         linkedin,
         github,
+        instagram,
     } = req.body;
 
     const { id: eid } = req.user;
@@ -37,13 +40,16 @@ const createOrUpdateEmployerProfile = async (req, res) => {
             company_name,
             phone_number,
             company_website,
+            staffSize,
             country,
             city,
             pincode,
+            estSince,
             full_address,
             description,
             linkedin,
             github,
+            instagram,
         };
 
         if (req.files && req.files['company_logo']) {

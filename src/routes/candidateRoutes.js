@@ -9,7 +9,7 @@ const {
 const  checkAuth = require('../middlewares/authMiddleware');
 const { getCandidate, changePassword } = require('../controllers/Candidate/getCandidate');
 const { requestPasswordReset, resetPassword  } = require('../controllers/Candidate/resetPasswordController');
-const { createOrUpdateCandidateProfile, getCandidateProfile, uploadFiles } = require('../controllers/Candidate/CandidateProfileController');
+const { createOrUpdateCandidateProfile, getCandidateProfile, uploadFiles, getAllCandidateProfiles } = require('../controllers/Candidate/CandidateProfileController');
 const { createResume, updateResume, deleteResume, getAllResumes, getResumeById, getResumeByCandidateId } = require('../controllers/Candidate/resumeController');
 
 const router = express.Router();
@@ -22,6 +22,9 @@ router.get('/me', checkAuth, getCandidate);
 router.post('/change-password', checkAuth, changePassword)
 router.post('/profile',checkAuth, uploadFiles, createOrUpdateCandidateProfile);
 router.get('/get-profile', checkAuth, getCandidateProfile);
+
+// New route for fetching all candidate profiles
+router.get('/getAll-candidates', getAllCandidateProfiles);
 
 // Resume routes
 router.post('/resumes', checkAuth, createResume);

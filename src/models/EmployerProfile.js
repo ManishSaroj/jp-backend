@@ -32,6 +32,10 @@ const EmployerProfile = employerSequelize.define('EmployerProfile', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  staffSize: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   country: {
     type: DataTypes.STRING,
     allowNull: true,
@@ -41,6 +45,10 @@ const EmployerProfile = employerSequelize.define('EmployerProfile', {
     allowNull: true,
   },
   pincode: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  estSince: {
     type: DataTypes.STRING,
     allowNull: true,
   },
@@ -57,6 +65,10 @@ const EmployerProfile = employerSequelize.define('EmployerProfile', {
     allowNull: true,
   },
   github: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  instagram: {
     type: DataTypes.STRING,
     allowNull: true,
   },

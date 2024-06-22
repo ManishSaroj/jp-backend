@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const { employerSequelize } = require('../config/db.config');
 const Employer = require('./EmployerModel');
+const EmployerProfile = require('./EmployerProfile');
 
 const EmployerJobPost = employerSequelize.define('EmployerJobPost', {
     jobpostId: {
@@ -68,14 +69,6 @@ const EmployerJobPost = employerSequelize.define('EmployerJobPost', {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    website: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    estSince: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-    },
     completeAddress: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -115,5 +108,6 @@ const EmployerJobPost = employerSequelize.define('EmployerJobPost', {
 
 Employer.hasMany(EmployerJobPost, { foreignKey: 'eid' });
 EmployerJobPost.belongsTo(Employer, { foreignKey: 'eid' });
+EmployerJobPost.belongsTo(EmployerProfile, { foreignKey: 'eid' });
 
 module.exports = EmployerJobPost;
