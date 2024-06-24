@@ -27,6 +27,7 @@ const createOrUpdateCandidateProfile = async (req, res) => {
         city,
         pincode,
         fullAddress,
+        skills,
         aboutme,
         linkedIn,
         github,
@@ -59,6 +60,7 @@ const createOrUpdateCandidateProfile = async (req, res) => {
             city,
             pincode,
             fullAddress,
+            skills,
             aboutme,
             linkedIn,
             github,
@@ -99,6 +101,26 @@ const createOrUpdateCandidateProfile = async (req, res) => {
 
     } catch (error) {
         console.log('Error creating/updating candidate profile:', error);
+        return generateResponse(res, 500, 'Server error', null, error.message);
+    }
+};
+
+const updateLookingForJobStatus = async (req, res) => {
+    const { lookingForJobs } = req.body;
+    const { id: cid } = req.user;
+
+    try {
+        const candidateProfile = await CandidateProfile.findOne({ where: { cid } });
+
+        if (!candidateProfile) {
+            return generateResponse(res, 404, 'Candidate profile not found');
+        }
+
+        await candidateProfile.update({ lookingForJobs });
+
+        return generateResponse(res, 200, 'Looking for job status updated successfully', { lookingForJobs });
+    } catch (error) {
+        console.error('Error updating looking for job status:', error);
         return generateResponse(res, 500, 'Server error', null, error.message);
     }
 };
@@ -156,6 +178,7 @@ const uploadFiles = upload.fields([{ name: 'candidate_image', maxCount: 1 }, { n
 
 module.exports = {
     createOrUpdateCandidateProfile,
+    updateLookingForJobStatus,
     getCandidateProfile,
     getAllCandidateProfiles,
     uploadFiles,

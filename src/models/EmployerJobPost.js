@@ -97,13 +97,23 @@ const EmployerJobPost = employerSequelize.define('EmployerJobPost', {
         type: DataTypes.DATEONLY,
         allowNull: false,
     },
+    postedDate: {
+        type: DataTypes.DATEONLY,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+    },
     createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: employerSequelize.literal('CURRENT_TIMESTAMP'), 
-    }
+    },
+    updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: employerSequelize.literal('CURRENT_TIMESTAMP'),
+    },
 }, {
-    timestamps: false,
+    timestamps: true,
 });
 
 Employer.hasMany(EmployerJobPost, { foreignKey: 'eid' });
