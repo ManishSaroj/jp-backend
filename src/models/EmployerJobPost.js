@@ -61,7 +61,7 @@ const EmployerJobPost = employerSequelize.define('EmployerJobPost', {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    location: {
+    city: {
         type: DataTypes.STRING,
         allowNull: false,
     },
@@ -69,7 +69,7 @@ const EmployerJobPost = employerSequelize.define('EmployerJobPost', {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    completeAddress: {
+    jobAddress: {
         type: DataTypes.STRING,
         allowNull: false,
     },

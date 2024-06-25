@@ -33,16 +33,18 @@ const getAllJobPosts = async (req, res) => {
             gender: job.gender,
             country: job.country,
             state: job.state,
-            location: job.location,
+            city: job.city,
             email: job.email,
-            completeAddress: job.completeAddress,
+            jobAddress: job.jobAddress,
             skills: job.skills,
             description: job.description,
             jobReq: job.jobReq,
             jobRes: job.jobRes,
             startDate: job.startDate,
             endDate: job.endDate,
+            postedDate: job.postedDate,
             createdAt: job.createdAt,
+            updatedAt: job.updatedAt,
             // Include all EmployerProfile data
             EmployerProfile: job.Employer.EmployerProfile 
                 ? {
@@ -95,16 +97,18 @@ const getJobPostById = async (req, res) => {
             gender: jobPost.gender,
             country: jobPost.country,
             state: jobPost.state,
-            location: jobPost.location,
+            city: jobPost.city,
             email: jobPost.email,
-            completeAddress: jobPost.completeAddress,
+            jobAddress: jobPost.jobAddress,
             skills: jobPost.skills,
             description: jobPost.description,
             jobReq: jobPost.jobReq,
             jobRes: jobPost.jobRes,
             startDate: jobPost.startDate,
             endDate: jobPost.endDate,
+            postedDate: jobPost.postedDate,
             createdAt: jobPost.createdAt,
+            updatedAt: jobPost.updatedAt,
             // Include all fields from EmployerProfile
             EmployerProfile: jobPost.Employer.EmployerProfile 
                 ? {
