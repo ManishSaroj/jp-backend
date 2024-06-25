@@ -2,6 +2,7 @@ const EmployerJobPost = require('../../models/EmployerJobPost');
 const EmployerProfile = require('../../models/EmployerProfile');
 const Employer = require('../../models/EmployerModel');
 const { generateResponse } = require('../../utils/responseUtils');
+const { calculatePostedDateTimeline, formatDate } = require('../../utils/dateUtils');
 
 const getAllJobPosts = async (req, res) => {
     try {
@@ -45,6 +46,9 @@ const getAllJobPosts = async (req, res) => {
             postedDate: job.postedDate,
             createdAt: job.createdAt,
             updatedAt: job.updatedAt,
+            endDateTimeline: formatDate(job.endDate),
+            datePosted: formatDate(job.postedDate),
+            postedTimeline: calculatePostedDateTimeline(job.createdAt), // Add timeline
             // Include all EmployerProfile data
             EmployerProfile: job.Employer.EmployerProfile 
                 ? {
@@ -109,6 +113,9 @@ const getJobPostById = async (req, res) => {
             postedDate: jobPost.postedDate,
             createdAt: jobPost.createdAt,
             updatedAt: jobPost.updatedAt,
+            endDateTimeline: formatDate(jobPost.endDate),
+            datePosted: formatDate(jobPost.postedDate),
+            postedTimeline: calculatePostedDateTimeline(jobPost.createdAt), // Add timeline
             // Include all fields from EmployerProfile
             EmployerProfile: jobPost.Employer.EmployerProfile 
                 ? {
