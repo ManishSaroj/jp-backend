@@ -29,4 +29,5 @@ router.get('/get-employer-jobposts', checkAuth, getEmployerJobPosts);
 router.post('/request-password-reset', requestPasswordReset);
 router.post('/reset-password', resetPassword);
 
+
 module.exports = router;

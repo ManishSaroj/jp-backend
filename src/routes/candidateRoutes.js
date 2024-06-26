@@ -11,7 +11,7 @@ const { getCandidate, changePassword } = require('../controllers/Candidate/getCa
 const { requestPasswordReset, resetPassword  } = require('../controllers/Candidate/resetPasswordController');
 const { createOrUpdateCandidateProfile, updateLookingForJobStatus, getCandidateProfile, uploadFiles, getAllCandidateProfiles } = require('../controllers/Candidate/CandidateProfileController');
 const { createResume, updateResume, deleteResume, getAllResumes, getResumeById, getResumeByCandidateId } = require('../controllers/Candidate/resumeController');
-const { getAllJobPosts, getJobPostById } = require('../controllers/Candidate/getAllJobPosts');
+const { getAllJobPosts, getJobPostById, applyForJob, getAppliedJobsForCandidate } = require('../controllers/Candidate/getAllJobPosts');
 
 const router = express.Router();
 
@@ -40,7 +40,9 @@ router.get('/resumes/:id', checkAuth, getResumeByCandidateId);
 router.post('/request-password-reset', requestPasswordReset);
 router.post('/reset-password', resetPassword);
 
-router.get('/getAll-jobposts', getAllJobPosts);
-router.get('/get-jobpost/:jobpostId', getJobPostById);
+router.get('/getAll-jobposts',checkAuth, getAllJobPosts);
+router.get('/get-jobpost/:jobpostId',checkAuth, getJobPostById);
+router.post('/apply-for-job', checkAuth, applyForJob);
+router.get('/jobposts/applied', checkAuth, getAppliedJobsForCandidate); 
 
 module.exports = router;

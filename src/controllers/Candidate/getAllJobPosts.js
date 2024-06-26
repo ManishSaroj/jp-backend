@@ -1,6 +1,8 @@
 const EmployerJobPost = require('../../models/EmployerJobPost');
 const EmployerProfile = require('../../models/EmployerProfile');
 const Employer = require('../../models/EmployerModel');
+const JobApplication = require('../../models/JobApplication');
+const CandidateProfile = require('../../models/CandidateProfile');
 const { generateResponse } = require('../../utils/responseUtils');
 const { calculatePostedDateTimeline, formatDate } = require('../../utils/dateUtils');
 
@@ -9,9 +11,7 @@ const getAllJobPosts = async (req, res) => {
         const jobPosts = await EmployerJobPost.findAll({
             include: [{
                 model: Employer,
-                include: [{
-                    model: EmployerProfile
-                }]
+                include: [EmployerProfile]
             }]
         });
 
@@ -19,48 +19,9 @@ const getAllJobPosts = async (req, res) => {
             return generateResponse(res, 404, 'No job posts found');
         }
 
-        // Map job posts to format the response
         const formattedJobPosts = jobPosts.map(job => ({
-            jobpostId: job.jobpostId,
-            eid: job.eid,
-            jobTitle: job.jobTitle,
-            jobCategory: job.jobCategory,
-            jobType: job.jobType,
-            minSalary: job.minSalary,
-            maxSalary: job.maxSalary,
-            salaryFrequency: job.salaryFrequency,
-            experience: job.experience,
-            qualification: job.qualification,
-            gender: job.gender,
-            country: job.country,
-            state: job.state,
-            city: job.city,
-            email: job.email,
-            jobAddress: job.jobAddress,
-            skills: job.skills,
-            description: job.description,
-            jobReq: job.jobReq,
-            jobRes: job.jobRes,
-            startDate: job.startDate,
-            endDate: job.endDate,
-            postedDate: job.postedDate,
-            createdAt: job.createdAt,
-            updatedAt: job.updatedAt,
-            endDateTimeline: formatDate(job.endDate),
-            datePosted: formatDate(job.postedDate),
-            postedTimeline: calculatePostedDateTimeline(job.createdAt), // Add timeline
-            // Include all EmployerProfile data
-            EmployerProfile: job.Employer.EmployerProfile 
-                ? {
-                    ...job.Employer.EmployerProfile.toJSON(),
-                    company_logo: job.Employer.EmployerProfile.company_logo 
-                        ? job.Employer.EmployerProfile.company_logo.toString('base64') 
-                        : null,
-                    company_banner: job.Employer.EmployerProfile.company_banner 
-                        ? job.Employer.EmployerProfile.company_banner.toString('base64') 
-                        : null,
-                  }
-                : null,
+            ...formatJobPostResponse(job),
+            EmployerProfile: formatEmployerProfile(job.Employer.EmployerProfile)
         }));
 
         return generateResponse(res, 200, 'Job posts retrieved successfully', { jobPosts: formattedJobPosts });
@@ -71,63 +32,22 @@ const getAllJobPosts = async (req, res) => {
 };
 
 const getJobPostById = async (req, res) => {
-    const { jobpostId } = req.params; // Assuming jobpostId is passed in the request params
+    const { jobpostId } = req.params;
+    const { profileId } = req.query;
+
     try {
-        const jobPost = await EmployerJobPost.findByPk(jobpostId, {
-            include: [{
-                model: Employer,
-                include: [{
-                    model: EmployerProfile
-                }]
-            }]
-        });
+        const jobPost = await findJobPostById(jobpostId);
 
         if (!jobPost) {
             return generateResponse(res, 404, 'Job post not found');
         }
 
-        // Format the response
+        const hasApplied = profileId ? await hasCandidateApplied(profileId, jobpostId) : false;
+
         const formattedJobPost = {
-            jobpostId: jobPost.jobpostId,
-            eid: jobPost.eid,
-            jobTitle: jobPost.jobTitle,
-            jobCategory: jobPost.jobCategory,
-            jobType: jobPost.jobType,
-            minSalary: jobPost.minSalary,
-            maxSalary: jobPost.maxSalary,
-            salaryFrequency: jobPost.salaryFrequency,
-            experience: jobPost.experience,
-            qualification: jobPost.qualification,
-            gender: jobPost.gender,
-            country: jobPost.country,
-            state: jobPost.state,
-            city: jobPost.city,
-            email: jobPost.email,
-            jobAddress: jobPost.jobAddress,
-            skills: jobPost.skills,
-            description: jobPost.description,
-            jobReq: jobPost.jobReq,
-            jobRes: jobPost.jobRes,
-            startDate: jobPost.startDate,
-            endDate: jobPost.endDate,
-            postedDate: jobPost.postedDate,
-            createdAt: jobPost.createdAt,
-            updatedAt: jobPost.updatedAt,
-            endDateTimeline: formatDate(jobPost.endDate),
-            datePosted: formatDate(jobPost.postedDate),
-            postedTimeline: calculatePostedDateTimeline(jobPost.createdAt), // Add timeline
-            // Include all fields from EmployerProfile
-            EmployerProfile: jobPost.Employer.EmployerProfile 
-                ? {
-                    ...jobPost.Employer.EmployerProfile.toJSON(),
-                    company_logo: jobPost.Employer.EmployerProfile.company_logo 
-                        ? jobPost.Employer.EmployerProfile.company_logo.toString('base64') 
-                        : null,
-                    company_banner: jobPost.Employer.EmployerProfile.company_banner 
-                        ? jobPost.Employer.EmployerProfile.company_banner.toString('base64') 
-                        : null,
-                  }
-                : null,
+            ...formatJobPostResponse(jobPost),
+            EmployerProfile: formatEmployerProfile(jobPost.Employer.EmployerProfile),
+            hasApplied
         };
 
         return generateResponse(res, 200, 'Job post retrieved successfully', { jobPost: formattedJobPost });
@@ -137,7 +57,173 @@ const getJobPostById = async (req, res) => {
     }
 };
 
+const applyForJob = async (req, res) => {
+    const { candidateProfileId, jobpostId, employerProfileId } = req.body;
+
+    try {
+        const existingApplication = await JobApplication.findOne({
+            where: { candidateProfileId, jobpostId }
+        });
+
+        if (existingApplication) {
+            return generateResponse(res, 400, 'You have already applied for this job');
+        }
+
+        await validateEntitiesExist(jobpostId, employerProfileId, candidateProfileId);
+
+        const jobApplication = await JobApplication.create({
+            candidateProfileId,
+            jobpostId,
+            employerProfileId,
+            status: 'Applied',
+            appliedDate: new Date()
+        });
+
+        return generateResponse(res, 201, 'Job application submitted successfully', { jobApplication });
+    } catch (error) {
+        console.error('Error applying for job:', error);
+        return generateResponse(res, 500, 'Server error', null, error.message);
+    }
+};
+
+const getAppliedJobsForCandidate = async (req, res) => {
+    const { profileId } = req.query;
+
+    try {
+        const appliedJobs = await JobApplication.findAll({
+            where: { candidateProfileId: profileId },
+            include: [{
+                model: EmployerJobPost,
+                include: [{
+                    model: Employer,
+                    include: [EmployerProfile] // Include employer profile here
+                }]
+            }]
+        });
+
+        if (appliedJobs.length === 0) {
+            return generateResponse(res, 404, 'No applied jobs found');
+        }
+
+        const formattedAppliedJobs = [];
+        for (const jobApplication of appliedJobs) {
+            try {
+                const jobPost = await findJobPostById(jobApplication.jobpostId);
+                if (!jobPost) {
+                    throw new Error(`Job post with id ${jobApplication.jobpostId} not found`);
+                }
+
+                const employerProfile = jobApplication.EmployerJobPost.Employer.EmployerProfile;
+                const formattedJobApplication = {
+                    jobApplicationId: jobApplication.applicationId,
+                    jobpostId: jobApplication.jobpostId,
+                    jobTitle: jobApplication.EmployerJobPost.jobTitle,
+                    employerName: jobApplication.EmployerJobPost.Employer.companyName,
+                    appliedDate: jobApplication.appliedDate,
+                    status: jobApplication.status,
+                    jobPost: {
+                        ...formatJobPostResponse(jobPost),
+                        EmployerProfile: formatEmployerProfile(employerProfile)
+                    }
+                };
+
+                formattedAppliedJobs.push(formattedJobApplication);
+            } catch (error) {
+                console.error('Error formatting applied job:', error);
+            }
+        }
+
+        return generateResponse(res, 200, 'Applied jobs retrieved successfully', { appliedJobs: formattedAppliedJobs });
+    } catch (error) {
+        console.error('Error retrieving applied jobs:', error);
+        return generateResponse(res, 500, 'Server error', null, error.message);
+    }
+};
+
+
+
+
+
+
+// Helper functions
+
+async function findJobPostById(jobpostId) {
+    return await EmployerJobPost.findByPk(jobpostId, {
+        include: [{
+            model: Employer,
+            include: [EmployerProfile]
+        }]
+    });
+}
+
+async function hasCandidateApplied(profileId, jobpostId) {
+    const existingApplication = await JobApplication.findOne({
+        where: { candidateProfileId: profileId, jobpostId }
+    });
+    return !!existingApplication;
+}
+
+function formatJobPostResponse(jobPost) {
+    return {
+        jobpostId: jobPost.jobpostId,
+        eid: jobPost.eid,
+        jobTitle: jobPost.jobTitle,
+        jobCategory: jobPost.jobCategory,
+        jobType: jobPost.jobType,
+        minSalary: jobPost.minSalary,
+        maxSalary: jobPost.maxSalary,
+        salaryFrequency: jobPost.salaryFrequency,
+        experience: jobPost.experience,
+        qualification: jobPost.qualification,
+        gender: jobPost.gender,
+        country: jobPost.country,
+        state: jobPost.state,
+        city: jobPost.city,
+        email: jobPost.email,
+        jobAddress: jobPost.jobAddress,
+        skills: jobPost.skills,
+        description: jobPost.description,
+        jobReq: jobPost.jobReq,
+        jobRes: jobPost.jobRes,
+        startDate: jobPost.startDate,
+        endDate: jobPost.endDate,
+        postedDate: jobPost.postedDate,
+        createdAt: jobPost.createdAt,
+        updatedAt: jobPost.updatedAt,
+        endDateTimeline: formatDate(jobPost.endDate),
+        datePosted: formatDate(jobPost.postedDate),
+        postedTimeline: calculatePostedDateTimeline(jobPost.createdAt)
+    };
+}
+
+function formatEmployerProfile(employerProfile) {
+    return employerProfile ? {
+        ...employerProfile.toJSON(),
+        company_logo: employerProfile.company_logo ? employerProfile.company_logo.toString('base64') : null,
+        company_banner: employerProfile.company_banner ? employerProfile.company_banner.toString('base64') : null
+    } : null;
+}
+
+async function validateEntitiesExist(jobpostId, employerProfileId, candidateProfileId) {
+    const jobPost = await EmployerJobPost.findByPk(jobpostId);
+    if (!jobPost) {
+        throw new Error('Job post not found');
+    }
+
+    const employerProfile = await EmployerProfile.findByPk(employerProfileId);
+    if (!employerProfile) {
+        throw new Error('Employer profile not found');
+    }
+
+    const candidateProfile = await CandidateProfile.findByPk(candidateProfileId);
+    if (!candidateProfile) {
+        throw new Error('Candidate profile not found');
+    }
+}
+
 module.exports = {
     getAllJobPosts,
     getJobPostById,
+    applyForJob,
+    getAppliedJobsForCandidate,
 };
