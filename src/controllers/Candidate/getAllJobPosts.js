@@ -5,6 +5,7 @@ const JobApplication = require('../../models/JobApplication');
 const CandidateProfile = require('../../models/CandidateProfile');
 const { generateResponse } = require('../../utils/responseUtils');
 const { calculatePostedDateTimeline, formatDate } = require('../../utils/dateUtils');
+const { employerSequelize } = require('../../config/db.config')
 
 const getAllJobPosts = async (req, res) => {
     try {
@@ -71,15 +72,28 @@ const applyForJob = async (req, res) => {
 
         await validateEntitiesExist(jobpostId, employerProfileId, candidateProfileId);
 
-        const jobApplication = await JobApplication.create({
-            candidateProfileId,
-            jobpostId,
-            employerProfileId,
-            status: 'Applied',
-            appliedDate: new Date()
+        // Start a transaction
+        const result = await employerSequelize.transaction(async (t) => {
+            // Create the job application
+            const jobApplication = await JobApplication.create({
+                candidateProfileId,
+                jobpostId,
+                employerProfileId,
+                status: 'Applied',
+                appliedDate: new Date()
+            }, { transaction: t });
+
+            // Increment the appliedCandidatesCount
+            await EmployerJobPost.increment('appliedCandidatesCount', {
+                by: 1,
+                where: { jobpostId },
+                transaction: t
+            });
+
+            return jobApplication;
         });
 
-        return generateResponse(res, 201, 'Job application submitted successfully', { jobApplication });
+        return generateResponse(res, 201, 'Job application submitted successfully', { jobApplication: result });
     } catch (error) {
         console.error('Error applying for job:', error);
         return generateResponse(res, 500, 'Server error', null, error.message);
