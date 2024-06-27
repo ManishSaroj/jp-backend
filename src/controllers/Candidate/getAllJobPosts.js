@@ -119,7 +119,7 @@ const getAppliedJobsForCandidate = async (req, res) => {
                     jobpostId: jobApplication.jobpostId,
                     jobTitle: jobApplication.EmployerJobPost.jobTitle,
                     employerName: jobApplication.EmployerJobPost.Employer.companyName,
-                    appliedDate: jobApplication.appliedDate,
+                    appliedDate: formatDate(jobApplication.appliedDate),
                     status: jobApplication.status,
                     jobPost: {
                         ...formatJobPostResponse(jobPost),
