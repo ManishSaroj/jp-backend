@@ -55,14 +55,14 @@ const CandidateProfile = candidateSequelize.define('CandidateProfile', {
     allowNull: true,
   },
   dob: {
-    type: DataTypes.DATEONLY, 
+    type: DataTypes.DATEONLY,
     allowNull: true,
   },
   age: {
     type: DataTypes.INTEGER,
     allowNull: true,
   },
-  gender : {
+  gender: {
     type: DataTypes.STRING,
     allowNull: true,
   },
@@ -80,6 +80,10 @@ const CandidateProfile = candidateSequelize.define('CandidateProfile', {
   },
   fullAddress: {
     type: DataTypes.STRING,
+    allowNull: true,
+  },
+  skills: {
+    type: DataTypes.JSON,
     allowNull: true,
   },
   aboutme: {
@@ -102,13 +106,18 @@ const CandidateProfile = candidateSequelize.define('CandidateProfile', {
     type: DataTypes.BLOB('long'),
     allowNull: true,
   },
-  resumeFileName : {
+  resumeFileName: {
     type: DataTypes.STRING,
     allowNull: true,
   },
   candidate_resume: {
     type: DataTypes.BLOB('long'),
     allowNull: true,
+  },
+  lookingForJobs: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false, // Default value can be true or false based on your requirement
   },
 }, {
   timestamps: false,

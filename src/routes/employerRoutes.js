@@ -9,8 +9,7 @@ const  checkAuth = require('../middlewares/authMiddleware');
 const { getEmployer, changePassword } = require('../controllers/Employer/getEmployer');
 const { requestPasswordReset, resetPassword } = require('../controllers/Employer/resetPasswordController');
 const { createOrUpdateEmployerProfile, getEmployerProfile, uploadImages } = require('../controllers/Employer/EmployerProfileController');
-const { createJobPost, getEmployerJobPosts } = require('../controllers/Employer/EmployerJobPost');
-const { getAllJobPosts, getJobPostById } = require('../controllers/Employer/getAllJobPosts');
+const { createJobPost, getEmployerJobPosts, getJobPostById } = require('../controllers/Employer/EmployerJobPost');
 
 const router = express.Router();
 
@@ -25,11 +24,11 @@ router.get('/get-profile', checkAuth, getEmployerProfile);
 
 router.post('/create-jobpost',checkAuth, createJobPost);
 router.get('/get-employer-jobposts', checkAuth, getEmployerJobPosts);
-router.get('/getAll-jobposts', getAllJobPosts);
-router.get('/get-jobpost/:jobpostId', getJobPostById);
+router.get('/jobpost/:jobpostId', checkAuth, getJobPostById);
 
 // Password reset routes
 router.post('/request-password-reset', requestPasswordReset);
 router.post('/reset-password', resetPassword);
+
 
 module.exports = router;

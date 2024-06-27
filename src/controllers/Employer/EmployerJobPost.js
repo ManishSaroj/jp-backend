@@ -15,9 +15,9 @@ const createJobPost = async (req, res) => {
         gender,
         country,
         state,
-        location,
+        city,
         email,
-        completeAddress,
+        jobAddress,
         skills,
         description,
         jobReq,
@@ -53,9 +53,9 @@ const createJobPost = async (req, res) => {
             gender,
             country,
             state,
-            location,
+            city,
             email,
-            completeAddress,
+            jobAddress,
             skills,
             description,
             jobReq,
@@ -109,8 +109,34 @@ const getAllJobPosts = async (req, res) => {
     }
 };
 
+const getJobPostById = async (req, res) => {
+    try {
+        if (!req.user || !req.user.id) {
+            return generateResponse(res, 401, 'Unauthorized: User not authenticated');
+        }
+
+        const { jobpostId } = req.params;
+        const eid = req.user.id;
+
+        // Retrieve job post by id and employer id
+        const jobPost = await EmployerJobPost.findOne({ 
+            where: { jobpostId, eid }
+        });
+
+        if (!jobPost) {
+            return generateResponse(res, 404, 'Job post not found');
+        }
+
+        return generateResponse(res, 200, 'Job post retrieved successfully', { jobPost });
+    } catch (error) {
+        console.error('Error retrieving job post:', error);
+        return generateResponse(res, 500, 'Server error', null, error.message);
+    }
+};
+
 module.exports = {
     createJobPost,
     getEmployerJobPosts,
     getAllJobPosts,
+    getJobPostById
 };

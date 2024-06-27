@@ -17,6 +17,11 @@ const EmployerJobPost = employerSequelize.define('EmployerJobPost', {
             key: 'eid',
         },
     },
+    appliedCandidatesCount: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+    },
     jobTitle: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -61,7 +66,7 @@ const EmployerJobPost = employerSequelize.define('EmployerJobPost', {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    location: {
+    city: {
         type: DataTypes.STRING,
         allowNull: false,
     },
@@ -69,7 +74,7 @@ const EmployerJobPost = employerSequelize.define('EmployerJobPost', {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    completeAddress: {
+    jobAddress: {
         type: DataTypes.STRING,
         allowNull: false,
     },
@@ -97,13 +102,23 @@ const EmployerJobPost = employerSequelize.define('EmployerJobPost', {
         type: DataTypes.DATEONLY,
         allowNull: false,
     },
+    postedDate: {
+        type: DataTypes.DATEONLY,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+    },
     createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
         defaultValue: employerSequelize.literal('CURRENT_TIMESTAMP'), 
-    }
+    },
+    updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: employerSequelize.literal('CURRENT_TIMESTAMP'),
+    },
 }, {
-    timestamps: false,
+    timestamps: true,
 });
 
 Employer.hasMany(EmployerJobPost, { foreignKey: 'eid' });
