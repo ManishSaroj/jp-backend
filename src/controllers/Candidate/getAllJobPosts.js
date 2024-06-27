@@ -4,7 +4,7 @@ const Employer = require('../../models/EmployerModel');
 const JobApplication = require('../../models/JobApplication');
 const CandidateProfile = require('../../models/CandidateProfile');
 const { generateResponse } = require('../../utils/responseUtils');
-const { calculatePostedDateTimeline, formatDate } = require('../../utils/dateUtils');
+const { calculatePostedDateTimeline, formatDate, convertToFormattedDate } = require('../../utils/dateUtils');
 const { employerSequelize } = require('../../config/db.config')
 
 const getAllJobPosts = async (req, res) => {
@@ -187,6 +187,8 @@ function formatJobPostResponse(jobPost) {
         minSalary: jobPost.minSalary,
         maxSalary: jobPost.maxSalary,
         salaryFrequency: jobPost.salaryFrequency,
+        totalOpenings: jobPost.totalOpenings,
+        duration: jobPost.duration,
         experience: jobPost.experience,
         qualification: jobPost.qualification,
         gender: jobPost.gender,
@@ -201,12 +203,12 @@ function formatJobPostResponse(jobPost) {
         jobRes: jobPost.jobRes,
         startDate: jobPost.startDate,
         endDate: jobPost.endDate,
-        postedDate: jobPost.postedDate,
         createdAt: jobPost.createdAt,
         updatedAt: jobPost.updatedAt,
         endDateTimeline: formatDate(jobPost.endDate),
-        datePosted: formatDate(jobPost.postedDate),
-        postedTimeline: calculatePostedDateTimeline(jobPost.createdAt)
+        datePosted: convertToFormattedDate(jobPost.createdAt),
+        postedTimeline: calculatePostedDateTimeline(jobPost.createdAt),
+         appliedCandidatesCount: jobPost.appliedCandidatesCount 
     };
 }
 
