@@ -46,6 +46,14 @@ const EmployerJobPost = employerSequelize.define('EmployerJobPost', {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    totalOpenings: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    duration: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
     experience: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -87,11 +95,11 @@ const EmployerJobPost = employerSequelize.define('EmployerJobPost', {
         allowNull: false,
     },
     jobReq: {
-        type: DataTypes.JSON,
+        type: DataTypes.TEXT,
         allowNull: false,
     },
     jobRes: {
-        type: DataTypes.JSON,
+        type: DataTypes.TEXT,
         allowNull: false,
     },
     startDate: {
@@ -102,11 +110,11 @@ const EmployerJobPost = employerSequelize.define('EmployerJobPost', {
         type: DataTypes.DATEONLY,
         allowNull: false,
     },
-    postedDate: {
-        type: DataTypes.DATEONLY,
-        allowNull: false,
-        defaultValue: DataTypes.NOW,
-    },
+    // postedDate: {
+    //     type: DataTypes.DATEONLY,
+    //     allowNull: false,
+    //     defaultValue: DataTypes.NOW,
+    // },
     createdAt: {
         type: DataTypes.DATE,
         allowNull: false,

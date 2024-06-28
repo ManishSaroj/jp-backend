@@ -16,8 +16,13 @@ app.use(cors({
   origin: process.env.FRONTEND_BASE_URL, 
   credentials: true,
 }));
-app.use(bodyParser.json());
+// app.use(bodyParser.json());
 app.use(cookieParser());
+
+// Increase the size limit for JSON and URL-encoded data
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+
 
 // Routes
 app.use('/api/employers', employerRoutes);
