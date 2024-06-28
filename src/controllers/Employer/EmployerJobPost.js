@@ -1,5 +1,7 @@
 const Employer = require('../../models/EmployerModel');
 const EmployerJobPost = require('../../models/EmployerJobPost');
+const JobApplication = require('../../models/JobApplication');
+const CandidateProfile = require('../../models/CandidateProfile');
 const { generateResponse } = require('../../utils/responseUtils');
 
 const createJobPost = async (req, res) => {
@@ -138,9 +140,119 @@ const getJobPostById = async (req, res) => {
     }
 };
 
+const updateJobPost = async (req, res) => {
+    try {
+        if (!req.user || !req.user.id) {
+            return generateResponse(res, 401, 'Unauthorized: User not authenticated');
+        }
+
+        const { jobpostId } = req.params;
+        const eid = req.user.id;
+        const updatedData = req.body;
+
+        // Find the job post
+        const jobPost = await EmployerJobPost.findOne({ 
+            where: { jobpostId, eid }
+        });
+
+        if (!jobPost) {
+            return generateResponse(res, 404, 'Job post not found');
+        }
+
+        // Update the job post
+        await jobPost.update(updatedData);
+
+        return generateResponse(res, 200, 'Job post updated successfully', { jobPost });
+    } catch (error) {
+        console.error('Error updating job post:', error);
+        return generateResponse(res, 500, 'Server error', null, error.message);
+    }
+};
+
+
+// In your employerController.js or similar file
+const getAppliedCandidates = async (req, res) => {
+    try {
+        if (!req.user || !req.user.id) {
+            return generateResponse(res, 401, 'Unauthorized: User not authenticated');
+        }
+
+        const { jobpostId } = req.params;
+        const eid = req.user.id;
+
+        // Fetch the job post to ensure it belongs to the current employer
+        const jobPost = await EmployerJobPost.findOne({ 
+            where: { jobpostId, eid }
+        });
+
+        if (!jobPost) {
+            return generateResponse(res, 404, 'Job post not found');
+        }
+
+        // Fetch applied candidates from JobApplication
+        const jobApplications = await JobApplication.findAll({
+            where: { jobpostId },
+            attributes: ['applicationId', 'candidateProfileId', 'status', 'appliedDate']
+        });
+
+        // Get unique candidate profile IDs
+        const candidateProfileIds = [...new Set(jobApplications.map(app => app.candidateProfileId))];
+
+        // Fetch candidate profiles
+        const candidateProfiles = await CandidateProfile.findAll({
+            where: { profileId: candidateProfileIds },
+            attributes: [
+                'profileId',
+                'candidate_name',
+                'phone_number',
+                'email',
+                'qualification',
+                'jobrole',
+                'experience',
+                'city',
+                'country',
+                'candidate_image'
+            ]
+        });
+
+        // Create a map of candidate profiles for easy lookup
+        const profileMap = new Map(candidateProfiles.map(profile => [profile.profileId, profile]));
+
+        // Combine the data
+        const formattedCandidates = jobApplications.map(application => {
+            const profile = profileMap.get(application.candidateProfileId);
+            return {
+                applicationId: application.applicationId,
+                status: application.status,
+                appliedDate: application.appliedDate,
+                candidate: profile ? {
+                    profileId: profile.profileId,
+                    candidate_name: profile.candidate_name,
+                    email: profile.email,
+                    qualification: profile.qualification,
+                    jobrole: profile.jobrole,
+                    experience: profile.experience,
+                    city: profile.city,
+                    country: profile.country,
+                    candidate_image: profile.candidate_image ? profile.candidate_image.toString('base64') : null
+                } : null
+            };
+        });
+
+        return generateResponse(res, 200, 'Applied candidates retrieved successfully', { appliedCandidates: formattedCandidates });
+    } catch (error) {
+        console.error('Error retrieving applied candidates:', error);
+        return generateResponse(res, 500, 'Server error', null, error.message);
+    }
+};
+
+
+
 module.exports = {
     createJobPost,
     getEmployerJobPosts,
     getAllJobPosts,
-    getJobPostById
+    getJobPostById,
+    updateJobPost,
+    getAppliedCandidates,
 };
