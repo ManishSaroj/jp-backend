@@ -156,11 +156,7 @@ const getCandidateProfile = async (req, res) => {
 const getAllCandidateProfiles = async (req, res) => {
     try {
         // Fetch all candidate profiles
-        const candidateProfiles = await CandidateProfile.findAll({
-            where: {
-                lookingForJobs: true
-            }
-        });
+        const candidateProfiles = await CandidateProfile.findAll();
 
         // Prepare profiles data to include base64 encoded images if available
         const profilesData = candidateProfiles.map(profile => ({
