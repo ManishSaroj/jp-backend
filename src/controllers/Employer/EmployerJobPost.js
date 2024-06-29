@@ -3,6 +3,7 @@ const EmployerJobPost = require('../../models/EmployerJobPost');
 const JobApplication = require('../../models/JobApplication');
 const CandidateProfile = require('../../models/CandidateProfile');
 const { generateResponse } = require('../../utils/responseUtils');
+const { formatDate } = require('../../utils/dateUtils')
 
 const createJobPost = async (req, res) => {
     const {
@@ -247,6 +248,75 @@ const getAppliedCandidates = async (req, res) => {
 };
 
 
+const getCandidateDetails = async (req, res) => {
+    try {
+        if (!req.user || !req.user.id) {
+            return generateResponse(res, 401, 'Unauthorized: User not authenticated');
+        }
+
+        const { profileId } = req.params;
+
+        // Retrieve candidate profile by profileId
+        const candidateProfile = await CandidateProfile.findOne({
+            where: { profileId },
+            attributes: [
+                'profileId',
+                'candidate_name',
+                'phone_number',
+                'email',
+                'website',
+                'qualification',
+                'languages',
+                'jobrole',
+                'jobCategory',
+                'experience',
+                'dob',
+                'age',
+                'gender',
+                'country',
+                'city',
+                'pincode',
+                'fullAddress',
+                'skills',
+                'aboutme',
+                'linkedIn',
+                'github',
+                'candidate_image',
+                'candidate_banner',
+                'resumeFileName',
+                'candidate_resume',
+                'lookingForJobs'
+            ]
+        });
+
+        if (!candidateProfile) {
+            return generateResponse(res, 404, 'Candidate profile not found');
+        }
+
+        // Format the date of birth
+        const formattedCandidateProfile = {
+            ...candidateProfile.toJSON(),
+            dob: formatDate(candidateProfile.dob)
+        };
+
+        // Convert candidate image and resume to base64 if they exist
+        if (candidateProfile.candidate_image) {
+            candidateProfile.candidate_image = candidateProfile.candidate_image.toString('base64');
+        }
+        if (candidateProfile.candidate_banner) {
+            candidateProfile.candidate_banner = candidateProfile.candidate_banner.toString('base64');
+        }
+        if (candidateProfile.candidate_resume) {
+            candidateProfile.candidate_resume = candidateProfile.candidate_resume.toString('base64');
+        }
+
+        return generateResponse(res, 200, 'Candidate profile retrieved successfully', { candidateProfile });
+    } catch (error) {
+        console.error('Error retrieving candidate profile:', error);
+        return generateResponse(res, 500, 'Server error', null, error.message);
+    }
+};
+
 
 module.exports = {
     createJobPost,
@@ -255,4 +325,5 @@ module.exports = {
     getJobPostById,
     updateJobPost,
     getAppliedCandidates,
+    getCandidateDetails,
 };
