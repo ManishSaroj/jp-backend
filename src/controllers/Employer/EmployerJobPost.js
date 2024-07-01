@@ -2,6 +2,7 @@ const Employer = require('../../models/EmployerModel');
 const EmployerJobPost = require('../../models/EmployerJobPost');
 const JobApplication = require('../../models/JobApplication');
 const CandidateProfile = require('../../models/CandidateProfile');
+const { employerSequelize } = require('../../config/db.config')
 const { generateResponse } = require('../../utils/responseUtils');
 const { formatDate } = require('../../utils/dateUtils')
 
@@ -317,6 +318,73 @@ const getCandidateDetails = async (req, res) => {
     }
 };
 
+const JobPostStatus = async (req, res) => {
+    try {
+        if (!req.user || !req.user.id) {
+            return generateResponse(res, 401, 'Unauthorized: User not authenticated');
+        }
+
+        const { jobpostId } = req.params;
+        const eid = req.user.id;
+
+        // Find the job post
+        const jobPost = await EmployerJobPost.findOne({ 
+            where: { jobpostId, eid }
+        });
+
+        if (!jobPost) {
+            return generateResponse(res, 404, 'Job post not found');
+        }
+
+        // Toggle the isActive status
+        jobPost.isActive = !jobPost.isActive;
+        await jobPost.save();
+
+        return generateResponse(res, 200, `Job post ${jobPost.isActive ? 'activated' : 'deactivated'} successfully`, { jobPost });
+    } catch (error) {
+        console.error('Error toggling job post status:', error);
+        return generateResponse(res, 500, 'Server error', null, error.message);
+    }
+};
+
+const deleteJobPost = async (req, res) => {
+    const { jobpostId } = req.params;
+    const eid = req.user.id; // Assuming you have user information in the request
+  
+    try {
+      // Start a transaction
+      const result = await employerSequelize.transaction(async (t) => {
+        // Find the job post
+        const jobPost = await EmployerJobPost.findOne({
+          where: { jobpostId, eid },
+          transaction: t,
+        });
+  
+        if (!jobPost) {
+          return res.status(404).json({ message: 'Job post not found' });
+        }
+  
+        // Delete related job applications
+        await JobApplication.destroy({
+          where: { jobpostId },
+          transaction: t,
+        });
+  
+        // Delete the job post
+        await jobPost.destroy({ transaction: t });
+  
+        return true;
+      });
+  
+      if (result) {
+        res.status(200).json({ message: 'Job post and related applications deleted successfully' });
+      }
+    } catch (error) {
+      console.error('Error deleting job post:', error);
+      res.status(500).json({ message: 'An error occurred while deleting the job post' });
+    }
+  };
+
 
 module.exports = {
     createJobPost,
@@ -326,4 +394,6 @@ module.exports = {
     updateJobPost,
     getAppliedCandidates,
     getCandidateDetails,
+    JobPostStatus,
+    deleteJobPost,
 };
