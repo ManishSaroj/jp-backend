@@ -48,7 +48,8 @@ const getJobPostById = async (req, res) => {
         const formattedJobPost = {
             ...formatJobPostResponse(jobPost),
             EmployerProfile: formatEmployerProfile(jobPost.Employer.EmployerProfile),
-            hasApplied
+            hasApplied,
+            isActive: jobPost.isActive 
         };
 
         return generateResponse(res, 200, 'Job post retrieved successfully', { jobPost: formattedJobPost });
@@ -62,6 +63,15 @@ const applyForJob = async (req, res) => {
     const { candidateProfileId, jobpostId, employerProfileId } = req.body;
 
     try {
+        const jobPost = await EmployerJobPost.findByPk(jobpostId);
+
+        if (!jobPost) {
+            return generateResponse(res, 404, 'Job post not found');
+        }
+
+        if (!jobPost.isActive) {
+            return generateResponse(res, 400, 'This job post is no longer accepting applications');
+        }
         const existingApplication = await JobApplication.findOne({
             where: { candidateProfileId, jobpostId }
         });

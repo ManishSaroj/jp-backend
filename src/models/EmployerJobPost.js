@@ -22,6 +22,11 @@ const EmployerJobPost = employerSequelize.define('EmployerJobPost', {
         allowNull: false,
         defaultValue: 0,
     },
+    isActive: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+    },
     jobTitle: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -110,11 +115,6 @@ const EmployerJobPost = employerSequelize.define('EmployerJobPost', {
         type: DataTypes.DATEONLY,
         allowNull: false,
     },
-    // postedDate: {
-    //     type: DataTypes.DATEONLY,
-    //     allowNull: false,
-    //     defaultValue: DataTypes.NOW,
-    // },
     createdAt: {
         type: DataTypes.DATE,
         allowNull: false,

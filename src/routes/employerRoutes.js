@@ -9,7 +9,8 @@ const  checkAuth = require('../middlewares/authMiddleware');
 const { getEmployer, changePassword } = require('../controllers/Employer/getEmployer');
 const { requestPasswordReset, resetPassword } = require('../controllers/Employer/resetPasswordController');
 const { createOrUpdateEmployerProfile, getEmployerProfile, uploadImages } = require('../controllers/Employer/EmployerProfileController');
-const { createJobPost, getEmployerJobPosts, getJobPostById, updateJobPost, getAppliedCandidates} = require('../controllers/Employer/EmployerJobPost');
+const { createJobPost, getEmployerJobPosts, getJobPostById, updateJobPost, getAppliedCandidates, getCandidateDetails, JobPostStatus, deleteJobPost} = require('../controllers/Employer/EmployerJobPost');
+const { saveCandidate, getSavedCandidates } = require('../controllers/Employer/savedCandidateController');
 
 const router = express.Router();
 
@@ -26,7 +27,13 @@ router.post('/create-jobpost',checkAuth, createJobPost);
 router.get('/get-employer-jobposts', checkAuth, getEmployerJobPosts);
 router.get('/jobpost/:jobpostId', checkAuth, getJobPostById);
 router.put('/jobpost/:jobpostId', checkAuth, updateJobPost);
+router.put('/jobpost/:jobpostId/jobpost-status', checkAuth, JobPostStatus);
+router.delete('/jobpost/:jobpostId/delete-jobpost', checkAuth, deleteJobPost);
 router.get('/jobpost/:jobpostId/applied-candidates', checkAuth, getAppliedCandidates);
+router.get('/candidate-details/:profileId', checkAuth , getCandidateDetails);
+
+router.post('/save-candidate', checkAuth, saveCandidate);
+router.get('/saved-candidates', checkAuth, getSavedCandidates);
 
 // Password reset routes
 router.post('/request-password-reset', requestPasswordReset);
