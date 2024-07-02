@@ -483,7 +483,6 @@ const updateApplicationStatus = async (req, res) => {
     }
 };
 
-// In your backend controller (e.g., EmployerJobPost.js)
 
 const getShortlistedCandidates = async (req, res) => {
     try {

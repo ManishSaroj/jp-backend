@@ -32,6 +32,7 @@ router.delete('/jobpost/:jobpostId/delete-jobpost', checkAuth, deleteJobPost);
 router.get('/jobpost/:jobpostId/applied-candidates', checkAuth, getAppliedCandidates);
 router.get('/candidate-details/:profileId', checkAuth , getCandidateDetails);
 router.put('/application/:applicationId/status', checkAuth, updateApplicationStatus);
+router.put('/application/:applicationId/review', );
 router.get('/application/:applicationId/status', checkAuth, getApplicationStatus);
 router.get('/jobpost/:jobpostId/shortlisted-candidates', checkAuth, getShortlistedCandidates);
 

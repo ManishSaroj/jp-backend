@@ -89,7 +89,11 @@ const applyForJob = async (req, res) => {
                 candidateProfileId,
                 jobpostId,
                 employerProfileId,
-                status: 'Applied',
+                isApplied: true,
+                isUnderReview: false,
+                isShortlisted: false,
+                isRejected: false,
+                isHired: false,
                 appliedDate: new Date()
             }, { transaction: t });
 

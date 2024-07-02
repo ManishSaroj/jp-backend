@@ -98,7 +98,7 @@ const JobApplication = employerSequelize.define('JobApplication', {
   isUnderReview: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
-    defaultValue: true,
+    defaultValue: false,
   },
   isShortlisted: {
     type: DataTypes.BOOLEAN,
