@@ -249,6 +249,8 @@ const getAppliedCandidates = async (req, res) => {
 };
 
 
+
+
 const getCandidateDetails = async (req, res) => {
     try {
         if (!req.user || !req.user.id) {
@@ -310,6 +312,7 @@ const getCandidateDetails = async (req, res) => {
         if (candidateProfile.candidate_resume) {
             candidateProfile.candidate_resume = candidateProfile.candidate_resume.toString('base64');
         }
+        
 
         return generateResponse(res, 200, 'Candidate profile retrieved successfully', { candidateProfile });
     } catch (error) {
@@ -386,6 +389,159 @@ const deleteJobPost = async (req, res) => {
   };
 
 
+// const updateApplicationStatus = async (req, res) => {
+//     try {
+//       if (!req.user || !req.user.id) {
+//         return generateResponse(res, 401, 'Unauthorized: User not authenticated');
+//       }
+  
+//       const { applicationId } = req.params;
+//       const { newStatus } = req.body;
+//       const eid = req.user.id;
+  
+//       // Validate the new status
+//       const validStatuses = ['Applied', 'Under Review', 'Shortlisted', 'Rejected', 'Hired'];
+//       if (!validStatuses.includes(newStatus)) {
+//         return generateResponse(res, 400, 'Invalid status provided');
+//       }
+  
+//       // Find the job application to ensure it belongs to the current employer
+//       const jobApplication = await JobApplication.findOne({
+//         where: { applicationId },
+//         include: [{ model: EmployerJobPost, where: { eid } }]
+//       });
+  
+//       if (!jobApplication) {
+//         return generateResponse(res, 404, 'Job application not found');
+//       }
+  
+//       // Update the status flags based on the new status
+//       switch (newStatus) {
+//         case 'Shortlisted':
+//           jobApplication.isShortlisted = !jobApplication.isShortlisted;
+//           if (jobApplication.isShortlisted) {
+//             jobApplication.isUnderReview = false;
+//           }
+//           break;
+//         case 'Hired':
+//           jobApplication.isHired = !jobApplication.isHired;
+//           if (jobApplication.isHired) {
+//             jobApplication.isRejected = false;
+//             jobApplication.isUnderReview = false;
+//           }
+//           break;
+//         case 'Rejected':
+//           jobApplication.isRejected = !jobApplication.isRejected;
+//           if (jobApplication.isRejected) {
+//             jobApplication.isHired = false;
+//             jobApplication.isUnderReview = false;
+//           }
+//           break;
+//         case 'Under Review':
+//           jobApplication.isUnderReview = true;
+//           jobApplication.isHired = false;
+//           jobApplication.isRejected = false;
+//           break;
+//         case 'Applied':
+//           jobApplication.isShortlisted = false;
+//           jobApplication.isHired = false;
+//           jobApplication.isRejected = false;
+//           jobApplication.isUnderReview = false;
+//           break;
+//       }
+  
+//       await jobApplication.save();
+  
+//       return generateResponse(res, 200, 'Application status updated successfully', { jobApplication });
+//     } catch (error) {
+//       console.error('Error updating application status:', error);
+//       return generateResponse(res, 500, 'Server error', null, error.message);
+//     }
+//   };
+
+const updateApplicationStatus = async (req, res) => {
+    try {
+      if (!req.user || !req.user.id) {
+        return generateResponse(res, 401, 'Unauthorized: User not authenticated');
+      }
+  
+      const { applicationId } = req.params;
+      const { newStatus } = req.body;
+      const eid = req.user.id;
+  
+      // Validate the new status
+      const validStatuses = ['Applied', 'Under Review', 'Shortlisted', 'Rejected', 'Hired'];
+      if (!validStatuses.includes(newStatus)) {
+        return generateResponse(res, 400, 'Invalid status provided');
+      }
+  
+      // Find the job application to ensure it belongs to the current employer
+      const jobApplication = await JobApplication.findOne({
+        where: { applicationId },
+        include: [{ model: EmployerJobPost, where: { eid } }]
+      });
+  
+      if (!jobApplication) {
+        return generateResponse(res, 404, 'Job application not found');
+      }
+  
+      // Update the status flags based on the new status
+      switch (newStatus) {
+        case 'Shortlisted':
+          jobApplication.isShortlisted = !jobApplication.isShortlisted;
+          if (jobApplication.isShortlisted) {
+            jobApplication.isUnderReview = false;
+          }
+          break;
+        case 'Hired':
+          jobApplication.isHired = !jobApplication.isHired;
+          if (jobApplication.isHired) {
+            jobApplication.isRejected = false;
+            jobApplication.isUnderReview = false;
+          }
+          break;
+        case 'Rejected':
+          jobApplication.isRejected = !jobApplication.isRejected;
+          if (jobApplication.isRejected) {
+            jobApplication.isHired = false;
+            jobApplication.isUnderReview = false;
+          }
+          break;
+        case 'Under Review':
+          jobApplication.isUnderReview = true;
+          jobApplication.isHired = false;
+          jobApplication.isRejected = false;
+          break;
+        case 'Applied':
+          jobApplication.isShortlisted = false;
+          jobApplication.isHired = false;
+          jobApplication.isRejected = false;
+          jobApplication.isUnderReview = false;
+          break;
+      }
+  
+      await jobApplication.save();
+  
+      // Determine the current status based on the updated flags
+      let currentStatus = 'Applied';
+      if (jobApplication.isHired) {
+        currentStatus = 'Hired';
+      } else if (jobApplication.isRejected) {
+        currentStatus = 'Rejected';
+      } else if (jobApplication.isShortlisted) {
+        currentStatus = 'Shortlisted';
+      } else if (jobApplication.isUnderReview) {
+        currentStatus = 'Under Review';
+      }
+  
+      return generateResponse(res, 200, 'Application status updated successfully', { jobApplication, currentStatus });
+    } catch (error) {
+      console.error('Error updating application status:', error);
+      return generateResponse(res, 500, 'Server error', null, error.message);
+    }
+  };
+  
+
 module.exports = {
     createJobPost,
     getEmployerJobPosts,
@@ -396,4 +552,5 @@ module.exports = {
     getCandidateDetails,
     JobPostStatus,
     deleteJobPost,
+    updateApplicationStatus,
 };
