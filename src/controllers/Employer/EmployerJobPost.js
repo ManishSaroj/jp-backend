@@ -383,89 +383,6 @@ const deleteJobPost = async (req, res) => {
   };
 
 
-// const getApplicationStatus = async (req, res) => {
-//     try {
-//         if (!req.user || !req.user.id) {
-//             return generateResponse(res, 401, 'Unauthorized: User not authenticated');
-//         }
-
-//         const { applicationId } = req.params;
-//         const eid = req.user.id;
-
-//         const jobApplication = await JobApplication.findOne({
-//             where: { applicationId },
-//             include: [{ model: EmployerJobPost, where: { eid } }]
-//         });
-
-//         if (!jobApplication) {
-//             return generateResponse(res, 404, 'Job application not found');
-//         }
-
-//         let currentStatus = 'Applied';
-//         if (jobApplication.isHired) currentStatus = 'Hired';
-//         else if (jobApplication.isRejected) currentStatus = 'Rejected';
-//         else if (jobApplication.isShortlisted) currentStatus = 'Shortlisted';
-//         else if (jobApplication.isUnderReview) currentStatus = 'Under Review';
-
-//         return generateResponse(res, 200, 'Application status retrieved successfully', { 
-//             jobApplication, 
-//             currentStatus 
-//         });
-//     } catch (error) {
-//         console.error('Error retrieving application status:', error);
-//         return generateResponse(res, 500, 'Server error', null, error.message);
-//     }
-// };
-
-// const updateApplicationStatus = async (req, res) => {
-//     try {
-//         if (!req.user || !req.user.id) {
-//             return generateResponse(res, 401, 'Unauthorized: User not authenticated');
-//         }
-
-//         const { applicationId } = req.params;
-//         const { newStatus } = req.body;
-//         const eid = req.user.id;
-
-//         const validStatuses = ['Applied', 'Under Review', 'Shortlisted', 'Rejected', 'Hired'];
-//         if (!validStatuses.includes(newStatus)) {
-//             return generateResponse(res, 400, 'Invalid status provided');
-//         }
-
-//         const jobApplication = await JobApplication.findOne({
-//             where: { applicationId },
-//             include: [{ model: EmployerJobPost, where: { eid } }]
-//         });
-
-//         if (!jobApplication) {
-//             return generateResponse(res, 404, 'Job application not found');
-//         }
-
-//         let currentStatus = 'Applied';
-//         if (jobApplication.isHired) currentStatus = 'Hired';
-//         else if (jobApplication.isRejected) currentStatus = 'Rejected';
-//         else if (jobApplication.isShortlisted) currentStatus = 'Shortlisted';
-//         else if (jobApplication.isUnderReview) currentStatus = 'Under Review';
-
-//         if (currentStatus !== newStatus) {
-//             jobApplication.isShortlisted = newStatus === 'Shortlisted';
-//             jobApplication.isHired = newStatus === 'Hired';
-//             jobApplication.isRejected = newStatus === 'Rejected';
-//             jobApplication.isUnderReview = newStatus === 'Under Review';
-
-//             await jobApplication.save();
-//         }
-
-//         return generateResponse(res, 200, 'Application status updated successfully', { 
-//             jobApplication, 
-//             previousStatus: currentStatus,
-//             newStatus: newStatus 
-//         });
-//     } catch (error) {
-//         console.error('Error updating application status:', error);
-//         return generateResponse(res, 500, 'Server error', null, error.message);
-//     }
-// };
 
 const getApplicationStatus = async (req, res) => {
     try {
@@ -499,7 +416,6 @@ const getApplicationStatus = async (req, res) => {
         return generateResponse(res, 500, 'Server error', null, error.message);
     }
 };
-
 
 const updateApplicationStatus = async (req, res) => {
     try {
@@ -536,6 +452,13 @@ const updateApplicationStatus = async (req, res) => {
                 jobApplication.isHired = false;
             } else if (newStatus === 'Shortlisted') {
                 jobApplication.isShortlisted = true;
+                
+                // Increase shortlistedCandidatesCount for the job post
+                const jobPost = await EmployerJobPost.findByPk(jobApplication.jobpostId);
+                if (jobPost) {
+                    jobPost.shortlistedCandidatesCount += 1;
+                    await jobPost.save();
+                }
             } else if (newStatus === 'Under Review') {
                 jobApplication.isUnderReview = true;
             } else if (newStatus === 'Applied') {
@@ -545,7 +468,7 @@ const updateApplicationStatus = async (req, res) => {
             await jobApplication.save();
         }
 
-        const updatedApplication = await jobApplication.save();
+        const updatedApplication = await JobApplication.findByPk(applicationId);
 
         return generateResponse(res, 200, 'Application status updated successfully', {
           isHired: updatedApplication.isHired,
@@ -560,6 +483,84 @@ const updateApplicationStatus = async (req, res) => {
     }
 };
 
+// In your backend controller (e.g., EmployerJobPost.js)
+
+const getShortlistedCandidates = async (req, res) => {
+    try {
+        if (!req.user || !req.user.id) {
+            return generateResponse(res, 401, 'Unauthorized: User not authenticated');
+        }
+
+        const { jobpostId } = req.params;
+        const eid = req.user.id;
+
+        // Fetch the job post to ensure it belongs to the current employer
+        const jobPost = await EmployerJobPost.findOne({ 
+            where: { jobpostId, eid }
+        });
+
+        if (!jobPost) {
+            return generateResponse(res, 404, 'Job post not found');
+        }
+
+        // Fetch shortlisted candidates from JobApplication
+        const jobApplications = await JobApplication.findAll({
+            where: { 
+                jobpostId,
+                isShortlisted: true
+            },
+            attributes: ['applicationId', 'candidateProfileId', 'status', 'appliedDate']
+        });
+
+        // Get unique candidate profile IDs
+        const candidateProfileIds = [...new Set(jobApplications.map(app => app.candidateProfileId))];
+
+        // Fetch candidate profiles
+        const candidateProfiles = await CandidateProfile.findAll({
+            where: { profileId: candidateProfileIds },
+            attributes: [
+                'profileId',
+                'candidate_name',
+                'email',
+                'qualification',
+                'jobrole',
+                'experience',
+                'city',
+                'country',
+                'candidate_image'
+            ]
+        });
+
+        // Create a map of candidate profiles for easy lookup
+        const profileMap = new Map(candidateProfiles.map(profile => [profile.profileId, profile]));
+
+        // Combine the data
+        const formattedCandidates = jobApplications.map(application => {
+            const profile = profileMap.get(application.candidateProfileId);
+            return {
+                applicationId: application.applicationId,
+                status: application.status,
+                appliedDate: application.appliedDate,
+                candidate: profile ? {
+                    profileId: profile.profileId,
+                    candidate_name: profile.candidate_name,
+                    email: profile.email,
+                    qualification: profile.qualification,
+                    jobrole: profile.jobrole,
+                    experience: profile.experience,
+                    city: profile.city,
+                    country: profile.country,
+                    candidate_image: profile.candidate_image ? profile.candidate_image.toString('base64') : null
+                } : null
+            };
+        });
+
+        return generateResponse(res, 200, 'Shortlisted candidates retrieved successfully', { shortlistedCandidates: formattedCandidates });
+    } catch (error) {
+        console.error('Error retrieving shortlisted candidates:', error);
+        return generateResponse(res, 500, 'Server error', null, error.message);
+    }
+};
 
 module.exports = {
     createJobPost,
@@ -573,4 +574,5 @@ module.exports = {
     deleteJobPost,
     getApplicationStatus,
     updateApplicationStatus,
+    getShortlistedCandidates,
 };
