@@ -90,12 +90,17 @@ const JobApplication = employerSequelize.define('JobApplication', {
       key: 'profileId',
     },
   },
-  isShortlisted: {
+  isApplied: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
-    defaultValue: false,
+    defaultValue: true,
   },
-  isHired: {
+  isUnderReview: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: true,
+  },
+  isShortlisted: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
     defaultValue: false,
@@ -105,10 +110,10 @@ const JobApplication = employerSequelize.define('JobApplication', {
     allowNull: false,
     defaultValue: false,
   },
-  isUnderReview: {
+  isHired: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
-    defaultValue: true,
+    defaultValue: false,
   },
   status: {
     type: DataTypes.VIRTUAL,
@@ -117,6 +122,7 @@ const JobApplication = employerSequelize.define('JobApplication', {
       if (this.isRejected) return 'Rejected';
       if (this.isShortlisted) return 'Shortlisted';
       if (this.isUnderReview) return 'Under Review';
+      if (this.isApplied) return 'Applied';
       return 'Applied';
     },
   },
@@ -133,12 +139,8 @@ const JobApplication = employerSequelize.define('JobApplication', {
 JobApplication.addHook('beforeSave', (jobApplication) => {
   if (jobApplication.isHired) {
     jobApplication.isRejected = false;
-    jobApplication.isUnderReview = false;
   } else if (jobApplication.isRejected) {
     jobApplication.isHired = false;
-    jobApplication.isUnderReview = false;
-  } else if (jobApplication.isShortlisted) {
-    jobApplication.isUnderReview = false;
   }
 });
 
