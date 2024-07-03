@@ -22,6 +22,11 @@ const EmployerJobPost = employerSequelize.define('EmployerJobPost', {
         allowNull: false,
         defaultValue: 0,
     },
+    shortlistedCandidatesCount: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+    },
     isActive: {
         type: DataTypes.BOOLEAN,
         allowNull: false,

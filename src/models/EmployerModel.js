@@ -25,7 +25,7 @@ const Employer = employerSequelize.define('Employer', {
   },
   phone_number: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   termsAgreed: {
     type: DataTypes.BOOLEAN,

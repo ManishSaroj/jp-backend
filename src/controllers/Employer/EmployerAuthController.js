@@ -1,45 +1,27 @@
-// backend/src/controllers/Employer/EmployerAuthController.js
 const passport = require('passport');
+const jwt = require('jsonwebtoken');
 
-const googleAuth = (req, res, next) => {
-  passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next);
-};
+exports.googleAuthEmployer = passport.authenticate('google-employer', {
+  scope: ['profile', 'email']
+});
 
-const googleAuthCallback = (req, res, next) => {
-  passport.authenticate('google', { failureRedirect: '/login' }, (err, user) => {
-    if (err || !user) {
-      return res.redirect('/login');
+exports.googleAuthEmployerCallback = (req, res, next) => {
+  passport.authenticate('google-employer', async (err, employer, info) => {
+    if (err) {
+      return next(err);
     }
-    req.logIn(user, (err) => {
-      if (err) {
-        return next(err);
-      }
-      res.redirect('/employer/dashboard');
-    });
-  })(req, res, next);
-};
-
-const linkedinAuth = (req, res, next) => {
-  passport.authenticate('linkedin')(req, res, next);
-};
-
-const linkedinAuthCallback = (req, res, next) => {
-  passport.authenticate('linkedin', { failureRedirect: '/login' }, (err, user) => {
-    if (err || !user) {
-      return res.redirect('/login');
+    if (!employer) {
+      return res.redirect(`${process.env.FRONTEND_BASE_URL}/login?error=authentication_failed`);
     }
-    req.logIn(user, (err) => {
-      if (err) {
-        return next(err);
-      }
-      res.redirect('/employer/dashboard');
+    const token = jwt.sign({ id: employer.eid, type: 'employer' }, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN
     });
+    res.cookie(process.env.COOKIE_NAME, token, {
+      expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 1),
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      domain: process.env.COOKIE_DOMAIN
+    });
+    res.redirect(`${process.env.FRONTEND_BASE_URL}/employerdashboard`);
   })(req, res, next);
-};
-
-module.exports = {
-  googleAuth,
-  googleAuthCallback,
-  linkedinAuth,
-  linkedinAuthCallback,
 };

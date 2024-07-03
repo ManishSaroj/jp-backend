@@ -25,7 +25,7 @@ const Candidate = candidateSequelize.define('Candidate', {
   },
   phone_number: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   termsAgreed: {
     type: DataTypes.BOOLEAN,

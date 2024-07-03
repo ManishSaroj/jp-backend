@@ -1,5 +1,7 @@
 require('dotenv').config(); // Load environment variables from .env file
 const express = require('express');
+const session = require('express-session');
+const passport = require('passport');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
@@ -8,6 +10,9 @@ const employerRoutes = require('./src/routes/employerRoutes');
 const candidateRoutes = require('./src/routes/candidateRoutes');
 const authRoutes = require('./src/routes/authRoutes'); 
 const logoutRoutes = require('./src/routes/logoutRoutes');
+
+// require('./src/config/googleAuth')
+require('./src/config/passport.config')
 
 const app = express();
 
@@ -18,6 +23,15 @@ app.use(cors({
 }));
 // app.use(bodyParser.json());
 app.use(cookieParser());
+
+// Add session and passport middleware
+app.use(session({
+  secret: process.env.JWT_SECRET,
+  resave: false,
+  saveUninitialized: false
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Increase the size limit for JSON and URL-encoded data
 app.use(bodyParser.json({ limit: '50mb' }));
