@@ -6,26 +6,58 @@ const CandidateProfile = require('../../models/CandidateProfile');
 const { generateResponse } = require('../../utils/responseUtils');
 const { calculatePostedDateTimeline, formatDate, convertToFormattedDate } = require('../../utils/dateUtils');
 const { employerSequelize } = require('../../config/db.config')
+const { Op } = require('sequelize');
 
 const getAllJobPosts = async (req, res) => {
     try {
-        const jobPosts = await EmployerJobPost.findAll({
+        const { 
+            page = 1, 
+            limit = 10, 
+            jobType, 
+            jobCategory, 
+            state, 
+            search 
+        } = req.query;
+
+        const offset = (page - 1) * limit;
+
+        const whereClause = {};
+        if (jobType && jobType !== 'All') whereClause.jobType = jobType;
+        if (jobCategory && jobCategory !== 'All') whereClause.jobCategory = jobCategory;
+        if (state && state !== 'All') whereClause.state = state;
+
+        if (search) {
+            whereClause[Op.or] = [
+                { jobTitle: { [Op.like]: `%${search}%` } },
+                { city: { [Op.like]: `%${search}%` } },
+                { skills: { [Op.like]: `%${search}%` } }
+            ];
+        }
+
+        const { rows: jobPosts, count } = await EmployerJobPost.findAndCountAll({
+            where: whereClause,
             include: [{
                 model: Employer,
                 include: [EmployerProfile]
-            }]
+            }],
+            limit: parseInt(limit),
+            offset: offset,
+            order: [['createdAt', 'DESC']]
         });
-
-        if (jobPosts.length === 0) {
-            return generateResponse(res, 404, 'No job posts found');
-        }
 
         const formattedJobPosts = jobPosts.map(job => ({
             ...formatJobPostResponse(job),
             EmployerProfile: formatEmployerProfile(job.Employer.EmployerProfile)
         }));
 
-        return generateResponse(res, 200, 'Job posts retrieved successfully', { jobPosts: formattedJobPosts });
+        const totalPages = Math.ceil(count / limit);
+
+        return generateResponse(res, 200, 'Job posts retrieved successfully', {
+            jobPosts: formattedJobPosts,
+            currentPage: parseInt(page),
+            totalPages: totalPages,
+            totalJobs: count
+        });
     } catch (error) {
         console.error('Error retrieving job posts:', error);
         return generateResponse(res, 500, 'Server error', null, error.message);
