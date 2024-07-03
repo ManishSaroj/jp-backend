@@ -2,11 +2,13 @@
 const express = require('express');
 const  checkAuth = require('../middlewares/authMiddleware');
 const { registerCandidate, loginCandidate, resendVerificationEmail, verifyCandidateEmail,} = require('../controllers/Candidate/CandidateController');
+const { googleAuthCandidate, googleAuthCandidateCallback } = require('../controllers/Candidate/CandidateAuthController');
 const { getCandidate, changePassword } = require('../controllers/Candidate/getCandidate');
 const { requestPasswordReset, resetPassword  } = require('../controllers/Candidate/resetPasswordController');
 const { createOrUpdateCandidateProfile, updateLookingForJobStatus, getCandidateProfile, uploadFiles, getAllCandidateProfiles } = require('../controllers/Candidate/CandidateProfileController');
 const { createResume, updateResume, deleteResume, getAllResumes, getResumeById, getResumeByCandidateId } = require('../controllers/Candidate/resumeController');
 const { getAllJobPosts, getJobPostById, applyForJob, getAppliedJobsForCandidate } = require('../controllers/Candidate/getAllJobPosts');
+
 
 const router = express.Router();
 
@@ -15,6 +17,10 @@ router.post('/register', registerCandidate);
 router.post('/login', loginCandidate);
 router.get('/verify-email', verifyCandidateEmail); 
 router.post('/resend-email', resendVerificationEmail);
+
+router.get('/auth/google', googleAuthCandidate);
+router.get('/auth/google/callback', googleAuthCandidateCallback);
+
 
 // Password reset routes
 router.post('/request-password-reset', requestPasswordReset);
@@ -41,5 +47,6 @@ router.get('/getAll-jobposts',checkAuth, getAllJobPosts);
 router.get('/get-jobpost/:jobpostId',checkAuth, getJobPostById);
 router.post('/apply-for-job', checkAuth, applyForJob);
 router.get('/jobposts/applied', checkAuth, getAppliedJobsForCandidate); 
+
 
 module.exports = router;

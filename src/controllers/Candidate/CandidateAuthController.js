@@ -1,45 +1,27 @@
-// backend/src/controllers/Candidate/CandidateAuthController.js
 const passport = require('passport');
+const jwt = require('jsonwebtoken');
 
-const googleAuth = (req, res, next) => {
-  passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next);
-};
+exports.googleAuthCandidate = passport.authenticate('google-candidate', {
+  scope: ['profile', 'email']
+});
 
-const googleAuthCallback = (req, res, next) => {
-  passport.authenticate('google', { failureRedirect: '/login' }, (err, user) => {
-    if (err || !user) {
-      return res.redirect('/login');
+exports.googleAuthCandidateCallback = (req, res, next) => {
+  passport.authenticate('google-candidate', async (err, candidate, info) => {
+    if (err) {
+      return next(err);
     }
-    req.logIn(user, (err) => {
-      if (err) {
-        return next(err);
-      }
-      res.redirect('/candidate/dashboard');
-    });
-  })(req, res, next);
-};
-
-const linkedinAuth = (req, res, next) => {
-  passport.authenticate('linkedin')(req, res, next);
-};
-
-const linkedinAuthCallback = (req, res, next) => {
-  passport.authenticate('linkedin', { failureRedirect: '/login' }, (err, user) => {
-    if (err || !user) {
-      return res.redirect('/login');
+    if (!candidate) {
+      return res.redirect(`${process.env.FRONTEND_BASE_URL}/login?error=authentication_failed`);
     }
-    req.logIn(user, (err) => {
-      if (err) {
-        return next(err);
-      }
-      res.redirect('/candidate/dashboard');
+    const token = jwt.sign({ id: candidate.cid, type: 'candidate' }, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN
     });
+    res.cookie(process.env.COOKIE_NAME, token, {
+      expires: new Date(Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 1),
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      domain: process.env.COOKIE_DOMAIN
+    });
+    res.redirect(`${process.env.FRONTEND_BASE_URL}/candidatedashboard`);
   })(req, res, next);
-};
-
-module.exports = {
-  googleAuth,
-  googleAuthCallback,
-  linkedinAuth,
-  linkedinAuthCallback,
 };

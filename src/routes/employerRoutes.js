@@ -5,6 +5,8 @@ const {
     resendVerificationEmail,
     verifyEmployerEmail,
  } = require('../controllers/Employer/EmployerController');
+ const { googleAuthEmployer, googleAuthEmployerCallback} = require('../controllers/Employer/EmployerAuthController');
+  
 const  checkAuth = require('../middlewares/authMiddleware');
 const { getEmployer, changePassword } = require('../controllers/Employer/getEmployer');
 const { requestPasswordReset, resetPassword } = require('../controllers/Employer/resetPasswordController');
@@ -18,6 +20,12 @@ router.post('/register', registerEmployer);
 router.post('/login', loginEmployer);
 router.get('/verify-email', verifyEmployerEmail);
 router.post('/resend-email', resendVerificationEmail);
+
+router.get('/auth/google', googleAuthEmployer);
+router.get('/auth/google/callback', googleAuthEmployerCallback);
+
+
+
 router.get('/me', checkAuth, getEmployer);
 router.post('/change-password', checkAuth, changePassword)
 router.post('/profile',checkAuth, uploadImages , createOrUpdateEmployerProfile);

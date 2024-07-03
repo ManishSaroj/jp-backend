@@ -23,7 +23,7 @@ const CandidateProfile = candidateSequelize.define('CandidateProfile', {
   },
   phone_number: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   email: {
     type: DataTypes.STRING,
