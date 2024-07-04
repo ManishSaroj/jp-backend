@@ -11,7 +11,7 @@ const EmployerJobPost = employerSequelize.define('EmployerJobPost', {
     },
     eid: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: {
             model: Employer,
             key: 'eid',
@@ -19,82 +19,82 @@ const EmployerJobPost = employerSequelize.define('EmployerJobPost', {
     },
     appliedCandidatesCount: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         defaultValue: 0,
     },
     shortlistedCandidatesCount: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         defaultValue: 0,
     },
     isActive: {
         type: DataTypes.BOOLEAN,
-        allowNull: false,
+        allowNull: true,
         defaultValue: true,
     },
     jobTitle: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     jobCategory: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     jobType: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     minSalary: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
     },
     maxSalary: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
     },
     salaryFrequency: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     totalOpenings: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     duration: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     experience: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     qualification: {
         type: DataTypes.JSON,
-        allowNull: false,
+        allowNull: true,
     },
     gender: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     country: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     state: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     city: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     email: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     jobAddress: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     skills: {
         type: DataTypes.JSON,
@@ -102,32 +102,32 @@ const EmployerJobPost = employerSequelize.define('EmployerJobPost', {
     },
     description: {
         type: DataTypes.TEXT,
-        allowNull: false,
+        allowNull: true,
     },
     jobReq: {
         type: DataTypes.TEXT,
-        allowNull: false,
+        allowNull: true,
     },
     jobRes: {
         type: DataTypes.TEXT,
-        allowNull: false,
+        allowNull: true,
     },
     startDate: {
         type: DataTypes.DATEONLY,
-        allowNull: false,
+        allowNull: true,
     },
     endDate: {
         type: DataTypes.DATEONLY,
-        allowNull: false,
+        allowNull: true,
     },
     createdAt: {
         type: DataTypes.DATE,
-        allowNull: false,
+        allowNull: true,
         defaultValue: employerSequelize.literal('CURRENT_TIMESTAMP'), 
     },
     updatedAt: {
         type: DataTypes.DATE,
-        allowNull: false,
+        allowNull: true,
         defaultValue: employerSequelize.literal('CURRENT_TIMESTAMP'),
     },
 }, {
