@@ -3,6 +3,8 @@ const express = require('express');
 const { loginAdmin } = require('../controllers/Admin/adminAuth');
 const checkAuth = require('../middlewares/authMiddleware');
 const { getAllCandidatesWithProfiles, getCandidateProfileById } = require('../controllers/Admin/adminCandidateController');
+const { getAllEmployersWithProfiles, getEmployerProfileById  } = require('../controllers/Admin/adminEmployerController');
+  
 
 const router = express.Router();
 
@@ -12,5 +14,9 @@ router.post('/login', loginAdmin);
 
 router.get('/candidates', checkAuth, getAllCandidatesWithProfiles);
 router.get('/candidates/profile/:profileId', checkAuth, getCandidateProfileById);
+
+router.get('/employers', checkAuth, getAllEmployersWithProfiles);
+router.get('/employers/profile/:profileId', checkAuth, getEmployerProfileById);
+
 
 module.exports = router;
