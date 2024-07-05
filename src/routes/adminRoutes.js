@@ -2,13 +2,15 @@
 const express = require('express');
 const { loginAdmin } = require('../controllers/Admin/adminAuth');
 const checkAuth = require('../middlewares/authMiddleware');
+const { getAllCandidatesWithProfiles } = require('../controllers/Admin/adminCandidateController');
 
 const router = express.Router();
 
 // Authentication route
 router.post('/login', loginAdmin);
 
-// Protected route example (if needed)
-// router.get('/dashboard', checkAuth, getAdminDashboard);
+
+router.get('/candidates', checkAuth, getAllCandidatesWithProfiles);
+
 
 module.exports = router;
