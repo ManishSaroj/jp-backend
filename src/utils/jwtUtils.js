@@ -22,7 +22,7 @@ const verifyToken = (token) => {
   }
 };
 
-const setTokenCookie = (res, token) => {
+const setTokenCookie = (res, token, isAdmin = false) => {
   const cookieMaxAge = parseInt(COOKIE_EXPIRES_IN, 10) * 1000; // Convert to milliseconds
   const cookieName = isAdmin ? ADMIN_COOKIE_NAME : COOKIE_NAME;
 
