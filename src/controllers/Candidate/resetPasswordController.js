@@ -11,7 +11,7 @@ const requestPasswordReset = async (req, res) => {
     const candidate = await Candidate.findOne({ where: { email } });
 
     if (!candidate) {
-      return generateResponse(res, 404, 'Candidate not found');
+      return generateResponse(res, 404, 'Email not found');
     }
 
     await sendPasswordResetEmail(candidate, 'candidate');
