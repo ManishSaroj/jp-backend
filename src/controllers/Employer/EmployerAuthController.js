@@ -13,7 +13,7 @@ exports.googleAuthEmployerCallback = (req, res, next) => {
     if (!employer) {
       return res.redirect(`${process.env.FRONTEND_BASE_URL}/login?error=authentication_failed`);
     }
-    const token = jwt.sign({ id: employer.eid, type: 'employer' }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: employer.eid, role: 'employer' }, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRES_IN
     });
     res.cookie(process.env.COOKIE_NAME, token, {
@@ -22,6 +22,6 @@ exports.googleAuthEmployerCallback = (req, res, next) => {
       secure: process.env.NODE_ENV === 'production',
       domain: process.env.COOKIE_DOMAIN
     });
-    res.redirect(`${process.env.FRONTEND_BASE_URL}/employerdashboard`);
+    res.redirect(`http://localhost:5173/employerdashboard`);
   })(req, res, next);
 };
