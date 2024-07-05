@@ -8,7 +8,7 @@ const getAllEmployersWithProfiles = async (req, res) => {
       attributes: ['email'],
       include: [{
         model: EmployerProfile,
-        attributes: ['profileId', 'eid', 'company_name', 'phone_number', 'company_website']
+        attributes: ['profileId', 'eid', 'company_name', 'phone_number', 'city', 'company_website']
       }]
     });
 

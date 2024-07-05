@@ -9,7 +9,7 @@ const getAllCandidatesWithProfiles = async (req, res) => {
       include: [{
         model: CandidateProfile,
         as: 'CandidateProfile',
-        attributes: ['profileId', 'cid', 'candidate_name', 'phone_number', 'qualification']
+        attributes: ['profileId', 'cid', 'candidate_name', 'phone_number', 'city', 'qualification']
       }]
     });
 
