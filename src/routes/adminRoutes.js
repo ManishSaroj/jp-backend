@@ -12,10 +12,10 @@ const router = express.Router();
 router.post('/login', loginAdmin);
 
 
-router.get('/candidates', checkAuth, getAllCandidatesWithProfiles);
+router.get('/candidates', getAllCandidatesWithProfiles);
 router.get('/candidates/profile/:profileId', checkAuth, getCandidateProfileById);
 
-router.get('/employers', checkAuth, getAllEmployersWithProfiles);
+router.get('/employers', getAllEmployersWithProfiles);
 router.get('/employers/profile/:profileId', checkAuth, getEmployerProfileById);
 
 
