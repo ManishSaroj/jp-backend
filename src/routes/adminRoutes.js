@@ -10,7 +10,7 @@ const router = express.Router();
 router.post('/login', loginAdmin);
 
 
-router.get('/candidates', checkAuth, getAllCandidatesWithProfiles);
+router.get('/candidates', getAllCandidatesWithProfiles);
 
 
 module.exports = router;
