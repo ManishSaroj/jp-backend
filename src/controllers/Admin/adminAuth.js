@@ -1,7 +1,7 @@
 const Admin = require('../../models/AdminModel');
 const bcrypt = require('bcryptjs');
 const { generateResponse } = require('../../utils/responseUtils');
-const { generateToken, setTokenCookie } = require('../../utils/jwtUtils');
+const { generateToken, setTokenCookie } = require('../../utils/adminJwtUtils');
 
 const loginAdmin = async (req, res) => {
   const { email, password } = req.body;
