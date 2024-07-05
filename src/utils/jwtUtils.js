@@ -5,7 +5,6 @@ const SECRET = process.env.JWT_SECRET || 'your-secret-key';
 const EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1h';
 const COOKIE_EXPIRES_IN = process.env.JWT_COOKIE_EXPIRES_IN || '1d';
 const COOKIE_NAME = process.env.COOKIE_NAME || 'sessionToken';
-const ADMIN_COOKIE_NAME = process.env.ADMIN_COOKIE_NAME || 'aplakaam';
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const COOKIE_DOMAIN = process.env.COOKIE_DOMAIN || undefined;
 
@@ -22,11 +21,10 @@ const verifyToken = (token) => {
   }
 };
 
-const setTokenCookie = (res, token, isAdmin = false) => {
+const setTokenCookie = (res, token) => {
   const cookieMaxAge = parseInt(COOKIE_EXPIRES_IN, 10) * 1000; // Convert to milliseconds
-  const cookieName = isAdmin ? ADMIN_COOKIE_NAME : COOKIE_NAME;
 
-  res.cookie(cookieName, token, {
+  res.cookie(COOKIE_NAME, token, {
     httpOnly: true,
     secure: IS_PRODUCTION,
     maxAge: cookieMaxAge,

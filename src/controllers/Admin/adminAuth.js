@@ -23,7 +23,7 @@ const loginAdmin = async (req, res) => {
     });
   
     // Set the token as a cookie
-    setTokenCookie(res, token, true);
+    setTokenCookie(res, token);
 
     generateResponse(res, 200, 'Admin logged in successfully', { admin: { aid: admin.aid, email: admin.email } });
   } catch (error) {
