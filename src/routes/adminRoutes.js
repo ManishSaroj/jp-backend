@@ -13,10 +13,10 @@ router.post('/login', loginAdmin);
 
 
 router.get('/candidates', getAllCandidatesWithProfiles);
-router.get('/candidates/profile/:profileId', checkAuth, getCandidateProfileById);
+router.get('/candidates/profile/:profileId', getCandidateProfileById);
 
 router.get('/employers', getAllEmployersWithProfiles);
-router.get('/employers/profile/:profileId', checkAuth, getEmployerProfileById);
+router.get('/employers/profile/:profileId', getEmployerProfileById);
 
 
 module.exports = router;
