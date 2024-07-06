@@ -13,7 +13,7 @@ exports.googleAuthCandidateCallback = (req, res, next) => {
     if (!candidate) {
       return res.redirect(`${process.env.FRONTEND_BASE_URL}/login?error=authentication_failed`);
     }
-    const token = jwt.sign({ id: candidate.cid, type: 'candidate' }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: candidate.cid, role: 'candidate' }, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRES_IN
     });
     res.cookie(process.env.COOKIE_NAME, token, {
