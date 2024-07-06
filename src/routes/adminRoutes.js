@@ -3,7 +3,7 @@ const router = express.Router();
 const { loginAdmin } = require('../controllers/Admin/adminAuth');
 const checkAdminAuth = require('../middlewares/adminAuthMiddleware');
 const adminlogoutMiddleware = require('../middlewares/adminLogoutMiddleware'); // Assuming this is the path to your logout middleware
-const { getAllCandidatesWithProfiles, getCandidateProfileById } = require('../controllers/Admin/adminCandidateController');
+const { getAllCandidatesWithProfiles, getCandidateProfileById, uploadFiles, updateCandidateAndProfile } = require('../controllers/Admin/adminCandidateController');
 const { getAllEmployersWithProfiles, getEmployerProfileById } = require('../controllers/Admin/adminEmployerController');
 
 // Authentication route
@@ -20,6 +20,7 @@ router.get('/checkAdminAuth', checkAdminAuth, (req, res) => {
 
 router.get('/candidates', getAllCandidatesWithProfiles);
 router.get('/candidates/profile/:profileId', getCandidateProfileById);
+router.put('/candidates/profile/:profileId', checkAdminAuth, uploadFiles, updateCandidateAndProfile);
 
 router.get('/employers', getAllEmployersWithProfiles);
 router.get('/employers/profile/:profileId', getEmployerProfileById);
