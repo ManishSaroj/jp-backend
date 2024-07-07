@@ -1,5 +1,5 @@
-const { Resume, Education, Experience, Project, Certification } = require('../../models/ResumeModal');
-const Candidate = require('../../models/CandidateModel');
+const { Resume, Education, Experience, Project, Certification } = require('../../models/Candidate/ResumeModal');
+const Candidate = require('../../models/Candidate/CandidateModel');
 const { generateResponse } = require('../../utils/responseUtils');
 
 // Create a new resume

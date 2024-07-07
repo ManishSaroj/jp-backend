@@ -1,7 +1,7 @@
 const Employer = require('../../models/EmployerModel');
 const EmployerJobPost = require('../../models/EmployerJobPost');
 const JobApplication = require('../../models/JobApplication');
-const CandidateProfile = require('../../models/CandidateProfile');
+const CandidateProfile = require('../../models/Candidate/CandidateProfile');
 const { employerSequelize } = require('../../config/db.config')
 const { generateResponse } = require('../../utils/responseUtils');
 const { formatDate } = require('../../utils/dateUtils')

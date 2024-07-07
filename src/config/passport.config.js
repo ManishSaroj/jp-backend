@@ -2,8 +2,8 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const axios = require('axios');
 
-const Candidate = require('../models/CandidateModel');
-const CandidateProfile = require('../models/CandidateProfile');
+const Candidate = require('../models/Candidate/CandidateModel');
+const CandidateProfile = require('../models/Candidate/CandidateProfile');
 const Employer = require('../models/EmployerModel');
 const EmployerProfile = require('../models/EmployerProfile');
 

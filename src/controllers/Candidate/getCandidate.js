@@ -1,5 +1,5 @@
 const { generateResponse } = require('../../utils/responseUtils');
-const Candidate = require('../../models/CandidateModel');
+const Candidate = require('../../models/Candidate/CandidateModel');
 const bcrypt = require('bcryptjs');
 
 // Controller method to get candidate data

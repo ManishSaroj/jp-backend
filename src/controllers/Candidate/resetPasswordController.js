@@ -1,4 +1,4 @@
-const Candidate = require('../../models/CandidateModel');
+const Candidate = require('../../models/Candidate/CandidateModel');
 const { sendPasswordResetEmail } = require('../../utils/resetPasswordUtils');
 const { generateResponse } = require('../../utils/responseUtils');
 const bcrypt = require('bcryptjs');

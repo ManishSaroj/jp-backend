@@ -1,6 +1,6 @@
 // CandidateProfileModel.js
 const { DataTypes } = require('sequelize');
-const { candidateSequelize } = require('../config/db.config');
+const { candidateSequelize } = require('../../config/db.config');
 const Candidate = require('./CandidateModel');
 
 const CandidateProfile = candidateSequelize.define('CandidateProfile', {
