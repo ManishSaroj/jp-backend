@@ -1,4 +1,4 @@
-const Employer = require('../../models/EmployerModel');
+const Employer = require('../../models/Employer/EmployerModel');
 const { sendPasswordResetEmail } = require('../../utils/resetPasswordUtils');
 const { generateResponse } = require('../../utils/responseUtils');
 const bcrypt = require('bcryptjs');

@@ -1,5 +1,5 @@
-const Employer = require('../../models/EmployerModel');
-const EmployerProfile = require('../../models/EmployerProfile');
+const Employer = require('../../models/Employer/EmployerModel');
+const EmployerProfile = require('../../models/Employer/EmployerProfile');
 const bcrypt = require('bcryptjs');
 const { sendVerificationEmail } = require('../../utils/verifyEmailUtils'); 
 const { generateResponse } = require('../../utils/responseUtils');

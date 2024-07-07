@@ -4,8 +4,8 @@ const axios = require('axios');
 
 const Candidate = require('../models/Candidate/CandidateModel');
 const CandidateProfile = require('../models/Candidate/CandidateProfile');
-const Employer = require('../models/EmployerModel');
-const EmployerProfile = require('../models/EmployerProfile');
+const Employer = require('../models/Employer/EmployerModel');
+const EmployerProfile = require('../models/Employer/EmployerProfile');
 
 const handleGoogleCallback = async (accessToken, refreshToken, profile, done, UserModel, ProfileModel, userKey, profileKey) => {
   try {

@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const { employerSequelize } = require('../config/db.config');
+const { employerSequelize } = require('../../config/db.config');
 
 const Employer = employerSequelize.define('Employer', {
   eid: {

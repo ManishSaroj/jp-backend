@@ -1,7 +1,7 @@
-const EmployerJobPost = require('../../models/EmployerJobPost');
-const EmployerProfile = require('../../models/EmployerProfile');
-const Employer = require('../../models/EmployerModel');
-const JobApplication = require('../../models/JobApplication');
+const EmployerJobPost = require('../../models/Employer/EmployerJobPost');
+const EmployerProfile = require('../../models/Employer/EmployerProfile');
+const Employer = require('../../models/Employer/EmployerModel');
+const JobApplication = require('../../models/Employer/JobApplication');
 const CandidateProfile = require('../../models/Candidate/CandidateProfile');
 const { generateResponse } = require('../../utils/responseUtils');
 const { calculatePostedDateTimeline, formatDate, convertToFormattedDate } = require('../../utils/dateUtils');

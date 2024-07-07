@@ -1,6 +1,6 @@
-const Employer = require('../../models/EmployerModel');
-const EmployerJobPost = require('../../models/EmployerJobPost');
-const JobApplication = require('../../models/JobApplication');
+const Employer = require('../../models/Employer/EmployerModel');
+const EmployerJobPost = require('../../models/Employer/EmployerJobPost');
+const JobApplication = require('../../models/Employer/JobApplication');
 const CandidateProfile = require('../../models/Candidate/CandidateProfile');
 const { employerSequelize } = require('../../config/db.config')
 const { generateResponse } = require('../../utils/responseUtils');

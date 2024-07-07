@@ -1,5 +1,5 @@
 const { generateResponse } = require('../../utils/responseUtils');
-const Employer = require('../../models/EmployerModel');
+const Employer = require('../../models/Employer/EmployerModel');
 const bcrypt = require('bcryptjs');
 
 // Controller method to get employer data

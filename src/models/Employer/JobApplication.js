@@ -60,7 +60,7 @@
 // module.exports = JobApplication;
 
 const { DataTypes } = require('sequelize');
-const { employerSequelize } = require('../config/db.config');
+const { employerSequelize } = require('../../config/db.config');
 const EmployerJobPost = require('./EmployerJobPost');
 const EmployerProfile = require('./EmployerProfile');
 

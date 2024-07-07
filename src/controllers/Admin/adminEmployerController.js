@@ -1,5 +1,5 @@
-const Employer = require('../../models/EmployerModel');
-const EmployerProfile = require('../../models/EmployerProfile');
+const Employer = require('../../models/Employer/EmployerModel');
+const EmployerProfile = require('../../models/Employer/EmployerProfile');
 const { generateResponse } = require('../../utils/responseUtils');
 
 const getAllEmployersWithProfiles = async (req, res) => {

@@ -1,6 +1,6 @@
-const SavedCandidate = require('../../models/savedCandidate');
+const SavedCandidate = require('../../models/Employer/savedCandidate');
 const CandidateProfile = require('../../models/Candidate/CandidateProfile');
-const EmployerProfile = require('../../models/EmployerProfile');
+const EmployerProfile = require('../../models/Employer/EmployerProfile');
 const { generateResponse } = require('../../utils/responseUtils');
 const { employerSequelize, candidateSequelize } = require('../../config/db.config');
 
