@@ -154,4 +154,3 @@ const getCandidateProfileById = async (req, res) => {
     updateCandidateAndProfile,
     uploadFiles
   };
-  
