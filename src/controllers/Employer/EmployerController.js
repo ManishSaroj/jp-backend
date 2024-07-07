@@ -42,7 +42,7 @@ const registerEmployer = async (req, res) => {
 };
 
 const loginEmployer = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, rememberMe } = req.body;
   try {
     const employer = await Employer.findOne({ where: { email } });
     if (!employer) {
@@ -62,11 +62,11 @@ const loginEmployer = async (req, res) => {
     const token = generateToken({
       id: employer.eid,
       role: 'employer',
-    });
+    }, rememberMe);
   
-    setTokenCookie(res, token);
+    setTokenCookie(res, token, rememberMe);
 
-    generateResponse(res, 200, 'Employer logged in successfully', { employer, token });
+    generateResponse(res, 200, 'Employer logged in successfully', { employer });
   } catch (error) {
     console.error('Error logging in employer:', error);
     generateResponse(res, 500, 'Server error', null, error.message);

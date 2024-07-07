@@ -42,7 +42,7 @@ const registerCandidate = async (req, res) => {
 };
 
 const loginCandidate = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, rememberMe } = req.body;
   try {
     const candidate = await Candidate.findOne({ where: { email } });
     if (!candidate) {
@@ -62,9 +62,10 @@ const loginCandidate = async (req, res) => {
     const token = generateToken({
       id: candidate.cid,
       role: 'candidate',
-    });
+    }, rememberMe);
   
-    setTokenCookie(res, token);
+    
+    setTokenCookie(res, token, rememberMe);
 
     generateResponse(res, 200, 'Candidate logged in successfully', { candidate });
   } catch (error) {
