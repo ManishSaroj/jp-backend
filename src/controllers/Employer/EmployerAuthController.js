@@ -22,6 +22,6 @@ exports.googleAuthEmployerCallback = (req, res, next) => {
       secure: process.env.NODE_ENV === 'production',
       domain: process.env.COOKIE_DOMAIN
     });
-    res.redirect(`http://localhost:5173/employerdashboard`);
+    res.redirect(`${process.env.FRONTEND_BASE_URL}/employerdashboard`);
   })(req, res, next);
 };

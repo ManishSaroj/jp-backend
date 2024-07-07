@@ -1,4 +1,4 @@
-const Admin = require('../../models/AdminModel');
+const Admin = require('../../models/Admin/AdminModel');
 const bcrypt = require('bcryptjs');
 const { generateResponse } = require('../../utils/responseUtils');
 const { generateToken, setTokenCookie } = require('../../utils/adminJwtUtils');
