@@ -7,6 +7,7 @@ const { generateResponse } = require('../../utils/responseUtils');
 const { calculatePostedDateTimeline, formatDate, convertToFormattedDate } = require('../../utils/dateUtils');
 const { employerSequelize } = require('../../config/db.config')
 const { Op } = require('sequelize');
+const Notification = require('../../models/Employer/jobUpdateNotification')
 
 const getAllJobPosts = async (req, res) => {
     try {
@@ -135,6 +136,16 @@ const applyForJob = async (req, res) => {
                 where: { jobpostId },
                 transaction: t
             });
+
+             // Create a notification for the candidate
+             await Notification.create({
+                profileId: candidateProfileId,
+                applicationId: jobApplication.applicationId, // Assuming id is the primary key of JobApplication
+                notificationType: 'Applied',
+                messageKey: 'Applied', // Assuming 'Applied' is the messageKey for application submitted
+                isRead: false,
+                createdAt: new Date()
+            }, { transaction: t });
 
             return jobApplication;
         });
