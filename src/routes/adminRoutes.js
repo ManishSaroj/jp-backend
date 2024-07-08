@@ -5,6 +5,7 @@ const checkAdminAuth = require('../middlewares/adminAuthMiddleware');
 const adminlogoutMiddleware = require('../middlewares/adminLogoutMiddleware'); // Assuming this is the path to your logout middleware
 const { getAllCandidatesWithProfiles, getCandidateProfileById, uploadFiles, updateCandidateAndProfile } = require('../controllers/Admin/adminCandidateController');
 const { getAllEmployersWithProfiles, getEmployerProfileById } = require('../controllers/Admin/adminEmployerController');
+const { updateJobCategory, getJobCategory, updateJobType, getJobType } = require('../controllers/Admin/AdminProfileController'); // Import the profile controllers for job category and job type
 
 // Authentication route
 router.post('/login', loginAdmin);
@@ -24,5 +25,13 @@ router.put('/candidates/profile/:profileId', checkAdminAuth, uploadFiles, update
 
 router.get('/employers', getAllEmployersWithProfiles);
 router.get('/employers/profile/:profileId', getEmployerProfileById);
+
+// Routes for job category and job type
+router.put('/jobCategory/:profileId', updateJobCategory);
+router.get('/jobCategory/:profileId',  getJobCategory);
+
+router.put('/jobType/profile/:profileId',  updateJobType);
+router.get('/jobType/profile/:profileId',  getJobType);
+
 
 module.exports = router;
