@@ -27,11 +27,10 @@ router.get('/employers', getAllEmployersWithProfiles);
 router.get('/employers/profile/:profileId', getEmployerProfileById);
 
 // Routes for job category and job type
-router.put('/jobCategory/:profileId', updateJobCategory);
-router.get('/jobCategory/:profileId',  getJobCategory);
-
-router.put('/jobType/profile/:profileId',  updateJobType);
-router.get('/jobType/profile/:profileId',  getJobType);
+router.put('/jobCategory',checkAdminAuth, updateJobCategory);
+router.get('/jobCategory',checkAdminAuth, getJobCategory);
+router.put('/jobType',checkAdminAuth, updateJobType);
+router.get('/jobType',checkAdminAuth, getJobType);
 
 
 module.exports = router;

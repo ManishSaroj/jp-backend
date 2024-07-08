@@ -4,12 +4,12 @@ const AdminProfile = require('../../models/Admin/AdminProfile');
 const { generateResponse } = require('../../utils/responseUtils');
 
 const updateJobCategory = async (req, res) => {
-  const { profileId } = req.params; // Assuming `profileId` is passed in the route params
+  const aid = req.admin.id; // Get aid from the token
   const { jobCategory } = req.body;
 
   try {
-    // Find the admin profile by profile ID (`profileId`)
-    let adminProfile = await AdminProfile.findOne({ where: { profileId } });
+    // Find the admin profile by aid
+    let adminProfile = await AdminProfile.findOne({ where: { aid } });
 
     if (!adminProfile) {
       return generateResponse(res, 404, 'Admin profile not found');
@@ -30,12 +30,12 @@ const updateJobCategory = async (req, res) => {
 };
 
 const getJobCategory = async (req, res) => {
-  const { profileId } = req.params; // Assuming `profileId` is passed in the route params
+  const aid = req.admin.id; // Get aid from the token
 
   try {
-    // Find the admin profile by profile ID (`profileId`)
-    const adminProfile = await AdminProfile.findOne({ 
-      where: { profileId },
+    // Find the admin profile by aid
+    const adminProfile = await AdminProfile.findOne({
+      where: { aid },
       attributes: ['jobCategory'], // Specify the attribute to retrieve
     });
 
@@ -51,12 +51,12 @@ const getJobCategory = async (req, res) => {
 };
 
 const updateJobType = async (req, res) => {
-  const { profileId } = req.params; // Assuming `profileId` is passed in the route params
+  const aid = req.admin.id; // Get aid from the token
   const { jobType } = req.body;
 
   try {
-    // Find the admin profile by profile ID (`profileId`)
-    let adminProfile = await AdminProfile.findOne({ where: { profileId } });
+    // Find the admin profile by aid
+    let adminProfile = await AdminProfile.findOne({ where: { aid } });
 
     if (!adminProfile) {
       return generateResponse(res, 404, 'Admin profile not found');
@@ -77,12 +77,12 @@ const updateJobType = async (req, res) => {
 };
 
 const getJobType = async (req, res) => {
-  const { profileId } = req.params; // Assuming `profileId` is passed in the route params
+  const aid = req.admin.id; // Get aid from the token
 
   try {
-    // Find the admin profile by profile ID (`profileId`)
-    const adminProfile = await AdminProfile.findOne({ 
-      where: { profileId },
+    // Find the admin profile by aid
+    const adminProfile = await AdminProfile.findOne({
+      where: { aid },
       attributes: ['jobType'], // Specify the attribute to retrieve
     });
 
