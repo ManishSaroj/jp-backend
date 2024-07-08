@@ -150,8 +150,7 @@ const getShortNotificationsForCandidate = async (req, res) => {
     }
 };
 
-
 module.exports = {
     getNotificationsForCandidate,
-    getShortNotificationsForCandidate
+    getShortNotificationsForCandidate,
 };

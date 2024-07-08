@@ -39,6 +39,11 @@ app.use(passport.session());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
+//sseConnection
+app.use((req, res, next) => {
+  req.app.locals.sseConnections = req.app.locals.sseConnections || {};
+  next();
+});
 
 // Routes
 app.use('/api/admin', adminRoutes);

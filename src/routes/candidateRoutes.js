@@ -9,6 +9,7 @@ const { createOrUpdateCandidateProfile, updateLookingForJobStatus, getCandidateP
 const { createResume, updateResume, deleteResume, getAllResumes, getResumeById, getResumeByCandidateId } = require('../controllers/Candidate/resumeController');
 const { getAllJobPosts, getJobPostById, applyForJob, getAppliedJobsForCandidate } = require('../controllers/Candidate/getAllJobPosts');
 const { getNotificationsForCandidate, getShortNotificationsForCandidate } = require('../controllers/Candidate/notificationController');
+const sseMiddleware = require('../middlewares/sseMiddleware');
 
 const router = express.Router();
 
@@ -50,5 +51,21 @@ router.get('/jobposts/applied', checkAuth, getAppliedJobsForCandidate);
 
 router.get('/notifications/:profileId', getNotificationsForCandidate);
 router.get('/short-notifications/:profileId', getShortNotificationsForCandidate);
-
+// SSE route for notifications
+router.get('/notifications/sse/:profileId', sseMiddleware, (req, res) => {
+    const { profileId } = req.params;
+  
+    // Set up SSE
+    res.sseSetup();
+  
+    // Store the connection
+    req.app.locals.sseConnections = req.app.locals.sseConnections || {};
+    req.app.locals.sseConnections[profileId] = res;
+  
+    // Remove the connection when the client disconnects
+    req.on('close', () => {
+      delete req.app.locals.sseConnections[profileId];
+    });
+  });
+  
 module.exports = router;

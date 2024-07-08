@@ -138,7 +138,7 @@ const applyForJob = async (req, res) => {
             });
 
              // Create a notification for the candidate
-             await Notification.create({
+             const notification = await Notification.create({
                 profileId: candidateProfileId,
                 applicationId: jobApplication.applicationId, // Assuming id is the primary key of JobApplication
                 notificationType: 'Applied',
@@ -146,6 +146,15 @@ const applyForJob = async (req, res) => {
                 isRead: false,
                 createdAt: new Date()
             }, { transaction: t });
+
+
+             // Send SSE event if there's an active connection
+            if (req.app.locals.sseConnections && req.app.locals.sseConnections[candidateProfileId]) {
+                req.app.locals.sseConnections[candidateProfileId].sseSend({
+                type: 'new_notification',
+                data: notification
+                });
+            }
 
             return jobApplication;
         });
