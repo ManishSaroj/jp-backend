@@ -1,3 +1,5 @@
 // messageTemplates/Hired.js
-module.exports = `Congratulations! We are excited to offer you a position at our company. Your skills and experiences are a great fit for our team, and we look forward to your contributions. 
-                  Please review the attached offer letter for more details.`;
+module.exports = {
+    message1: '🎊 You’re Hired!',
+    message2: `🎊 Congratulations! We’re excited to offer you a position. Check your email for the offer letter and next steps.`
+  };

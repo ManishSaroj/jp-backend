@@ -7,7 +7,7 @@ const { generateResponse } = require('../../utils/responseUtils');
 const { calculatePostedDateTimeline, formatDate, convertToFormattedDate } = require('../../utils/dateUtils');
 const { employerSequelize } = require('../../config/db.config')
 const { Op } = require('sequelize');
-const Notification = require('../../models/Employer/jobUpdateNotification')
+const CandidateNotification = require('../../models/Employer/jobUpdateNotification')
 
 const getAllJobPosts = async (req, res) => {
     try {
@@ -30,8 +30,12 @@ const getAllJobPosts = async (req, res) => {
         if (search) {
             whereClause[Op.or] = [
                 { jobTitle: { [Op.like]: `%${search}%` } },
+                { jobCategory: { [Op.like]: `%${search}%`} },
+                { jobType: { [Op.like]: `%${search}%`} },
+                { qualification: { [Op.like]: `%${search}%`} }, //
                 { city: { [Op.like]: `%${search}%` } },
-                { skills: { [Op.like]: `%${search}%` } }
+                { skills: { [Op.like]: `%${search}%` } }, //
+                
             ];
         }
 
@@ -138,9 +142,10 @@ const applyForJob = async (req, res) => {
             });
 
             // Create a notification for the candidate
-            const notification = await Notification.create({
+            const notification = await CandidateNotification.create({
                 profileId: candidateProfileId,
                 applicationId: jobApplication.applicationId,
+                jobpostId: jobApplication.jobpostId,
                 notificationType: 'Applied',
                 messageKey: 'Applied',
                 isRead: false,
@@ -233,11 +238,6 @@ const getAppliedJobsForCandidate = async (req, res) => {
         return generateResponse(res, 500, 'Server error', null, error.message);
     }
 };
-
-
-
-
-
 
 // Helper functions
 

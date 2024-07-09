@@ -5,6 +5,7 @@ const CandidateProfile = require('../../models/Candidate/CandidateProfile');
 const { employerSequelize } = require('../../config/db.config')
 const { generateResponse } = require('../../utils/responseUtils');
 const { formatDate } = require('../../utils/dateUtils')
+const CandidateNotification = require('../../models/Employer/jobUpdateNotification')
 
 const createJobPost = async (req, res) => {
     const {
@@ -171,7 +172,6 @@ const updateJobPost = async (req, res) => {
     }
 };
 
-
 // In your employerController.js or similar file
 const getAppliedCandidates = async (req, res) => {
     try {
@@ -247,9 +247,6 @@ const getAppliedCandidates = async (req, res) => {
         return generateResponse(res, 500, 'Server error', null, error.message);
     }
 };
-
-
-
 
 const getCandidateDetails = async (req, res) => {
     try {
@@ -382,8 +379,6 @@ const deleteJobPost = async (req, res) => {
     }
   };
 
-
-
 const getApplicationStatus = async (req, res) => {
     try {
         if (!req.user || !req.user.id) {
@@ -417,6 +412,72 @@ const getApplicationStatus = async (req, res) => {
     }
 };
 
+// const updateApplicationStatus = async (req, res) => {
+//     try {
+//         if (!req.user || !req.user.id) {
+//             return generateResponse(res, 401, 'Unauthorized: User not authenticated');
+//         }
+
+//         const { applicationId } = req.params;
+//         const { newStatus } = req.body;
+//         const eid = req.user.id;
+
+//         const validStatuses = ['Applied', 'Under Review', 'Shortlisted', 'Rejected', 'Hired'];
+//         if (!validStatuses.includes(newStatus)) {
+//             return generateResponse(res, 400, 'Invalid status provided');
+//         }
+
+//         const jobApplication = await JobApplication.findOne({
+//             where: { applicationId },
+//             include: [{ model: EmployerJobPost, where: { eid } }]
+//         });
+
+//         if (!jobApplication) {
+//             return generateResponse(res, 404, 'Job application not found');
+//         }
+
+//         const previousStatus = jobApplication.status;
+
+//         if (previousStatus !== newStatus) {
+//             if (newStatus === 'Hired') {
+//                 jobApplication.isHired = true;
+//                 jobApplication.isRejected = false;
+//             } else if (newStatus === 'Rejected') {
+//                 jobApplication.isRejected = true;
+//                 jobApplication.isHired = false;
+//             } else if (newStatus === 'Shortlisted') {
+//                 jobApplication.isShortlisted = true;
+                
+//                 // Increase shortlistedCandidatesCount for the job post
+//                 const jobPost = await EmployerJobPost.findByPk(jobApplication.jobpostId);
+//                 if (jobPost) {
+//                     jobPost.shortlistedCandidatesCount += 1;
+//                     await jobPost.save();
+//                 }
+//             } else if (newStatus === 'Under Review') {
+//                 jobApplication.isUnderReview = true;
+//             } else if (newStatus === 'Applied') {
+//                 jobApplication.isApplied = true;
+//             }
+
+//             await jobApplication.save();
+//         }
+
+//         const updatedApplication = await JobApplication.findByPk(applicationId);
+
+//         return generateResponse(res, 200, 'Application status updated successfully', {
+//           isHired: updatedApplication.isHired,
+//           isShortlisted: updatedApplication.isShortlisted,
+//           isRejected: updatedApplication.isRejected,
+//           isUnderReview: updatedApplication.isUnderReview,
+//           status: updatedApplication.status
+//         });
+//     } catch (error) {
+//         console.error('Error updating application status:', error);
+//         return generateResponse(res, 500, 'Server error', null, error.message);
+//     }
+// };
+
 const updateApplicationStatus = async (req, res) => {
     try {
         if (!req.user || !req.user.id) {
@@ -443,46 +504,85 @@ const updateApplicationStatus = async (req, res) => {
 
         const previousStatus = jobApplication.status;
 
-        if (previousStatus !== newStatus) {
-            if (newStatus === 'Hired') {
-                jobApplication.isHired = true;
-                jobApplication.isRejected = false;
-            } else if (newStatus === 'Rejected') {
-                jobApplication.isRejected = true;
-                jobApplication.isHired = false;
-            } else if (newStatus === 'Shortlisted') {
-                jobApplication.isShortlisted = true;
+        // Start a transaction
+        const result = await employerSequelize.transaction(async (t) => {
+            if (previousStatus !== newStatus) {
+                jobApplication.status = newStatus;
                 
-                // Increase shortlistedCandidatesCount for the job post
-                const jobPost = await EmployerJobPost.findByPk(jobApplication.jobpostId);
-                if (jobPost) {
-                    jobPost.shortlistedCandidatesCount += 1;
-                    await jobPost.save();
+                switch (newStatus) {
+                    case 'Hired':
+                        jobApplication.isHired = true;
+                        jobApplication.isRejected = false;
+                        break;
+                    case 'Rejected':
+                        jobApplication.isRejected = true;
+                        jobApplication.isHired = false;
+                        break;
+                    case 'Shortlisted':
+                        jobApplication.isShortlisted = true;
+                        break;
+                    case 'Under Review':
+                        jobApplication.isUnderReview = true;
+                        break;
                 }
-            } else if (newStatus === 'Under Review') {
-                jobApplication.isUnderReview = true;
-            } else if (newStatus === 'Applied') {
-                jobApplication.isApplied = true;
+
+                await jobApplication.save({ transaction: t });
+
+                // Create a notification
+                let messageKey = newStatus.replace(/\s+/g, '');
+                if (previousStatus === 'Hired' && newStatus === 'Rejected') {
+                    messageKey = 'HiredThenRejected';
+                }
+
+                const notification = await CandidateNotification.create({
+                    profileId: jobApplication.candidateProfileId,
+                    applicationId: jobApplication.applicationId,
+                    jobpostId: jobApplication.jobpostId,
+                    notificationType: newStatus,
+                    messageKey: messageKey,
+                    isRead: false,
+                    createdAt: new Date()
+                }, { transaction: t });
+
+                // Fetch job details for the notification
+                const jobPost = await EmployerJobPost.findByPk(jobApplication.jobpostId, { transaction: t });
+                const messageTemplate = require(`../../messageTemplates/${messageKey}`);
+                const message = messageTemplate.message1;
+
+                const formattedNotification = {
+                    notificationId: notification.notificationId,
+                    applicationId: notification.applicationId,
+                    notificationType: notification.notificationType,
+                    isRead: notification.isRead,
+                    createdAt: formatDate(notification.createdAt),
+                    message: message,
+                    jobTitle: jobPost.jobTitle
+                };
+
+                // Send SSE event if there's an active connection
+                if (req.app.locals.sseConnections && req.app.locals.sseConnections[jobApplication.candidateProfileId]) {
+                    req.app.locals.sseConnections[jobApplication.candidateProfileId].sseSend({
+                        type: 'new_notification',
+                        data: formattedNotification
+                    });
+                }
             }
 
-            await jobApplication.save();
-        }
-
-        const updatedApplication = await JobApplication.findByPk(applicationId);
+            return jobApplication;
+        });
 
         return generateResponse(res, 200, 'Application status updated successfully', {
-          isHired: updatedApplication.isHired,
-          isShortlisted: updatedApplication.isShortlisted,
-          isRejected: updatedApplication.isRejected,
-          isUnderReview: updatedApplication.isUnderReview,
-          status: updatedApplication.status
+            isHired: result.isHired,
+            isShortlisted: result.isShortlisted,
+            isRejected: result.isRejected,
+            isUnderReview: result.isUnderReview,
+            status: result.status
         });
     } catch (error) {
         console.error('Error updating application status:', error);
         return generateResponse(res, 500, 'Server error', null, error.message);
     }
 };
-
 
 const getShortlistedCandidates = async (req, res) => {
     try {

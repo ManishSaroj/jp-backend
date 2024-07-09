@@ -1,3 +1,5 @@
 // messageTemplates/UnderReview.js
-module.exports = `Your application is currently under review. Our hiring team is carefully evaluating your skills and experience to see if they match our requirements. 
-                  We appreciate your patience during this process.`;
+module.exports = {
+    message1: '🔍 Application Under Review!',
+    message2: `🕵️‍♂️ Good news! Your application is being reviewed. We’ll get back to you once we’ve had a closer look.`
+  };
