@@ -19,9 +19,13 @@ const CandidateNotification = employerSequelize.define('CandidateNotification', 
         type: DataTypes.INTEGER,
         allowNull: true,
       },
+    jobTitle: { 
+       type: DataTypes.STRING,
+       allowNull: true,
+    },
     notificationType: {
         type: DataTypes.ENUM,
-        values: ['Applied', 'UnderReview', 'Shortlisted', 'Rejected', 'Hired', 'HiredThenRejected'],
+        values: ['Applied', 'Shortlisted', 'Rejected', 'Hired', 'HiredThenRejected'],
         allowNull: true
     },
     messageKey: {

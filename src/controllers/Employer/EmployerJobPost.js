@@ -128,7 +128,7 @@ const getJobPostById = async (req, res) => {
         const eid = req.user.id;
 
         // Retrieve job post by id and employer id
-        const jobPost = await EmployerJobPost.findOne({ 
+        const jobPost = await EmployerJobPost.findOne({
             where: { jobpostId, eid }
         });
 
@@ -154,7 +154,7 @@ const updateJobPost = async (req, res) => {
         const updatedData = req.body;
 
         // Find the job post
-        const jobPost = await EmployerJobPost.findOne({ 
+        const jobPost = await EmployerJobPost.findOne({
             where: { jobpostId, eid }
         });
 
@@ -183,7 +183,7 @@ const getAppliedCandidates = async (req, res) => {
         const eid = req.user.id;
 
         // Fetch the job post to ensure it belongs to the current employer
-        const jobPost = await EmployerJobPost.findOne({ 
+        const jobPost = await EmployerJobPost.findOne({
             where: { jobpostId, eid }
         });
 
@@ -303,7 +303,7 @@ const getCandidateDetails = async (req, res) => {
         if (candidateProfile.candidate_resume) {
             candidateProfile.candidate_resume = candidateProfile.candidate_resume.toString('base64');
         }
-        
+
 
         return generateResponse(res, 200, 'Candidate profile retrieved successfully', { candidateProfile });
     } catch (error) {
@@ -322,7 +322,7 @@ const JobPostStatus = async (req, res) => {
         const eid = req.user.id;
 
         // Find the job post
-        const jobPost = await EmployerJobPost.findOne({ 
+        const jobPost = await EmployerJobPost.findOne({
             where: { jobpostId, eid }
         });
 
@@ -344,40 +344,40 @@ const JobPostStatus = async (req, res) => {
 const deleteJobPost = async (req, res) => {
     const { jobpostId } = req.params;
     const eid = req.user.id; // Assuming you have user information in the request
-  
+
     try {
-      // Start a transaction
-      const result = await employerSequelize.transaction(async (t) => {
-        // Find the job post
-        const jobPost = await EmployerJobPost.findOne({
-          where: { jobpostId, eid },
-          transaction: t,
+        // Start a transaction
+        const result = await employerSequelize.transaction(async (t) => {
+            // Find the job post
+            const jobPost = await EmployerJobPost.findOne({
+                where: { jobpostId, eid },
+                transaction: t,
+            });
+
+            if (!jobPost) {
+                return res.status(404).json({ message: 'Job post not found' });
+            }
+
+            // Delete related job applications
+            await JobApplication.destroy({
+                where: { jobpostId },
+                transaction: t,
+            });
+
+            // Delete the job post
+            await jobPost.destroy({ transaction: t });
+
+            return true;
         });
-  
-        if (!jobPost) {
-          return res.status(404).json({ message: 'Job post not found' });
+
+        if (result) {
+            res.status(200).json({ message: 'Job post and related applications deleted successfully' });
         }
-  
-        // Delete related job applications
-        await JobApplication.destroy({
-          where: { jobpostId },
-          transaction: t,
-        });
-  
-        // Delete the job post
-        await jobPost.destroy({ transaction: t });
-  
-        return true;
-      });
-  
-      if (result) {
-        res.status(200).json({ message: 'Job post and related applications deleted successfully' });
-      }
     } catch (error) {
-      console.error('Error deleting job post:', error);
-      res.status(500).json({ message: 'An error occurred while deleting the job post' });
+        console.error('Error deleting job post:', error);
+        res.status(500).json({ message: 'An error occurred while deleting the job post' });
     }
-  };
+};
 
 const getApplicationStatus = async (req, res) => {
     try {
@@ -399,7 +399,7 @@ const getApplicationStatus = async (req, res) => {
 
         const { status, isHired, isShortlisted, isRejected, isUnderReview } = jobApplication;
 
-        return generateResponse(res, 200, 'Application status retrieved successfully', { 
+        return generateResponse(res, 200, 'Application status retrieved successfully', {
             status,
             isHired,
             isShortlisted,
@@ -447,7 +447,7 @@ const getApplicationStatus = async (req, res) => {
 //                 jobApplication.isHired = false;
 //             } else if (newStatus === 'Shortlisted') {
 //                 jobApplication.isShortlisted = true;
-                
+
 //                 // Increase shortlistedCandidatesCount for the job post
 //                 const jobPost = await EmployerJobPost.findByPk(jobApplication.jobpostId);
 //                 if (jobPost) {
@@ -508,7 +508,7 @@ const updateApplicationStatus = async (req, res) => {
         const result = await employerSequelize.transaction(async (t) => {
             if (previousStatus !== newStatus) {
                 jobApplication.status = newStatus;
-                
+
                 switch (newStatus) {
                     case 'Hired':
                         jobApplication.isHired = true;
@@ -520,6 +520,12 @@ const updateApplicationStatus = async (req, res) => {
                         break;
                     case 'Shortlisted':
                         jobApplication.isShortlisted = true;
+                        // Increase shortlistedCandidatesCount for the job post
+                        const jobPost = await EmployerJobPost.findByPk(jobApplication.jobpostId, { transaction: t });
+                        if (jobPost) {
+                            jobPost.shortlistedCandidatesCount += 1;
+                            await jobPost.save({ transaction: t });
+                        }
                         break;
                     case 'Under Review':
                         jobApplication.isUnderReview = true;
@@ -528,43 +534,48 @@ const updateApplicationStatus = async (req, res) => {
 
                 await jobApplication.save({ transaction: t });
 
-                // Create a notification
-                let messageKey = newStatus.replace(/\s+/g, '');
-                if (previousStatus === 'Hired' && newStatus === 'Rejected') {
-                    messageKey = 'HiredThenRejected';
-                }
+                // Create a notification for all statuses except 'Under Review'
+                if (newStatus !== 'Under Review') {
+                    let messageKey = newStatus.replace(/\s+/g, '');
+                    if (previousStatus === 'Hired' && newStatus === 'Rejected') {
+                        messageKey = 'HiredThenRejected';
+                    }
 
-                const notification = await CandidateNotification.create({
-                    profileId: jobApplication.candidateProfileId,
-                    applicationId: jobApplication.applicationId,
-                    jobpostId: jobApplication.jobpostId,
-                    notificationType: newStatus,
-                    messageKey: messageKey,
-                    isRead: false,
-                    createdAt: new Date()
-                }, { transaction: t });
+                    const jobPost = await EmployerJobPost.findByPk(jobApplication.jobpostId, { transaction: t });
+                    const notification = await CandidateNotification.create({
+                        profileId: jobApplication.candidateProfileId,
+                        applicationId: jobApplication.applicationId,
+                        jobpostId: jobApplication.jobpostId,
+                        jobTitle: jobPost.jobTitle,
+                        notificationType: newStatus,
+                        messageKey: messageKey,
+                        isRead: false,
+                        createdAt: new Date()
+                    }, { transaction: t });
 
-                // Fetch job details for the notification
-                const jobPost = await EmployerJobPost.findByPk(jobApplication.jobpostId, { transaction: t });
-                const messageTemplate = require(`../../messageTemplates/${messageKey}`);
-                const message = messageTemplate.message1;
+                    // Fetch job details for the notification
+                    // const jobPost = await EmployerJobPost.findByPk(jobApplication.jobpostId, { transaction: t });
+                    const messageTemplate = require(`../../messageTemplates/${messageKey}`);
+                    const message = messageTemplate.message1;
 
-                const formattedNotification = {
-                    notificationId: notification.notificationId,
-                    applicationId: notification.applicationId,
-                    notificationType: notification.notificationType,
-                    isRead: notification.isRead,
-                    createdAt: formatDate(notification.createdAt),
-                    message: message,
-                    jobTitle: jobPost.jobTitle
-                };
+                    const formattedNotification = {
+                        notificationId: notification.notificationId,
+                        applicationId: notification.applicationId,
+                        jobPostId: notification.jobpostId,
+                        jobTitle: notification.jobTitle,
+                        notificationType: notification.notificationType,
+                        isRead: notification.isRead,
+                        createdAt: formatDate(notification.createdAt),
+                        message: message,
+                    };
 
-                // Send SSE event if there's an active connection
-                if (req.app.locals.sseConnections && req.app.locals.sseConnections[jobApplication.candidateProfileId]) {
-                    req.app.locals.sseConnections[jobApplication.candidateProfileId].sseSend({
-                        type: 'new_notification',
-                        data: formattedNotification
-                    });
+                    // Send SSE event if there's an active connection
+                    if (req.app.locals.sseConnections && req.app.locals.sseConnections[jobApplication.candidateProfileId]) {
+                        req.app.locals.sseConnections[jobApplication.candidateProfileId].sseSend({
+                            type: 'new_notification',
+                            data: formattedNotification
+                        });
+                    }
                 }
             }
 
@@ -594,7 +605,7 @@ const getShortlistedCandidates = async (req, res) => {
         const eid = req.user.id;
 
         // Fetch the job post to ensure it belongs to the current employer
-        const jobPost = await EmployerJobPost.findOne({ 
+        const jobPost = await EmployerJobPost.findOne({
             where: { jobpostId, eid }
         });
 
@@ -604,7 +615,7 @@ const getShortlistedCandidates = async (req, res) => {
 
         // Fetch shortlisted candidates from JobApplication
         const jobApplications = await JobApplication.findAll({
-            where: { 
+            where: {
                 jobpostId,
                 isShortlisted: true
             },
