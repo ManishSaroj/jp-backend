@@ -11,13 +11,13 @@ const Notification = require('../../models/Employer/jobUpdateNotification')
 
 const getAllJobPosts = async (req, res) => {
     try {
-        const { 
-            page = 1, 
-            limit = 10, 
-            jobType, 
-            jobCategory, 
-            state, 
-            search 
+        const {
+            page = 1,
+            limit = 10,
+            jobType,
+            jobCategory,
+            state,
+            search
         } = req.query;
 
         const offset = (page - 1) * limit;
@@ -82,7 +82,7 @@ const getJobPostById = async (req, res) => {
             ...formatJobPostResponse(jobPost),
             EmployerProfile: formatEmployerProfile(jobPost.Employer.EmployerProfile),
             hasApplied,
-            isActive: jobPost.isActive 
+            isActive: jobPost.isActive
         };
 
         return generateResponse(res, 200, 'Job post retrieved successfully', { jobPost: formattedJobPost });
@@ -137,22 +137,36 @@ const applyForJob = async (req, res) => {
                 transaction: t
             });
 
-             // Create a notification for the candidate
-             const notification = await Notification.create({
+            // Create a notification for the candidate
+            const notification = await Notification.create({
                 profileId: candidateProfileId,
-                applicationId: jobApplication.applicationId, // Assuming id is the primary key of JobApplication
+                applicationId: jobApplication.applicationId,
                 notificationType: 'Applied',
-                messageKey: 'Applied', // Assuming 'Applied' is the messageKey for application submitted
+                messageKey: 'Applied',
                 isRead: false,
                 createdAt: new Date()
             }, { transaction: t });
 
+            // Fetch additional details for the notification
+            const jobPost = await EmployerJobPost.findByPk(jobpostId, { transaction: t });
+            const messageTemplate = require(`../../messageTemplates/${notification.messageKey}`);
+            const message = messageTemplate.message1; // Assuming message1 is for short notifications
 
-             // Send SSE event if there's an active connection
+            const formattedNotification = {
+                notificationId: notification.notificationId,
+                applicationId: notification.applicationId,
+                notificationType: notification.notificationType,
+                isRead: notification.isRead,
+                createdAt: formatDate(notification.createdAt), // Ensure you have this function
+                message: message,
+                jobTitle: jobPost.jobTitle
+            };
+
+            // Send SSE event if there's an active connection
             if (req.app.locals.sseConnections && req.app.locals.sseConnections[candidateProfileId]) {
                 req.app.locals.sseConnections[candidateProfileId].sseSend({
-                type: 'new_notification',
-                data: notification
+                    type: 'new_notification',
+                    data: formattedNotification
                 });
             }
 
@@ -274,7 +288,7 @@ function formatJobPostResponse(jobPost) {
         endDateTimeline: formatDate(jobPost.endDate),
         datePosted: convertToFormattedDate(jobPost.createdAt),
         postedTimeline: calculatePostedDateTimeline(jobPost.createdAt),
-         appliedCandidatesCount: jobPost.appliedCandidatesCount 
+        appliedCandidatesCount: jobPost.appliedCandidatesCount
     };
 }
 

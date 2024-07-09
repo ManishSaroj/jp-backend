@@ -52,20 +52,24 @@ router.get('/jobposts/applied', checkAuth, getAppliedJobsForCandidate);
 router.get('/notifications/:profileId', getNotificationsForCandidate);
 router.get('/short-notifications/:profileId', getShortNotificationsForCandidate);
 // SSE route for notifications
+// ... (previous code remains the same)
+
 router.get('/notifications/sse/:profileId', sseMiddleware, (req, res) => {
-    const { profileId } = req.params;
-  
-    // Set up SSE
-    res.sseSetup();
-  
-    // Store the connection
-    req.app.locals.sseConnections = req.app.locals.sseConnections || {};
-    req.app.locals.sseConnections[profileId] = res;
-  
-    // Remove the connection when the client disconnects
-    req.on('close', () => {
-      delete req.app.locals.sseConnections[profileId];
-    });
+  const { profileId } = req.params;
+
+  res.sseSetup();
+
+  // Store the connection
+  req.app.locals.sseConnections = req.app.locals.sseConnections || {};
+  req.app.locals.sseConnections[profileId] = res;
+
+  // Send a test message
+  res.sseSend({ type: 'connection', message: 'SSE connection established' });
+
+  // Remove the connection when the client disconnects
+  req.on('close', () => {
+    delete req.app.locals.sseConnections[profileId];
   });
-  
-module.exports = router;
+});
+
+module.exports = router;  // Add this line at the end of the file
