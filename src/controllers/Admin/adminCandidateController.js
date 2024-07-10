@@ -51,9 +51,6 @@ const getCandidateProfileById = async (req, res) => {
       if (profileData.candidate_image) {
         profileData.candidate_image = profileData.candidate_image.toString('base64');
       }
-      if (profileData.candidate_banner) {
-        profileData.candidate_banner = profileData.candidate_banner.toString('base64');
-      }
       if (profileData.candidate_resume) {
         profileData.candidate_resume = profileData.candidate_resume.toString('base64');
       }
@@ -87,9 +84,6 @@ const getCandidateProfileById = async (req, res) => {
       try {
         if (req.files['candidate_image']) {
           updateData.candidate_image = req.files['candidate_image'][0].buffer;
-        }
-        if (req.files['candidate_banner']) {
-          updateData.candidate_banner = req.files['candidate_banner'][0].buffer;
         }
         if (req.files['candidate_resume']) {
           updateData.candidate_resume = req.files['candidate_resume'][0].buffer;
@@ -126,9 +120,6 @@ const getCandidateProfileById = async (req, res) => {
         const profileData = updatedProfile.toJSON();
         if (profileData.candidate_image) {
           profileData.candidate_image = profileData.candidate_image.toString('base64');
-        }
-        if (profileData.candidate_banner) {
-          profileData.candidate_banner = profileData.candidate_banner.toString('base64');
         }
         if (profileData.candidate_resume) {
           profileData.candidate_resume = profileData.candidate_resume.toString('base64');

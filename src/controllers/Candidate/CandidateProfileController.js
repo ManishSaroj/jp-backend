@@ -31,6 +31,11 @@ const createOrUpdateCandidateProfile = async (req, res) => {
         aboutme,
         linkedIn,
         github,
+        facebook,
+        twitter,
+        instagram,
+        behance,
+        dribbble,
     } = req.body;
 
     const { id: cid } = req.user;
@@ -40,8 +45,8 @@ const createOrUpdateCandidateProfile = async (req, res) => {
         if (!candidate) {
             return generateResponse(res, 404, 'Candidate not found');
         }
-        
-        let candidateProfile = await CandidateProfile.findOne({ where: { cid }});
+
+        let candidateProfile = await CandidateProfile.findOne({ where: { cid } });
 
         const updatedFields = {
             email,
@@ -64,14 +69,15 @@ const createOrUpdateCandidateProfile = async (req, res) => {
             aboutme,
             linkedIn,
             github,
+            facebook,
+            twitter,
+            instagram,
+            behance,
+            dribbble,
         };
 
         if (req.files && req.files['candidate_image']) {
             updatedFields.candidate_image = req.files['candidate_image'][0].buffer;
-        }
-
-        if (req.files && req.files['candidate_banner']) {
-            updatedFields.candidate_banner = req.files['candidate_banner'][0].buffer;
         }
 
         if (req.files && req.files['candidate_resume']) {
@@ -90,7 +96,6 @@ const createOrUpdateCandidateProfile = async (req, res) => {
         const profileData = {
             ...candidateProfile.toJSON(),
             candidate_image: candidateProfile.candidate_image ? candidateProfile.candidate_image.toString('base64') : null,
-            candidate_banner: candidateProfile.candidate_banner ? candidateProfile.candidate_banner.toString('base64') : null,
             candidate_resume: candidateProfile.candidate_resume ? candidateProfile.candidate_resume.toString('base64') : null,
             resumeFileName: candidateProfile.resumeFileName,
         };
@@ -142,7 +147,6 @@ const getCandidateProfile = async (req, res) => {
         const profileData = {
             ...candidateProfile.toJSON(),
             candidate_image: candidateProfile.candidate_image ? candidateProfile.candidate_image.toString('base64') : null,
-            candidate_banner: candidateProfile.candidate_banner ? candidateProfile.candidate_banner.toString('base64') : null,
             candidate_resume: candidateProfile.candidate_resume ? candidateProfile.candidate_resume.toString('base64') : null,
         };
 
@@ -162,7 +166,6 @@ const getAllCandidateProfiles = async (req, res) => {
         const profilesData = candidateProfiles.map(profile => ({
             ...profile.toJSON(),
             candidate_image: profile.candidate_image ? profile.candidate_image.toString('base64') : null,
-            candidate_banner: profile.candidate_banner ? profile.candidate_banner.toString('base64') : null,
             candidate_resume: profile.candidate_resume ? profile.candidate_resume.toString('base64') : null,
         }));
 

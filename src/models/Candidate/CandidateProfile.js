@@ -19,7 +19,7 @@ const CandidateProfile = candidateSequelize.define('CandidateProfile', {
   },
   candidate_name: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   phone_number: {
     type: DataTypes.STRING,
@@ -27,7 +27,7 @@ const CandidateProfile = candidateSequelize.define('CandidateProfile', {
   },
   email: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   website: {
     type: DataTypes.STRING,
@@ -98,11 +98,27 @@ const CandidateProfile = candidateSequelize.define('CandidateProfile', {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  candidate_image: {
-    type: DataTypes.BLOB('long'),
+  facebook: {
+    type: DataTypes.STRING,
     allowNull: true,
   },
-  candidate_banner: {
+  twitter: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  instagram: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  behance: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  dribbble: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  candidate_image: {
     type: DataTypes.BLOB('long'),
     allowNull: true,
   },
@@ -120,7 +136,7 @@ const CandidateProfile = candidateSequelize.define('CandidateProfile', {
     defaultValue: false, // Default value can be true or false based on your requirement
   },
 }, {
-  timestamps: false,
+  timestamps: true,
 });
 
 Candidate.hasOne(CandidateProfile, { foreignKey: 'cid' }); // One-to-One relationship

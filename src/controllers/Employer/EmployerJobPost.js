@@ -281,8 +281,12 @@ const getCandidateDetails = async (req, res) => {
                 'aboutme',
                 'linkedIn',
                 'github',
+                'facebook',
+                'twitter',
+                'instagram',
+                'behance',
+                'dribbble',
                 'candidate_image',
-                'candidate_banner',
                 'resumeFileName',
                 'candidate_resume',
                 'lookingForJobs'
@@ -297,9 +301,7 @@ const getCandidateDetails = async (req, res) => {
         if (candidateProfile.candidate_image) {
             candidateProfile.candidate_image = candidateProfile.candidate_image.toString('base64');
         }
-        if (candidateProfile.candidate_banner) {
-            candidateProfile.candidate_banner = candidateProfile.candidate_banner.toString('base64');
-        }
+       
         if (candidateProfile.candidate_resume) {
             candidateProfile.candidate_resume = candidateProfile.candidate_resume.toString('base64');
         }
@@ -411,72 +413,6 @@ const getApplicationStatus = async (req, res) => {
         return generateResponse(res, 500, 'Server error', null, error.message);
     }
 };
-
-// const updateApplicationStatus = async (req, res) => {
-//     try {
-//         if (!req.user || !req.user.id) {
-//             return generateResponse(res, 401, 'Unauthorized: User not authenticated');
-//         }
-
-//         const { applicationId } = req.params;
-//         const { newStatus } = req.body;
-//         const eid = req.user.id;
-
-//         const validStatuses = ['Applied', 'Under Review', 'Shortlisted', 'Rejected', 'Hired'];
-//         if (!validStatuses.includes(newStatus)) {
-//             return generateResponse(res, 400, 'Invalid status provided');
-//         }
-
-//         const jobApplication = await JobApplication.findOne({
-//             where: { applicationId },
-//             include: [{ model: EmployerJobPost, where: { eid } }]
-//         });
-
-//         if (!jobApplication) {
-//             return generateResponse(res, 404, 'Job application not found');
-//         }
-
-//         const previousStatus = jobApplication.status;
-
-//         if (previousStatus !== newStatus) {
-//             if (newStatus === 'Hired') {
-//                 jobApplication.isHired = true;
-//                 jobApplication.isRejected = false;
-//             } else if (newStatus === 'Rejected') {
-//                 jobApplication.isRejected = true;
-//                 jobApplication.isHired = false;
-//             } else if (newStatus === 'Shortlisted') {
-//                 jobApplication.isShortlisted = true;
-
-//                 // Increase shortlistedCandidatesCount for the job post
-//                 const jobPost = await EmployerJobPost.findByPk(jobApplication.jobpostId);
-//                 if (jobPost) {
-//                     jobPost.shortlistedCandidatesCount += 1;
-//                     await jobPost.save();
-//                 }
-//             } else if (newStatus === 'Under Review') {
-//                 jobApplication.isUnderReview = true;
-//             } else if (newStatus === 'Applied') {
-//                 jobApplication.isApplied = true;
-//             }
-
-//             await jobApplication.save();
-//         }
-
-//         const updatedApplication = await JobApplication.findByPk(applicationId);
-
-//         return generateResponse(res, 200, 'Application status updated successfully', {
-//           isHired: updatedApplication.isHired,
-//           isShortlisted: updatedApplication.isShortlisted,
-//           isRejected: updatedApplication.isRejected,
-//           isUnderReview: updatedApplication.isUnderReview,
-//           status: updatedApplication.status
-//         });
-//     } catch (error) {
-//         console.error('Error updating application status:', error);
-//         return generateResponse(res, 500, 'Server error', null, error.message);
-//     }
-// };
 
 const updateApplicationStatus = async (req, res) => {
     try {
