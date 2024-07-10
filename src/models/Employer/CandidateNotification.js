@@ -8,7 +8,7 @@ const CandidateNotification = employerSequelize.define('CandidateNotification', 
         primaryKey: true
     },
     profileId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.INTEGER,  // candidate profileId
         allowNull: true,
     },
     applicationId: {

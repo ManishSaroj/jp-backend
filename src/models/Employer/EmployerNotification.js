@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const { employerSequelize } = require('../../config/db.config'); 
+const { application } = require('express');
 
 const EmployerNotification = employerSequelize.define('EmployerNotification', {
     notificationId: {
@@ -7,7 +8,15 @@ const EmployerNotification = employerSequelize.define('EmployerNotification', {
         autoIncrement: true,
         primaryKey: true
     },
-    employerId: {
+    profileId: {
+        type: DataTypes.INTEGER,
+        allowNull: true
+    },
+    applicationId: {
+        type: DataTypes.INTEGER,
+        allowNull: true
+    },
+    eid: {
         type: DataTypes.INTEGER,
         allowNull: true
     },
@@ -16,12 +25,16 @@ const EmployerNotification = employerSequelize.define('EmployerNotification', {
         allowNull: true
     },
     candidateId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.INTEGER, // candidate profileId
         allowNull: true
     },
+    jobTitle: { 
+        type: DataTypes.STRING,
+        allowNull: true,
+     },
     notificationType: {
         type: DataTypes.ENUM,
-        values: ['NewApplication', 'ApplicationReviewed', 'InterviewScheduled', 'OfferMade', 'CandidateRejected'],
+        values: ['NewApplication'],
         allowNull: true
     },
     messageKey: {

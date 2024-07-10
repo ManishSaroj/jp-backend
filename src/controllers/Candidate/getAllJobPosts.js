@@ -7,7 +7,8 @@ const { generateResponse } = require('../../utils/responseUtils');
 const { calculatePostedDateTimeline, formatDate, convertToFormattedDate } = require('../../utils/dateUtils');
 const { employerSequelize } = require('../../config/db.config')
 const { Op } = require('sequelize');
-const CandidateNotification = require('../../models/Employer/CandidateNotification')
+const CandidateNotification = require('../../models/Employer/CandidateNotification');
+const EmployerNotification = require('../../models/Employer/EmployerNotification');
 
 const getAllJobPosts = async (req, res) => {
     try {
@@ -30,12 +31,12 @@ const getAllJobPosts = async (req, res) => {
         if (search) {
             whereClause[Op.or] = [
                 { jobTitle: { [Op.like]: `%${search}%` } },
-                { jobCategory: { [Op.like]: `%${search}%`} },
-                { jobType: { [Op.like]: `%${search}%`} },
-                { qualification: { [Op.like]: `%${search}%`} }, //
+                { jobCategory: { [Op.like]: `%${search}%` } },
+                { jobType: { [Op.like]: `%${search}%` } },
+                { qualification: { [Op.like]: `%${search}%` } }, //
                 { city: { [Op.like]: `%${search}%` } },
                 { skills: { [Op.like]: `%${search}%` } }, //
-                
+
             ];
         }
 
@@ -167,7 +168,7 @@ const applyForJob = async (req, res) => {
                 notificationType: notification.notificationType,
                 isRead: notification.isRead,
                 createdAt: formatDate(notification.createdAt), // Ensure you have this function
-                message1: message1,                
+                message1: message1,
             };
 
             // Send SSE event if there's an active connection
@@ -175,6 +176,42 @@ const applyForJob = async (req, res) => {
                 req.app.locals.sseConnections[candidateProfileId].sseSend({
                     type: 'new_notification',
                     data: formattedNotification
+                });
+            }
+
+            // code for employer notification
+            const newApplicationTemplate = require('../../Templates/Employer/messageTemplates/NewApplication');
+            const employerNotification = await EmployerNotification.create({
+                profileId: employerProfileId,
+                applicationId: jobApplication.applicationId,
+                eid: jobPost.eid,
+                jobpostId: jobApplication.jobpostId,
+                candidateId: candidateProfileId,
+                jobTitle: jobPost.jobTitle,
+                notificationType: 'NewApplication',
+                messageKey: 'NewApplication',
+                isRead: false,
+                createdAt: new Date()
+            }, { transaction: t });
+
+            // Format employer notification
+            const employerMessage = newApplicationTemplate.message1(`Candidate ID: ${candidateProfileId}`, jobPost.jobTitle);
+            const formattedEmployerNotification = {
+                notificationId: employerNotification.notificationId,
+                applicationId: employerNotification.applicationId,
+                jobpostId: employerNotification.jobpostId,
+                jobTitle: employerNotification.jobTitle,
+                notificationType: employerNotification.notificationType,
+                isRead: employerNotification.isRead,
+                createdAt: formatDate(employerNotification.createdAt),
+                message1: employerMessage,
+            };
+
+            // Send SSE event for employer if there's an active connection
+            if (req.app.locals.sseConnections && req.app.locals.sseConnections[employerProfileId]) {
+                req.app.locals.sseConnections[employerProfileId].sseSend({
+                    type: 'new_notification',
+                    data: formattedEmployerNotification
                 });
             }
 
