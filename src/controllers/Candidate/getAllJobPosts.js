@@ -7,7 +7,7 @@ const { generateResponse } = require('../../utils/responseUtils');
 const { calculatePostedDateTimeline, formatDate, convertToFormattedDate } = require('../../utils/dateUtils');
 const { employerSequelize } = require('../../config/db.config')
 const { Op } = require('sequelize');
-const CandidateNotification = require('../../models/Employer/jobUpdateNotification')
+const CandidateNotification = require('../../models/Employer/CandidateNotification')
 
 const getAllJobPosts = async (req, res) => {
     try {
@@ -156,7 +156,7 @@ const applyForJob = async (req, res) => {
 
             // Fetch additional details for the notification
             // const jobPost = await EmployerJobPost.findByPk(jobpostId, { transaction: t });
-            const messageTemplate = require(`../../messageTemplates/${notification.messageKey}`);
+            const messageTemplate = require(`../../Templates/Candidate/messageTemplates/${notification.messageKey}`);
             const message1 = messageTemplate.message1; // Assuming message1 is for short notifications
 
             const formattedNotification = {

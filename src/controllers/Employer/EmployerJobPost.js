@@ -5,7 +5,7 @@ const CandidateProfile = require('../../models/Candidate/CandidateProfile');
 const { employerSequelize } = require('../../config/db.config')
 const { generateResponse } = require('../../utils/responseUtils');
 const { formatDate } = require('../../utils/dateUtils')
-const CandidateNotification = require('../../models/Employer/jobUpdateNotification')
+const CandidateNotification = require('../../models/Employer/CandidateNotification')
 
 const createJobPost = async (req, res) => {
     const {
@@ -492,7 +492,7 @@ const updateApplicationStatus = async (req, res) => {
 
                     // Fetch job details for the notification
                     // const jobPost = await EmployerJobPost.findByPk(jobApplication.jobpostId, { transaction: t });
-                    const messageTemplate = require(`../../messageTemplates/${messageKey}`);
+                    const messageTemplate = require(`../../Templates/Candidate/messageTemplates/${messageKey}`);
                     const message1 = messageTemplate.message1;
                     const message2 = messageTemplate.message2;
 

@@ -1,6 +1,6 @@
 const { generateResponse } = require('../../utils/responseUtils');
 const { formatDate } = require('../../utils/dateUtils');
-const CandidateNotification = require('../../models/Employer/jobUpdateNotification');
+const CandidateNotification = require('../../models/Employer/CandidateNotification');
 const JobApplication = require('../../models/Employer/JobApplication');
 const EmployerJobPost = require('../../models/Employer/EmployerJobPost');
 const EmployerProfile = require('../../models/Employer/EmployerProfile');
@@ -31,7 +31,7 @@ const getNotificationsForCandidate = async (req, res) => {
             // Get message2 from message template
             let message1, message2;
             try {
-                const messageTemplate = require(`../../messageTemplates/${notification.messageKey}`);
+                const messageTemplate = require(`../../Templates/Candidate/messageTemplates/${notification.messageKey}`);
                 message1 = messageTemplate.message1;
                 message2 = messageTemplate.message2;
             } catch (error) {
