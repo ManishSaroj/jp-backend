@@ -157,7 +157,7 @@ const applyForJob = async (req, res) => {
             // Fetch additional details for the notification
             // const jobPost = await EmployerJobPost.findByPk(jobpostId, { transaction: t });
             const messageTemplate = require(`../../messageTemplates/${notification.messageKey}`);
-            const message = messageTemplate.message1; // Assuming message1 is for short notifications
+            const message1 = messageTemplate.message1; // Assuming message1 is for short notifications
 
             const formattedNotification = {
                 notificationId: notification.notificationId,
@@ -167,7 +167,7 @@ const applyForJob = async (req, res) => {
                 notificationType: notification.notificationType,
                 isRead: notification.isRead,
                 createdAt: formatDate(notification.createdAt), // Ensure you have this function
-                message: message,                
+                message1: message1,                
             };
 
             // Send SSE event if there's an active connection

@@ -5,40 +5,40 @@ const JobApplication = require('../../models/Employer/JobApplication');
 const EmployerJobPost = require('../../models/Employer/EmployerJobPost');
 const EmployerProfile = require('../../models/Employer/EmployerProfile');
 
-
 const getNotificationsForCandidate = async (req, res) => {
     const { profileId } = req.params;
-
+    
     try {
         // Fetch notifications for the candidate (all types)
         const notifications = await CandidateNotification.findAll({
             where: { profileId: profileId },
             order: [['createdAt', 'DESC']]
         });
-
+        
         if (notifications.length === 0) {
             return generateResponse(res, 404, 'No notifications found for this candidate');
         }
-
+        
         // Fetch additional details for each notification
         const formattedNotifications = await Promise.all(notifications.map(async (notification) => {
-
+            
             const employerProfile = await EmployerProfile.findOne({ where: { eid: notification.eid } });
             if (!employerProfile) {
-                console.log(`EmployerProfile not found for eid: ${employerJobPost.eid}`);
+                console.log(`EmployerProfile not found for eid: ${notification.eid}`);
                 return null;
             }
-
+            
             // Get message2 from message template
-            let message2;
+            let message1, message2;
             try {
                 const messageTemplate = require(`../../messageTemplates/${notification.messageKey}`);
+                message1 = messageTemplate.message1;
                 message2 = messageTemplate.message2;
             } catch (error) {
                 console.error(`Error loading message template for key: ${notification.messageKey}`, error);
                 message2 = 'Detailed message not found';
             }
-
+            
             return {
                 notificationId: notification.notificationId,
                 applicationId: notification.applicationId,
@@ -47,7 +47,8 @@ const getNotificationsForCandidate = async (req, res) => {
                 notificationType: notification.notificationType,
                 isRead: notification.isRead,
                 createdAt: formatDate(notification.createdAt),
-                message: message2,
+                message1: message1,
+                message2: message2,
                 jobDetails: {
                     company_name: employerProfile.company_name,
                     company_website: employerProfile.company_website,
@@ -57,67 +58,26 @@ const getNotificationsForCandidate = async (req, res) => {
                 }
             };
         }));
-
+        
         const validNotifications = formattedNotifications.filter(notification => notification !== null);
-
-        return generateResponse(res, 200, 'Notifications retrieved successfully', { notifications: validNotifications });
+        
+        // Prepare the response
+        const response = {
+            message1: validNotifications.slice(0, 3).map(notification => ({
+                notificationId: notification.notificationId,
+                message1: notification.message1,
+                jobTitle: notification.jobTitle,
+                createdAt: notification.createdAt
+            })),
+            message2: validNotifications
+        };
+        
+        return generateResponse(res, 200, 'Notifications retrieved successfully', response);
     } catch (error) {
         console.error('Error retrieving notifications:', error);
         return generateResponse(res, 500, 'Server error', null, error.message);
     }
 };
-
-const getShortNotificationsForCandidate = async (req, res) => {
-    const { profileId } = req.params;
-   
-    try {
-        const totalCount = await CandidateNotification.count({
-            where: { profileId: profileId }
-        });
-       
-        const notifications = await CandidateNotification.findAll({
-            where: { profileId: profileId },
-            order: [['createdAt', 'DESC']],
-            limit: 2
-        });
-        
-        if (notifications.length === 0) {
-            console.log('No notifications found for this candidate');
-            return generateResponse(res, 404, 'No notifications found for this candidate');
-        }
-
-        const formattedNotifications = await Promise.all(notifications.map(async (notification) => {
-
-            let message1;
-            try {
-                const messageTemplate = require(`../../messageTemplates/${notification.messageKey}`);
-                message1 = messageTemplate.message1;
-            } catch (error) {
-                console.error(`Error loading message template for key: ${notification.messageKey}`, error);
-                message1 = 'Short message not found';
-            }
-
-            return {
-                notificationId: notification.notificationId,
-                applicationId: notification.applicationId,
-                jobpostId: notification.jobpostId,
-                jobTitle: notification.jobTitle,
-                notificationType: notification.notificationType,
-                isRead: notification.isRead,
-                createdAt: formatDate(notification.createdAt),
-                message: message1,
-            };
-        }));
-
-        const validNotifications = formattedNotifications.filter(notification => notification !== null);
-
-        return generateResponse(res, 200, 'Short notifications retrieved successfully', { totalCount: totalCount, notifications: validNotifications });
-    } catch (error) {
-        console.error('Error retrieving short notifications:', error);
-        return generateResponse(res, 500, 'Server error', null, error.message);
-    }
-};
-
 
 const deleteNotification = async (req, res) => {
     const { notificationId } = req.params;
@@ -159,7 +119,6 @@ const deleteAllNotifications = async (req, res) => {
 
 module.exports = {
     getNotificationsForCandidate,
-    getShortNotificationsForCandidate,
     deleteNotification,
     deleteAllNotifications,
 };

@@ -557,7 +557,8 @@ const updateApplicationStatus = async (req, res) => {
                     // Fetch job details for the notification
                     // const jobPost = await EmployerJobPost.findByPk(jobApplication.jobpostId, { transaction: t });
                     const messageTemplate = require(`../../messageTemplates/${messageKey}`);
-                    const message = messageTemplate.message1;
+                    const message1 = messageTemplate.message1;
+                    const message2 = messageTemplate.message2;
 
                     const formattedNotification = {
                         notificationId: notification.notificationId,
@@ -567,7 +568,8 @@ const updateApplicationStatus = async (req, res) => {
                         notificationType: notification.notificationType,
                         isRead: notification.isRead,
                         createdAt: formatDate(notification.createdAt),
-                        message: message,
+                        message1: message1,
+                        message2: message2,
                     };
 
                     // Send SSE event if there's an active connection

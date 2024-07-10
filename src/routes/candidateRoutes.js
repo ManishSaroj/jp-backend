@@ -8,7 +8,7 @@ const { requestPasswordReset, resetPassword  } = require('../controllers/Candida
 const { createOrUpdateCandidateProfile, updateLookingForJobStatus, getCandidateProfile, uploadFiles, getAllCandidateProfiles } = require('../controllers/Candidate/CandidateProfileController');
 const { createResume, updateResume, deleteResume, getAllResumes, getResumeById, getResumeByCandidateId } = require('../controllers/Candidate/resumeController');
 const { getAllJobPosts, getJobPostById, applyForJob, getAppliedJobsForCandidate } = require('../controllers/Candidate/getAllJobPosts');
-const { getNotificationsForCandidate, getShortNotificationsForCandidate, deleteAllNotifications, deleteNotification } = require('../controllers/Candidate/notificationController');
+const { getNotificationsForCandidate, deleteAllNotifications, deleteNotification } = require('../controllers/Candidate/notificationController');
 const sseMiddleware = require('../middlewares/sseMiddleware');
 
 const router = express.Router();
@@ -50,7 +50,6 @@ router.post('/apply-for-job', checkAuth, applyForJob);
 router.get('/jobposts/applied', checkAuth, getAppliedJobsForCandidate); 
 
 router.get('/notifications/:profileId', getNotificationsForCandidate);
-router.get('/short-notifications/:profileId', getShortNotificationsForCandidate);
 router.delete('/notifications/:notificationId', checkAuth, deleteNotification);
 router.delete('/notifications/all/:profileId', checkAuth, deleteAllNotifications);
 
