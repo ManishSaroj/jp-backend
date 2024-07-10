@@ -44,6 +44,7 @@ const getNotificationsForEmployer = async (req, res) => {
             return {
                 notificationId: notification.notificationId,
                 applicationId: notification.applicationId,
+                profileId: notification.candidateId,
                 jobpostId: notification.jobpostId,
                 jobTitle: notification.jobTitle,
                 notificationType: notification.notificationType,
@@ -52,6 +53,7 @@ const getNotificationsForEmployer = async (req, res) => {
                 message1: message1,
                 message2: message2,
                 candidateDetails: {
+                    profileId: candidateProfile.profileId,
                     name: candidateProfile.candidate_name,
                     email: candidateProfile.email,
                     jobrole: candidateProfile.jobrole,
