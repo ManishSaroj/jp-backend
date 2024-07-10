@@ -545,6 +545,7 @@ const updateApplicationStatus = async (req, res) => {
                     const notification = await CandidateNotification.create({
                         profileId: jobApplication.candidateProfileId,
                         applicationId: jobApplication.applicationId,
+                        eid: jobPost.eid,
                         jobpostId: jobApplication.jobpostId,
                         jobTitle: jobPost.jobTitle,
                         notificationType: newStatus,

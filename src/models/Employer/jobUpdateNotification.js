@@ -15,6 +15,10 @@ const CandidateNotification = employerSequelize.define('CandidateNotification', 
         type: DataTypes.INTEGER,
         allowNull: true
     },
+    eid: {
+        type: DataTypes.INTEGER,
+        allowNull: true
+    },
     jobpostId: {
         type: DataTypes.INTEGER,
         allowNull: true,

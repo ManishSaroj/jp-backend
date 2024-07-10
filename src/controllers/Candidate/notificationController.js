@@ -22,19 +22,8 @@ const getNotificationsForCandidate = async (req, res) => {
 
         // Fetch additional details for each notification
         const formattedNotifications = await Promise.all(notifications.map(async (notification) => {
-            const jobApplication = await JobApplication.findByPk(notification.applicationId);
-            if (!jobApplication) {
-                console.log(`JobApplication not found for applicationId: ${notification.applicationId}`);
-                return null;
-            }
 
-            const employerJobPost = await EmployerJobPost.findByPk(jobApplication.jobpostId);
-            if (!employerJobPost) {
-                console.log(`EmployerJobPost not found for jobpostId: ${jobApplication.jobpostId}`);
-                return null;
-            }
-
-            const employerProfile = await EmployerProfile.findOne({ where: { eid: employerJobPost.eid } });
+            const employerProfile = await EmployerProfile.findOne({ where: { eid: notification.eid } });
             if (!employerProfile) {
                 console.log(`EmployerProfile not found for eid: ${employerJobPost.eid}`);
                 return null;
@@ -98,17 +87,6 @@ const getShortNotificationsForCandidate = async (req, res) => {
         }
 
         const formattedNotifications = await Promise.all(notifications.map(async (notification) => {
-            const jobApplication = await JobApplication.findByPk(notification.applicationId);
-            if (!jobApplication) {
-                console.log(`JobApplication not found for applicationId: ${notification.applicationId}`);
-                return null;
-            }
-
-            const employerJobPost = await EmployerJobPost.findByPk(jobApplication.jobpostId);
-            if (!employerJobPost) {
-                console.log(`EmployerJobPost not found for jobpostId: ${jobApplication.jobpostId}`);
-                return null;
-            }
 
             let message1;
             try {
@@ -140,7 +118,48 @@ const getShortNotificationsForCandidate = async (req, res) => {
     }
 };
 
+
+const deleteNotification = async (req, res) => {
+    const { notificationId } = req.params;
+
+    try {
+        const result = await CandidateNotification.destroy({
+            where: { notificationId: notificationId }
+        });
+
+        if (result === 0) {
+            return generateResponse(res, 404, 'Notification not found');
+        }
+
+        return generateResponse(res, 200, 'Notification deleted successfully');
+    } catch (error) {
+        console.error('Error deleting notification:', error);
+        return generateResponse(res, 500, 'Server error', null, error.message);
+    }
+};
+
+const deleteAllNotifications = async (req, res) => {
+    const { profileId } = req.params;
+
+    try {
+        const result = await CandidateNotification.destroy({
+            where: { profileId: profileId }
+        });
+
+        if (result === 0) {
+            return generateResponse(res, 404, 'No notifications found for this profile');
+        }
+
+        return generateResponse(res, 200, 'All notifications deleted successfully');
+    } catch (error) {
+        console.error('Error deleting all notifications:', error);
+        return generateResponse(res, 500, 'Server error', null, error.message);
+    }
+};
+
 module.exports = {
     getNotificationsForCandidate,
     getShortNotificationsForCandidate,
+    deleteNotification,
+    deleteAllNotifications,
 };

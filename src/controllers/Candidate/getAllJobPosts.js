@@ -145,6 +145,7 @@ const applyForJob = async (req, res) => {
             const notification = await CandidateNotification.create({
                 profileId: candidateProfileId,
                 applicationId: jobApplication.applicationId,
+                eid: jobPost.eid,
                 jobpostId: jobApplication.jobpostId,
                 jobTitle: jobPost.jobTitle,
                 notificationType: 'Applied',
