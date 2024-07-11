@@ -210,7 +210,7 @@ const applyForJob = async (req, res) => {
             // Send SSE event for employer if there's an active connection
             if (req.app.locals.sseConnections && req.app.locals.sseConnections[employerProfileId]) {
                 req.app.locals.sseConnections[employerProfileId].sseSend({
-                    type: 'new_notification',
+                    type: 'new_employer_notification',
                     data: formattedEmployerNotification
                 });
             }
