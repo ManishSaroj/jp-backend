@@ -6,6 +6,7 @@ const adminlogoutMiddleware = require('../middlewares/adminLogoutMiddleware'); /
 const { getAllCandidatesWithProfiles, getCandidateProfileById, uploadFiles, updateCandidateAndProfile } = require('../controllers/Admin/adminCandidateController');
 const { getAllEmployersWithProfiles, getEmployerProfileById } = require('../controllers/Admin/adminEmployerController');
 const { updateJobCategory, getJobCategory, updateJobType, getJobType } = require('../controllers/Admin/AdminProfileController'); // Import the profile controllers for job category and job type
+const { createOrUpdatePackage,getAllPackages, updatePackageDetails } = require('../controllers/Admin/PackageController');
 
 // Authentication route
 router.post('/login', loginAdmin);
@@ -32,5 +33,8 @@ router.get('/jobCategory',checkAdminAuth, getJobCategory);
 router.put('/jobType',checkAdminAuth, updateJobType);
 router.get('/jobType',checkAdminAuth, getJobType);
 
+router.post('/packages', createOrUpdatePackage);
+router.get('/packages', getAllPackages);
+router.patch('/packages', updatePackageDetails);
 
 module.exports = router;
