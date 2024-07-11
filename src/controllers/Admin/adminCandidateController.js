@@ -85,16 +85,16 @@ const getCandidateProfileById = async (req, res) => {
       const t = await candidateProfile.sequelize.transaction();
   
       try {
-        if (req.files['candidate_image']) {
-          updateData.candidate_image = req.files['candidate_image'][0].buffer;
-        }
-        if (req.files['candidate_banner']) {
-          updateData.candidate_banner = req.files['candidate_banner'][0].buffer;
-        }
-        if (req.files['candidate_resume']) {
-          updateData.candidate_resume = req.files['candidate_resume'][0].buffer;
-          updateData.resumeFileName = req.files['candidate_resume'][0].originalname;
-        }
+        // if (req.files['candidate_image']) {
+        //   updateData.candidate_image = req.files['candidate_image'][0].buffer;
+        // }
+        // if (req.files['candidate_banner']) {
+        //   updateData.candidate_banner = req.files['candidate_banner'][0].buffer;
+        // }
+        // if (req.files['candidate_resume']) {
+        //   updateData.candidate_resume = req.files['candidate_resume'][0].buffer;
+        //   updateData.resumeFileName = req.files['candidate_resume'][0].originalname;
+        // }
   
         await CandidateProfile.update(updateData, {
           where: { profileId },

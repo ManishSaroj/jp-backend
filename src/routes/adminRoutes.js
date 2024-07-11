@@ -21,7 +21,7 @@ router.get('/checkAdminAuth', checkAdminAuth, (req, res) => {
 
 router.get('/candidates', getAllCandidatesWithProfiles);
 router.get('/candidates/profile/:profileId', getCandidateProfileById);
-router.put('/candidates/profile/:profileId', checkAdminAuth, uploadFiles, updateCandidateAndProfile);
+router.put('/candidates/profile/:profileId', uploadFiles, updateCandidateAndProfile);
 
 router.get('/employers', getAllEmployersWithProfiles);
 router.get('/employers/profile/:profileId', getEmployerProfileById);
