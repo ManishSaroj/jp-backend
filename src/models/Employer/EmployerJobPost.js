@@ -69,7 +69,7 @@ const EmployerJobPost = employerSequelize.define('EmployerJobPost', {
         allowNull: true,
     },
     qualification: {
-        type: DataTypes.TEXT('long'),
+        type: DataTypes.JSON,
         allowNull: true,
     },
     gender: {
@@ -97,7 +97,7 @@ const EmployerJobPost = employerSequelize.define('EmployerJobPost', {
         allowNull: true,
     },
     skills: {
-        type: DataTypes.TEXT('long'),
+        type: DataTypes.JSON,
         allowNull: true,
     },
     description: {

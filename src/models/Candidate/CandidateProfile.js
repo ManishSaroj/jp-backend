@@ -38,7 +38,7 @@ const CandidateProfile = candidateSequelize.define('CandidateProfile', {
     allowNull: true,
   },
   languages: {
-    type: DataTypes.TEXT('long'),
+    type: DataTypes.JSON, // Changed to DataTypes.JSON
     allowNull: true,
     defaultValue: "" // Set a default value
   },
@@ -83,7 +83,7 @@ const CandidateProfile = candidateSequelize.define('CandidateProfile', {
     allowNull: true,
   },
   skills: {
-    type: DataTypes.TEXT('long'),
+    type: DataTypes.JSON,
     allowNull: true,
   },
   aboutme: {
