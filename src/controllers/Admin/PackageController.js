@@ -1,24 +1,6 @@
 const PackageModel = require('../../models/Admin/PackageModel');
 
 const PackageController = {
-    createOrUpdatePackage: async (req, res) => {
-        try {
-            const { name, originalPrice, discountedPrice, duration, ...features } = req.body;
-            const [package, created] = await PackageModel.upsert({
-                name,
-                originalPrice,
-                discountedPrice,
-                duration,
-                ...features
-            }, { returning: true });
-            
-            const status = created ? 201 : 200;
-            res.status(status).json(package);
-        } catch (error) {
-            res.status(500).json({ error: 'Failed to create or update package' });
-        }
-    },
-
     getAllPackages: async (req, res) => {
         try {
             const packages = await PackageModel.findAll();
@@ -31,11 +13,11 @@ const PackageController = {
     updatePackageDetails: async (req, res) => {
         try {
             const { packageName, updates } = req.body;
-            const updatedPackage = await PackageModel.update(
+            const [updatedCount] = await PackageModel.update(
                 updates,
                 { where: { name: packageName } }
             );
-            if (updatedPackage[0] === 0) {
+            if (updatedCount === 0) {
                 return res.status(404).json({ error: 'Package not found' });
             }
             res.status(200).json({ message: 'Package details updated successfully' });

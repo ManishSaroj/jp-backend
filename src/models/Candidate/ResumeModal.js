@@ -51,7 +51,7 @@ const Resume = candidateSequelize.define('CandidateResume', {
     allowNull: true,
   },
   skills: {
-    type: DataTypes.JSON, // Using JSONB for better performance and indexing
+    type: DataTypes.TEXT('long'),
     allowNull: true,
   },
 }, {

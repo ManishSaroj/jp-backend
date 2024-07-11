@@ -15,13 +15,24 @@ const PackageModel = adminSequelize.define('PackageModel', {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
     },
+    discountPercentage: {
+        type: DataTypes.DECIMAL(5, 2),
+        allowNull: false,
+        defaultValue: 0,
+    },
     discountedPrice: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
+        defaultValue: 0,
     },
     duration: {
         type: DataTypes.INTEGER,
         allowNull: false,
+    },
+    durationType: {
+        type: DataTypes.ENUM('days', 'months', 'years'),
+        allowNull: false,
+        defaultValue: 'days',
     },
     companyProfiles: {
         type: DataTypes.BOOLEAN,
@@ -51,6 +62,15 @@ const PackageModel = adminSequelize.define('PackageModel', {
         type: DataTypes.BOOLEAN,
         allowNull: false,
     },
+}, {
+    hooks: {
+        beforeCreate: (package) => {
+            package.discountedPrice = package.originalPrice * (1 - package.discountPercentage / 100);
+        },
+        beforeUpdate: (package) => {
+            package.discountedPrice = package.originalPrice * (1 - package.discountPercentage / 100);
+        }
+    }
 });
 
 module.exports = PackageModel;
