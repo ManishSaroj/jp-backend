@@ -26,7 +26,7 @@ router.put('/candidates/profile/:profileId', uploadFiles, updateCandidateAndProf
 
 router.get('/employers', getAllEmployersWithProfiles);
 router.get('/employers/profile/:profileId', getEmployerProfileById);
-router.put('/employer-profile/:profileId', uploadEmployerFiles, updateEmployerAndProfile);
+router.put('/employers/profile/:profileId', uploadEmployerFiles, updateEmployerAndProfile);
 
 // Routes for job category and job type
 router.put('/jobCategory',checkAdminAuth, updateJobCategory);
