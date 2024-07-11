@@ -8,7 +8,7 @@ const { requestPasswordReset, resetPassword  } = require('../controllers/Candida
 const { createOrUpdateCandidateProfile, updateLookingForJobStatus, getCandidateProfile, uploadFiles, getAllCandidateProfiles } = require('../controllers/Candidate/CandidateProfileController');
 const { createResume, updateResume, deleteResume, getAllResumes, getResumeById, getResumeByCandidateId } = require('../controllers/Candidate/resumeController');
 const { getAllJobPosts, getJobPostById, applyForJob, getAppliedJobsForCandidate } = require('../controllers/Candidate/getAllJobPosts');
-const { getNotificationsForCandidate, getShortNotificationsForCandidate } = require('../controllers/Candidate/notificationController');
+const { getNotificationsForCandidate, deleteAllNotifications, deleteNotification } = require('../controllers/Candidate/notificationController');
 const sseMiddleware = require('../middlewares/sseMiddleware');
 
 const router = express.Router();
@@ -50,22 +50,26 @@ router.post('/apply-for-job', checkAuth, applyForJob);
 router.get('/jobposts/applied', checkAuth, getAppliedJobsForCandidate); 
 
 router.get('/notifications/:profileId', getNotificationsForCandidate);
-router.get('/short-notifications/:profileId', getShortNotificationsForCandidate);
+router.delete('/notifications/:notificationId', checkAuth, deleteNotification);
+router.delete('/notifications/all/:profileId', checkAuth, deleteAllNotifications);
+
 // SSE route for notifications
 router.get('/notifications/sse/:profileId', sseMiddleware, (req, res) => {
-    const { profileId } = req.params;
-  
-    // Set up SSE
-    res.sseSetup();
-  
-    // Store the connection
-    req.app.locals.sseConnections = req.app.locals.sseConnections || {};
-    req.app.locals.sseConnections[profileId] = res;
-  
-    // Remove the connection when the client disconnects
-    req.on('close', () => {
-      delete req.app.locals.sseConnections[profileId];
-    });
+  const { profileId } = req.params;
+
+  res.sseSetup();
+
+  // Store the connection
+  req.app.locals.sseConnections = req.app.locals.sseConnections || {};
+  req.app.locals.sseConnections[profileId] = res;
+
+  // Send a test message
+  res.sseSend({ type: 'connection', message: 'SSE connection established' });
+
+  // Remove the connection when the client disconnects
+  req.on('close', () => {
+    delete req.app.locals.sseConnections[profileId];
   });
-  
-module.exports = router;
+});
+
+module.exports = router;  // Add this line at the end of the file

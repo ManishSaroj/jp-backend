@@ -1,32 +1,44 @@
 const { DataTypes } = require('sequelize');
 const { employerSequelize } = require('../../config/db.config'); 
 
-const Notification = employerSequelize.define('Notification', {
+const CandidateNotification = employerSequelize.define('CandidateNotification', {
     notificationId: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true
     },
     profileId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
+        type: DataTypes.INTEGER,  // candidate profileId
+        allowNull: true,
     },
     applicationId: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: true
+    },
+    eid: {
+        type: DataTypes.INTEGER,
+        allowNull: true
+    },
+    jobpostId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+    jobTitle: { 
+       type: DataTypes.STRING,
+       allowNull: true,
     },
     notificationType: {
         type: DataTypes.ENUM,
-        values: ['Applied', 'UnderReview', 'Shortlisted', 'Rejected', 'Hired', 'HiredThenRejected'],
-        allowNull: false
+        values: ['Applied', 'Shortlisted', 'Rejected', 'Hired', 'HiredThenRejected'],
+        allowNull: true
     },
     messageKey: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
     },
     isRead: {
         type: DataTypes.BOOLEAN,
-        allowNull: false,
+        allowNull: true,
         defaultValue: false
     },
     expiryDate: {
@@ -39,8 +51,8 @@ const Notification = employerSequelize.define('Notification', {
         defaultValue: DataTypes.NOW
     }
 }, {
-    tableName: 'Notifications',
+    tableName: 'CandidateNotifications',
     timestamps: false
 });
 
-module.exports = Notification;
+module.exports = CandidateNotification;

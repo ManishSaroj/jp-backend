@@ -1,38 +1,40 @@
 const { generateResponse } = require('../../utils/responseUtils');
 const { formatDate } = require('../../utils/dateUtils');
-const CandidateNotification = require('../../models/Employer/CandidateNotification');
-const JobApplication = require('../../models/Employer/JobApplication');
-const EmployerJobPost = require('../../models/Employer/EmployerJobPost');
-const EmployerProfile = require('../../models/Employer/EmployerProfile');
+const EmployerNotification = require('../../models/Employer/EmployerNotification');
+const CandidateProfile = require('../../models/Candidate/CandidateProfile');
 
-const getNotificationsForCandidate = async (req, res) => {
+const getNotificationsForEmployer = async (req, res) => {
     const { profileId } = req.params;
     
     try {
-        // Fetch notifications for the candidate (all types)
-        const notifications = await CandidateNotification.findAll({
+        // Fetch notifications for the employer (all types)
+        const notifications = await EmployerNotification.findAll({
             where: { profileId: profileId },
             order: [['createdAt', 'DESC']]
         });
         
         if (notifications.length === 0) {
-            return generateResponse(res, 404, 'No notifications found for this candidate');
+            return generateResponse(res, 404, 'No notifications found for this employer');
         }
         
         // Fetch additional details for each notification
         const formattedNotifications = await Promise.all(notifications.map(async (notification) => {
             
-            const employerProfile = await EmployerProfile.findOne({ where: { eid: notification.eid } });
-            if (!employerProfile) {
-                console.log(`EmployerProfile not found for eid: ${notification.eid}`);
+            const candidateProfile = await CandidateProfile.findOne({
+                where: { profileId: notification.candidateId },
+                attributes: ['candidate_name', 'email', 'jobrole', 'experience', 'candidate_image']
+            });
+
+            if (!candidateProfile) {
+                console.log(`CandidateProfile not found for profileId: ${notification.candidateId}`);
                 return null;
             }
             
             // Get message2 from message template
             let message1, message2;
             try {
-                const messageTemplate = require(`../../Templates/Candidate/messageTemplates/${notification.messageKey}`);
-                message1 = messageTemplate.message1;
+                const messageTemplate = require(`../../Templates/Employer/messageTemplates/${notification.messageKey}`);
+                message1 = messageTemplate.message1(candidateProfile.candidate_name, notification.jobTitle);
                 message2 = messageTemplate.message2;
             } catch (error) {
                 console.error(`Error loading message template for key: ${notification.messageKey}`, error);
@@ -42,6 +44,7 @@ const getNotificationsForCandidate = async (req, res) => {
             return {
                 notificationId: notification.notificationId,
                 applicationId: notification.applicationId,
+                profileId: notification.candidateId,
                 jobpostId: notification.jobpostId,
                 jobTitle: notification.jobTitle,
                 notificationType: notification.notificationType,
@@ -49,11 +52,14 @@ const getNotificationsForCandidate = async (req, res) => {
                 createdAt: formatDate(notification.createdAt),
                 message1: message1,
                 message2: message2,
-                jobDetails: {
-                    company_name: employerProfile.company_name,
-                    company_website: employerProfile.company_website,
-                    company_logo: employerProfile.company_logo
-                        ? Buffer.from(employerProfile.company_logo).toString('base64')
+                candidateDetails: {
+                    profileId: candidateProfile.profileId,
+                    name: candidateProfile.candidate_name,
+                    email: candidateProfile.email,
+                    jobrole: candidateProfile.jobrole,
+                    experience: candidateProfile.experience,
+                    profilePicture: candidateProfile.candidate_image
+                        ? Buffer.from(candidateProfile.candidate_image).toString('base64')
                         : null
                 }
             };
@@ -83,7 +89,7 @@ const deleteNotification = async (req, res) => {
     const { notificationId } = req.params;
 
     try {
-        const result = await CandidateNotification.destroy({
+        const result = await EmployerNotification.destroy({
             where: { notificationId: notificationId }
         });
 
@@ -102,7 +108,7 @@ const deleteAllNotifications = async (req, res) => {
     const { profileId } = req.params;
 
     try {
-        const result = await CandidateNotification.destroy({
+        const result = await EmployerNotification.destroy({
             where: { profileId: profileId }
         });
 
@@ -118,7 +124,7 @@ const deleteAllNotifications = async (req, res) => {
 };
 
 module.exports = {
-    getNotificationsForCandidate,
+    getNotificationsForEmployer,
     deleteNotification,
     deleteAllNotifications,
 };

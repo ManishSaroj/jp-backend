@@ -45,7 +45,7 @@ const getSavedCandidates = async (req, res) => {
             where: {
                 profileId: candidateProfileIds
             },
-            attributes: ['profileId', 'candidate_name', 'email', 'phone_number', 'qualification', 'languages', 'jobrole', 'experience', 'dob', 'age', 'gender', 'country', 'city', 'pincode', 'fullAddress', 'skills', 'aboutme', 'linkedIn', 'github', 'candidate_image', 'candidate_banner', 'resumeFileName', 'lookingForJobs'], // Add all fields you want to fetch
+            attributes: ['profileId', 'candidate_name', 'email', 'phone_number', 'qualification', 'languages', 'jobrole', 'experience', 'dob', 'age', 'gender', 'country', 'city', 'pincode', 'fullAddress', 'skills', 'aboutme', 'linkedIn', 'github' , 'facebook', 'twitter', 'instagram', 'behance', 'dribbble', 'candidate_image', 'resumeFileName', 'lookingForJobs'], // Add all fields you want to fetch
         });
 
         // Combine the data
@@ -54,7 +54,6 @@ const getSavedCandidates = async (req, res) => {
             if (candidateProfile) {
                 // Convert BLOB fields to base64 strings if they exist
                 candidateProfile.candidate_image = candidateProfile.candidate_image ? candidateProfile.candidate_image.toString('base64') : null;
-                candidateProfile.candidate_banner = candidateProfile.candidate_banner ? candidateProfile.candidate_banner.toString('base64') : null;
                 candidateProfile.candidate_resume = candidateProfile.candidate_resume ? candidateProfile.candidate_resume.toString('base64') : null;
             }
             return {

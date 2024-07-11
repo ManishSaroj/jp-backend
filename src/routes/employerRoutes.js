@@ -13,6 +13,8 @@ const { requestPasswordReset, resetPassword } = require('../controllers/Employer
 const { createOrUpdateEmployerProfile, getEmployerProfile, uploadImages } = require('../controllers/Employer/EmployerProfileController');
 const { createJobPost, getEmployerJobPosts, getJobPostById, updateJobPost, getAppliedCandidates, getCandidateDetails, JobPostStatus, deleteJobPost, updateApplicationStatus, getApplicationStatus, getShortlistedCandidates} = require('../controllers/Employer/EmployerJobPost');
 const { saveCandidate, getSavedCandidates } = require('../controllers/Employer/savedCandidateController');
+const { getNotificationsForEmployer, deleteAllNotifications, deleteNotification } = require('../controllers/Employer/notificationController');
+const sseMiddleware = require('../middlewares/sseMiddleware');
 
 const router = express.Router();
 
@@ -51,5 +53,27 @@ router.get('/saved-candidates', checkAuth, getSavedCandidates);
 router.post('/request-password-reset', requestPasswordReset);
 router.post('/reset-password', resetPassword);
 
+router.get('/notifications/:profileId', getNotificationsForEmployer);
+router.delete('/notifications/:notificationId', checkAuth, deleteNotification);
+router.delete('/notifications/all/:profileId', checkAuth, deleteAllNotifications);
+
+// SSE route for notifications
+router.get('/notifications/sse/:profileId', sseMiddleware, (req, res) => {
+  const { profileId } = req.params;
+
+  res.sseSetup();
+
+  // Store the connection
+  req.app.locals.sseConnections = req.app.locals.sseConnections || {};
+  req.app.locals.sseConnections[profileId] = res;
+
+  // Send a test message
+  res.sseSend({ type: 'connection', message: 'SSE connection established' });
+
+  // Remove the connection when the client disconnects
+  req.on('close', () => {
+    delete req.app.locals.sseConnections[profileId];
+  });
+});
 
 module.exports = router;

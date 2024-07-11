@@ -51,9 +51,6 @@ const getCandidateProfileById = async (req, res) => {
       if (profileData.candidate_image) {
         profileData.candidate_image = profileData.candidate_image.toString('base64');
       }
-      if (profileData.candidate_banner) {
-        profileData.candidate_banner = profileData.candidate_banner.toString('base64');
-      }
       if (profileData.candidate_resume) {
         profileData.candidate_resume = profileData.candidate_resume.toString('base64');
       }
@@ -126,9 +123,6 @@ const getCandidateProfileById = async (req, res) => {
         const profileData = updatedProfile.toJSON();
         if (profileData.candidate_image) {
           profileData.candidate_image = profileData.candidate_image.toString('base64');
-        }
-        if (profileData.candidate_banner) {
-          profileData.candidate_banner = profileData.candidate_banner.toString('base64');
         }
         if (profileData.candidate_resume) {
           profileData.candidate_resume = profileData.candidate_resume.toString('base64');
