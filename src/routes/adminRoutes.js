@@ -35,6 +35,7 @@ router.put('/jobType',checkAdminAuth, updateJobType);
 router.get('/jobType',checkAdminAuth, getJobType);
 
 router.get('/packages',checkAdminAuth , getAllPackages);
-router.patch('/packages',checkAdminAuth, updatePackageDetails);
+router.put('/packages',checkAdminAuth, updatePackageDetails);
+router.get('/setPackages', getAllPackages);
 
 module.exports = router;
