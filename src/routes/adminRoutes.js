@@ -3,6 +3,7 @@ const router = express.Router();
 const { loginAdmin } = require('../controllers/Admin/adminAuth');
 const checkAdminAuth = require('../middlewares/adminAuthMiddleware');
 const adminlogoutMiddleware = require('../middlewares/adminLogoutMiddleware'); // Assuming this is the path to your logout middleware
+const { requestPasswordReset, resetPassword } = require('../controllers/Admin/resetPassword')
 const { getAllCandidatesWithProfiles, getCandidateProfileById, uploadFiles, updateCandidateAndProfile } = require('../controllers/Admin/adminCandidateController');
 const { getAllEmployersWithProfiles, getEmployerProfileById, updateEmployerAndProfile, uploadEmployerFiles } = require('../controllers/Admin/adminEmployerController');
 const { updateJobCategory, getJobCategory, updateJobType, getJobType } = require('../controllers/Admin/AdminProfileController'); // Import the profile controllers for job category and job type
@@ -19,6 +20,9 @@ router.post('/logout', adminlogoutMiddleware, (req, res) => {
 router.get('/checkAdminAuth', checkAdminAuth, (req, res) => {
   res.status(200).json({ success: true, message: "Authenticated as admin", admin: req.admin });
 });
+
+router.post('/request-password-reset', requestPasswordReset);
+router.post('/reset-password', resetPassword);
 
 router.get('/candidates', getAllCandidatesWithProfiles);
 router.get('/candidates/profile/:profileId', getCandidateProfileById);

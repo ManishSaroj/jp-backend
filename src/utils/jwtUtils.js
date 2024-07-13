@@ -10,6 +10,7 @@ const COOKIE_NAME = process.env.COOKIE_NAME || 'sessionToken';
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const COOKIE_DOMAIN = process.env.COOKIE_DOMAIN || undefined;
 
+// Generates a JWT token based on the provided payload
 const generateToken = (payload, rememberMe) => {
   const expiresIn = rememberMe ? REMEMBER_ME_EXPIRES_IN : EXPIRES_IN;
   return jwt.sign(payload, SECRET, { expiresIn });

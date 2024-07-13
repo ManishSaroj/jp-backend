@@ -5,6 +5,7 @@ const { generateResponse } = require('../../utils/responseUtils');
 const { sendVerificationEmail } = require('../../utils/verifyEmailUtils')
 const { generateToken, setTokenCookie } = require('../../utils/jwtUtils');
 
+// Registers a new candidate.
 const registerCandidate = async (req, res) => {
   const { candidate_name, email, password, phone_number, terms_agreed } = req.body;
 
@@ -13,15 +14,16 @@ const registerCandidate = async (req, res) => {
     if (existingCandidate) {
       return generateResponse(res, 400, 'Candidate already exists');
     }
-
+    // Hash the password before storing it in the database
     const hashedPassword = await bcrypt.hash(password, 10);
+    
     const newCandidate = await Candidate.create({
       candidate_name,
       email,
       password: hashedPassword,
       phone_number,
       termsAgreed: terms_agreed,
-      emailVerified: false, // Add this line to set emailVerified to false initially
+      emailVerified: false, // set emailVerified to false initially
     });
 
      // Create a new CandidateProfile record
@@ -32,6 +34,7 @@ const registerCandidate = async (req, res) => {
       phone_number,
     });
 
+     // Send a verification email to the newly registered candidate
     await sendVerificationEmail(newCandidate, 'candidate');
 
     generateResponse(res, 201, 'Candidate registered successfully. Verification email sent.', { candidate: newCandidate });
