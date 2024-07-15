@@ -16,6 +16,7 @@ const generateToken = (payload, rememberMe) => {
   return jwt.sign(payload, SECRET, { expiresIn });
 };
 
+// Verifies a JWT token and returns its payload if valid
 const verifyToken = (token) => {
   try {
     const decoded = jwt.verify(token, SECRET);
@@ -25,6 +26,7 @@ const verifyToken = (token) => {
   }
 };
 
+// Sets the JWT token as an HTTP-only cookie
 const setTokenCookie = (res, token, rememberMe) => {
   const cookieMaxAge = rememberMe 
     ? REMEMBER_ME_COOKIE_EXPIRES_IN 

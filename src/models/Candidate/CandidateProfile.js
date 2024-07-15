@@ -13,7 +13,7 @@ const CandidateProfile = candidateSequelize.define('CandidateProfile', {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: Candidate,
+      model: Candidate, // Reference to the Candidate model
       key: 'cid',
     },
   },
@@ -38,7 +38,7 @@ const CandidateProfile = candidateSequelize.define('CandidateProfile', {
     allowNull: true,
   },
   languages: {
-    type: DataTypes.JSON, // Changed to DataTypes.JSON
+    type: DataTypes.JSON, 
     allowNull: true,
     defaultValue: "" // Set a default value
   },
@@ -139,7 +139,8 @@ const CandidateProfile = candidateSequelize.define('CandidateProfile', {
   timestamps: true,
 });
 
-Candidate.hasOne(CandidateProfile, { foreignKey: 'cid' }); // One-to-One relationship
-CandidateProfile.belongsTo(Candidate, { foreignKey: 'cid' }); // Required for bi-directional association
+// Define the one-to-one relationship between Candidate and CandidateProfile
+Candidate.hasOne(CandidateProfile, { foreignKey: 'cid' }); 
+CandidateProfile.belongsTo(Candidate, { foreignKey: 'cid' }); 
 
 module.exports = CandidateProfile;

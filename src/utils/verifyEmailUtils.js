@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const transporter = require('../config/nodemailer.config');
 const { generateEmailTemplate } = require('../emailTemplates/emailTemplates');
 
+// Function to send a verification email to the candidate and employer
 const sendVerificationEmail = async (user, userType) => {
   const verificationToken = crypto.randomBytes(32).toString('hex'); // Generate a random verification token
   const tokenExpiration = new Date(Date.now() + 5 * 60 * 1000); // Token expires in 5 minutes
