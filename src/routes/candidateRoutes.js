@@ -5,7 +5,7 @@ const { registerCandidate, loginCandidate, resendVerificationEmail, verifyCandid
 const { googleAuthCandidate, googleAuthCandidateCallback } = require('../controllers/Candidate/CandidateAuthController');
 const { getCandidate, changePassword } = require('../controllers/Candidate/getCandidate');
 const { requestPasswordReset, resetPassword  } = require('../controllers/Candidate/resetPasswordController');
-const { createOrUpdateCandidateProfile, updateLookingForJobStatus, getCandidateProfile, uploadFiles, getAllCandidateProfiles } = require('../controllers/Candidate/CandidateProfileController');
+const { createOrUpdateCandidateProfile, updateLookingForJobStatus, getCandidateProfile, uploadFiles, getAllCandidateProfiles, getCandidateImage, uploadCandidateImage, getCandidateResume, uploadCandidateResume } = require('../controllers/Candidate/CandidateProfileController');
 const { createResume, updateResume, deleteResume, getAllResumes, getResumeById, getResumeByCandidateId } = require('../controllers/Candidate/resumeController');
 const { getAllJobPosts, getJobPostById, applyForJob, getAppliedJobsForCandidate } = require('../controllers/Candidate/getAllJobPosts');
 const { getNotificationsForCandidate, deleteAllNotifications, deleteNotification } = require('../controllers/Candidate/notificationController');
@@ -30,6 +30,10 @@ router.post('/change-password', checkAuth, changePassword)
 
 // Candidate profile routes
 router.get('/me', checkAuth, getCandidate);
+router.get('/me/image', checkAuth, getCandidateImage);
+router.post('/me/image', checkAuth, uploadFiles, uploadCandidateImage);
+router.get('/me/resume', checkAuth, getCandidateResume);
+router.post('/me/resume', checkAuth, uploadFiles, uploadCandidateResume);
 router.post('/profile',checkAuth, uploadFiles, createOrUpdateCandidateProfile);
 router.patch('/update-job-status', checkAuth, updateLookingForJobStatus);
 router.get('/get-profile', checkAuth, getCandidateProfile);
