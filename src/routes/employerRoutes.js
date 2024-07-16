@@ -10,7 +10,7 @@ const {
 const  checkAuth = require('../middlewares/authMiddleware');
 const { getEmployer, changePassword } = require('../controllers/Employer/getEmployer');
 const { requestPasswordReset, resetPassword } = require('../controllers/Employer/resetPasswordController');
-const { createOrUpdateEmployerProfile, getEmployerProfile, uploadImages } = require('../controllers/Employer/EmployerProfileController');
+const { createOrUpdateEmployerProfile, getEmployerProfile, uploadImages, getCompanyLogo, uploadEmployerLogo, getCompanyBanner, uploadCompanyBanner } = require('../controllers/Employer/EmployerProfileController');
 const { createJobPost, getEmployerJobPosts, getJobPostById, updateJobPost, getAppliedCandidates, getCandidateDetails, JobPostStatus, deleteJobPost, updateApplicationStatus, getApplicationStatus, getShortlistedCandidates} = require('../controllers/Employer/EmployerJobPost');
 const { saveCandidate, getSavedCandidates } = require('../controllers/Employer/savedCandidateController');
 const { getNotificationsForEmployer, deleteAllNotifications, deleteNotification } = require('../controllers/Employer/notificationController');
@@ -30,6 +30,11 @@ router.get('/auth/google/callback', googleAuthEmployerCallback);
 
 router.get('/me', checkAuth, getEmployer);
 router.post('/change-password', checkAuth, changePassword)
+router.get('/company-logo', checkAuth, getCompanyLogo);
+router.post('/upload-logo', checkAuth, uploadImages, uploadEmployerLogo);
+router.get('/company-banner', checkAuth, getCompanyBanner);
+router.post('/upload-banner', checkAuth, uploadImages, uploadCompanyBanner);
+
 router.post('/profile',checkAuth, uploadImages , createOrUpdateEmployerProfile);
 router.get('/get-profile', checkAuth, getEmployerProfile);
 
