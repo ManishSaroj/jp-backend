@@ -19,9 +19,9 @@ router.post('/login', loginCandidate);
 router.get('/verify-email', verifyCandidateEmail); 
 router.post('/resend-email', resendVerificationEmail);
 
+// Google authentication routes
 router.get('/auth/google', googleAuthCandidate);
 router.get('/auth/google/callback', googleAuthCandidateCallback);
-
 
 // Password reset routes
 router.post('/request-password-reset', requestPasswordReset);
@@ -49,6 +49,7 @@ router.get('/get-jobpost/:jobpostId',checkAuth, getJobPostById);
 router.post('/apply-for-job', checkAuth, applyForJob);
 router.get('/jobposts/applied', checkAuth, getAppliedJobsForCandidate); 
 
+// Notification routes
 router.get('/notifications/:profileId', getNotificationsForCandidate);
 router.delete('/notifications/:notificationId', checkAuth, deleteNotification);
 router.delete('/notifications/all/:profileId', checkAuth, deleteAllNotifications);
@@ -57,6 +58,7 @@ router.delete('/notifications/all/:profileId', checkAuth, deleteAllNotifications
 router.get('/notifications/sse/:profileId', sseMiddleware, (req, res) => {
   const { profileId } = req.params;
 
+  // Set up SSE connection
   res.sseSetup();
 
   // Store the connection
@@ -72,4 +74,4 @@ router.get('/notifications/sse/:profileId', sseMiddleware, (req, res) => {
   });
 });
 
-module.exports = router;  // Add this line at the end of the file
+module.exports = router; 

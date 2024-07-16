@@ -1,7 +1,7 @@
 const Employer = require('../../models/Employer/EmployerModel');
 const EmployerProfile = require('../../models/Employer/EmployerProfile');
 const bcrypt = require('bcryptjs');
-const { sendVerificationEmail } = require('../../utils/verifyEmailUtils'); 
+const { sendVerificationEmail } = require('../../utils/verifyEmailUtils');
 const { generateResponse } = require('../../utils/responseUtils');
 const { generateToken, setTokenCookie } = require('../../utils/jwtUtils');
 
@@ -20,7 +20,7 @@ const registerEmployer = async (req, res) => {
       email,
       password: hashedPassword,
       phone_number,
-      termsAgreed: terms_agreed, 
+      termsAgreed: terms_agreed,
       emailVerified: false, // Add this line to set emailVerified to false initially
     });
 
@@ -58,12 +58,12 @@ const loginEmployer = async (req, res) => {
       return generateResponse(res, 400, 'Invalid credentials');
     }
 
-     // jwt cookie token for check auth
+    // jwt cookie token for check auth
     const token = generateToken({
       id: employer.eid,
       role: 'employer',
     }, rememberMe);
-  
+
     setTokenCookie(res, token, rememberMe);
 
     generateResponse(res, 200, 'Employer logged in successfully', { employer });
@@ -84,6 +84,22 @@ const resendVerificationEmail = async (req, res) => {
     if (employer.emailVerified) {
       return generateResponse(res, 400, 'Email already verified');
     }
+
+    // Check the rate limit for resending verification emails
+    const thirtyMinutesAgo = new Date(new Date() - 30 * 60 * 1000); // 30 minutes ago
+    if (employer.verificationAttempts >= 5 && employer.lastVerificationAttempt > thirtyMinutesAgo) {
+      return generateResponse(res, 429, 'Too many requests. Please try again later.');
+    }
+
+    // Update the employer's verification attempts and last verification attempt
+    if (employer.lastVerificationAttempt <= thirtyMinutesAgo) {
+      employer.verificationAttempts = 1; // Reset attempts after 30 minutes
+    } else {
+      employer.verificationAttempts += 1;
+    }
+    employer.lastVerificationAttempt = new Date();
+    await employer.save();
+
 
     await sendVerificationEmail(employer, 'employer');
 

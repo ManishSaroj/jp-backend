@@ -55,6 +55,15 @@ const Candidate = candidateSequelize.define('Candidate', {
     type: DataTypes.DATE,
     allowNull: true,
   },
+  verificationAttempts: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0, // Default to 0 attempts
+  },
+  lastVerificationAttempt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
   passwordResetToken: {
     type: DataTypes.STRING,
     allowNull: true,
