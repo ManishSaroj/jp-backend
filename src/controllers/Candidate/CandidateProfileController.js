@@ -184,29 +184,6 @@ const getCandidateImage = async (req, res) => {
     }
 };
 
-// const uploadCandidateImage = async (req, res) => {
-//     try {
-//         const { id: cid } = req.user;
-
-//         if (!req.files || !req.files['candidate_image']) {
-//             return generateResponse(res, 400, 'No image file uploaded');
-//         }
-
-//         const candidateProfile = await CandidateProfile.findOne({ where: { cid } });
-
-//         if (!candidateProfile) {
-//             return generateResponse(res, 404, 'Candidate profile not found');
-//         }
-
-//         await candidateProfile.update({ candidate_image: req.files['candidate_image'][0].buffer });
-
-//         return generateResponse(res, 200, 'Candidate image uploaded successfully');
-//     } catch (error) {
-//         console.error('Error uploading candidate image:', error);
-//         return generateResponse(res, 500, 'Server error', null, error.message);
-//     }
-// };
-
 const uploadCandidateImage = async (req, res) => {
     try {
         const { id: cid } = req.user;
