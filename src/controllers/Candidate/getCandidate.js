@@ -1,3 +1,4 @@
+const multer = require('multer');
 const { generateResponse } = require('../../utils/responseUtils');
 const Candidate = require('../../models/Candidate/CandidateModel');
 const bcrypt = require('bcryptjs');
@@ -5,18 +6,23 @@ const bcrypt = require('bcryptjs');
 // Controller method to get candidate data
 const getCandidate = async (req, res) => {
   try {
-    // Extract candidate ID from JWT token
     const candidateId = req.user.id;
 
-    // Fetch candidate data using candidateId
-    const candidate = await Candidate.findByPk(candidateId);
+    const candidate = await Candidate.findByPk(candidateId, {
+      attributes: ['candidate_name', 'email']
+    });
 
     if (!candidate) {
       return generateResponse(res, 404, 'Candidate not found');
     }
 
-    // Send candidate data to frontend
-    generateResponse(res, 200, 'Candidate data retrieved successfully', { candidate });
+    // Prepare the response data
+    const responseData = {
+      candidate_name: candidate.candidate_name,
+      email: candidate.email,
+    };
+
+    generateResponse(res, 200, 'Candidate data retrieved successfully', responseData);
   } catch (error) {
     console.error('Error fetching candidate data:', error);
     generateResponse(res, 500, 'Server error', null, error.message);

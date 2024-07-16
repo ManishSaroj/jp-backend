@@ -10,11 +10,13 @@ const COOKIE_NAME = process.env.COOKIE_NAME || 'sessionToken';
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const COOKIE_DOMAIN = process.env.COOKIE_DOMAIN || undefined;
 
+// Generates a JWT token based on the provided payload
 const generateToken = (payload, rememberMe) => {
   const expiresIn = rememberMe ? REMEMBER_ME_EXPIRES_IN : EXPIRES_IN;
   return jwt.sign(payload, SECRET, { expiresIn });
 };
 
+// Verifies a JWT token and returns its payload if valid
 const verifyToken = (token) => {
   try {
     const decoded = jwt.verify(token, SECRET);
@@ -24,6 +26,7 @@ const verifyToken = (token) => {
   }
 };
 
+// Sets the JWT token as an HTTP-only cookie
 const setTokenCookie = (res, token, rememberMe) => {
   const cookieMaxAge = rememberMe 
     ? REMEMBER_ME_COOKIE_EXPIRES_IN 

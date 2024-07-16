@@ -76,15 +76,6 @@ const createOrUpdateCandidateProfile = async (req, res) => {
             dribbble,
         };
 
-        if (req.files && req.files['candidate_image']) {
-            updatedFields.candidate_image = req.files['candidate_image'][0].buffer;
-        }
-
-        if (req.files && req.files['candidate_resume']) {
-            updatedFields.candidate_resume = req.files['candidate_resume'][0].buffer;
-            updatedFields.resumeFileName = req.files['candidate_resume'][0].originalname; // Set resumeFileName from the uploaded file's original name
-        }
-
         if (candidateProfile) {
             await candidateProfile.update(updatedFields);
             await candidate.update({ candidate_name, phone_number });
@@ -95,9 +86,6 @@ const createOrUpdateCandidateProfile = async (req, res) => {
 
         const profileData = {
             ...candidateProfile.toJSON(),
-            candidate_image: candidateProfile.candidate_image ? candidateProfile.candidate_image.toString('base64') : null,
-            candidate_resume: candidateProfile.candidate_resume ? candidateProfile.candidate_resume.toString('base64') : null,
-            resumeFileName: candidateProfile.resumeFileName,
         };
 
         const status = candidateProfile.isNewRecord ? 201 : 200;
@@ -146,8 +134,6 @@ const getCandidateProfile = async (req, res) => {
 
         const profileData = {
             ...candidateProfile.toJSON(),
-            candidate_image: candidateProfile.candidate_image ? candidateProfile.candidate_image.toString('base64') : null,
-            candidate_resume: candidateProfile.candidate_resume ? candidateProfile.candidate_resume.toString('base64') : null,
         };
 
         return generateResponse(res, 200, 'Candidate profile fetched successfully', { profile: profileData });
@@ -176,6 +162,98 @@ const getAllCandidateProfiles = async (req, res) => {
     }
 };
 
+const getCandidateImage = async (req, res) => {
+    try {
+        const { id: cid } = req.user;
+
+        const candidateProfile = await CandidateProfile.findOne({ where: { cid } });
+
+        if (!candidateProfile || !candidateProfile.candidate_image) {
+            return generateResponse(res, 404, 'Candidate image not found');
+        }
+
+        const imageBase64 = candidateProfile.candidate_image.toString('base64');
+
+        return generateResponse(res, 200, 'Candidate image fetched successfully', { candidate_image: imageBase64 });
+    } catch (error) {
+        console.error('Error fetching candidate image:', error);
+        return generateResponse(res, 500, 'Server error', null, error.message);
+    }
+};
+
+const uploadCandidateImage = async (req, res) => {
+    try {
+        const { id: cid } = req.user;
+
+        if (!req.files || !req.files['candidate_image']) {
+            return generateResponse(res, 400, 'No image file uploaded');
+        }
+
+        const candidateProfile = await CandidateProfile.findOne({ where: { cid } });
+
+        if (!candidateProfile) {
+            return generateResponse(res, 404, 'Candidate profile not found');
+        }
+
+        await candidateProfile.update({ candidate_image: req.files['candidate_image'][0].buffer });
+
+        return generateResponse(res, 200, 'Candidate image uploaded successfully');
+    } catch (error) {
+        console.error('Error uploading candidate image:', error);
+        return generateResponse(res, 500, 'Server error', null, error.message);
+    }
+};
+
+const getCandidateResume = async (req, res) => {
+    try {
+        const { id: cid } = req.user;
+
+        const candidateProfile = await CandidateProfile.findOne({ where: { cid } });
+
+        if (!candidateProfile || !candidateProfile.candidate_resume) {
+            return generateResponse(res, 404, 'Candidate resume not found');
+        }
+
+        const resumeBase64 = candidateProfile.candidate_resume.toString('base64');
+
+        return generateResponse(res, 200, 'Candidate resume fetched successfully', { 
+            candidate_resume: resumeBase64,
+            resumeFileName: candidateProfile.resumeFileName
+        });
+    } catch (error) {
+        console.error('Error fetching candidate resume:', error);
+        return generateResponse(res, 500, 'Server error', null, error.message);
+    }
+};
+
+const uploadCandidateResume = async (req, res) => {
+    try {
+        const { id: cid } = req.user;
+
+        if (!req.files || !req.files['candidate_resume']) {
+            return generateResponse(res, 400, 'No resume file uploaded');
+        }
+
+        const candidateProfile = await CandidateProfile.findOne({ where: { cid } });
+
+        if (!candidateProfile) {
+            return generateResponse(res, 404, 'Candidate profile not found');
+        }
+
+        const resumeFile = req.files['candidate_resume'][0];
+        await candidateProfile.update({ 
+            candidate_resume: resumeFile.buffer,
+            resumeFileName: resumeFile.originalname
+        });
+
+        return generateResponse(res, 200, 'Candidate resume uploaded successfully');
+    } catch (error) {
+        console.error('Error uploading candidate resume:', error);
+        return generateResponse(res, 500, 'Server error', null, error.message);
+    }
+};
+
+
 // Middleware to handle file uploads for candidate_image and candidate_banner
 const uploadFiles = upload.fields([{ name: 'candidate_image', maxCount: 1 }, { name: 'candidate_banner', maxCount: 1 }, { name: 'candidate_resume', maxCount: 1 }]);
 
@@ -184,5 +262,9 @@ module.exports = {
     updateLookingForJobStatus,
     getCandidateProfile,
     getAllCandidateProfiles,
+    getCandidateImage,
+    uploadCandidateImage,
+    getCandidateResume,
+    uploadCandidateResume,
     uploadFiles,
 };

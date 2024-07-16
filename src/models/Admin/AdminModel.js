@@ -31,16 +31,16 @@ const Admin = adminSequelize.define('Admin', {
     type: DataTypes.DATE,
     allowNull: true,
   },
-  createdAt: {
-    type: DataTypes.DATE,
-    allowNull: false,
-    defaultValue: DataTypes.NOW,
-  },
-  updatedAt: {
-    type: DataTypes.DATE,
-    allowNull: false,
-    defaultValue: DataTypes.NOW,
-  }
+  // createdAt: {
+  //   type: DataTypes.DATE,
+  //   allowNull: false,
+  //   defaultValue: DataTypes.NOW,
+  // },
+  // updatedAt: {
+  //   type: DataTypes.DATE,
+  //   allowNull: false,
+  //   defaultValue: DataTypes.NOW,
+  // }
 }, {
   timestamps: false,
 });

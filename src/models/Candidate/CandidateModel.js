@@ -16,7 +16,7 @@ const Candidate = candidateSequelize.define('Candidate', {
     allowNull: false,
     unique: true,
     validate: {
-      isEmail: true,
+      isEmail: true,  // Validate that email field should be an email address
     },
   },
   password: {
@@ -30,9 +30,9 @@ const Candidate = candidateSequelize.define('Candidate', {
   termsAgreed: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
-    defaultValue: false, // Changed default value to false
+    defaultValue: false, // Set default value for termsAgreed to false
     validate: {
-      termsAgreedCheck(value) { // Define the validation function
+      termsAgreedCheck(value) { // Custom validation function for termsAgreed field
         if (!value) {
           throw new Error('Terms and conditions must be agreed to sign up.');
         }
@@ -41,7 +41,7 @@ const Candidate = candidateSequelize.define('Candidate', {
   },
   emailVerified: {
     type: DataTypes.BOOLEAN,
-    defaultValue: false,
+    defaultValue: false, // Set default value for emailVerified to false
   },
   verificationToken: {
     type: DataTypes.STRING,
@@ -52,6 +52,15 @@ const Candidate = candidateSequelize.define('Candidate', {
     allowNull: true,
   },
   tokenExpiration: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
+  verificationAttempts: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0, // Default to 0 attempts
+  },
+  lastVerificationAttempt: {
     type: DataTypes.DATE,
     allowNull: true,
   },
@@ -68,8 +77,7 @@ const Candidate = candidateSequelize.define('Candidate', {
     allowNull: true,
   },
 }, {
-  timestamps: false,
+  timestamps: true, // Enable timestamps (createdAt and updatedAt fields)
 });
-
 
 module.exports = Candidate;
