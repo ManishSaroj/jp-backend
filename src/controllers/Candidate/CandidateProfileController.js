@@ -132,9 +132,12 @@ const getCandidateProfile = async (req, res) => {
             return generateResponse(res, 404, 'Candidate profile not found');
         }
 
-        const profileData = {
-            ...candidateProfile.toJSON(),
-        };
+        // const profileData = {
+        //     ...candidateProfile.toJSON(),
+        // };
+
+         // Exclude candidate_image and candidate_resume from profileData
+         const { candidate_image, candidate_resume, resumeFileName, ...profileData } = candidateProfile.toJSON();
 
         return generateResponse(res, 200, 'Candidate profile fetched successfully', { profile: profileData });
     } catch (error) {
@@ -181,21 +184,55 @@ const getCandidateImage = async (req, res) => {
     }
 };
 
+// const uploadCandidateImage = async (req, res) => {
+//     try {
+//         const { id: cid } = req.user;
+
+//         if (!req.files || !req.files['candidate_image']) {
+//             return generateResponse(res, 400, 'No image file uploaded');
+//         }
+
+//         const candidateProfile = await CandidateProfile.findOne({ where: { cid } });
+
+//         if (!candidateProfile) {
+//             return generateResponse(res, 404, 'Candidate profile not found');
+//         }
+
+//         await candidateProfile.update({ candidate_image: req.files['candidate_image'][0].buffer });
+
+//         return generateResponse(res, 200, 'Candidate image uploaded successfully');
+//     } catch (error) {
+//         console.error('Error uploading candidate image:', error);
+//         return generateResponse(res, 500, 'Server error', null, error.message);
+//     }
+// };
+
 const uploadCandidateImage = async (req, res) => {
     try {
         const { id: cid } = req.user;
 
+        // Check if image file was uploaded
         if (!req.files || !req.files['candidate_image']) {
             return generateResponse(res, 400, 'No image file uploaded');
         }
 
+        // Get candidate profile by cid
         const candidateProfile = await CandidateProfile.findOne({ where: { cid } });
 
         if (!candidateProfile) {
             return generateResponse(res, 404, 'Candidate profile not found');
         }
 
-        await candidateProfile.update({ candidate_image: req.files['candidate_image'][0].buffer });
+        // Limit image size check (1MB limit)
+        const maxFileSize = 1 * 1024 * 1024; // 1MB in bytes
+        const imageFile = req.files['candidate_image'][0];
+
+        if (imageFile.size > maxFileSize) {
+            return generateResponse(res, 400, 'Image size exceeds the maximum allowed size (1MB)');
+        }
+
+        // Update candidate profile with image buffer
+        await candidateProfile.update({ candidate_image: imageFile.buffer });
 
         return generateResponse(res, 200, 'Candidate image uploaded successfully');
     } catch (error) {
@@ -203,6 +240,7 @@ const uploadCandidateImage = async (req, res) => {
         return generateResponse(res, 500, 'Server error', null, error.message);
     }
 };
+
 
 const getCandidateResume = async (req, res) => {
     try {
