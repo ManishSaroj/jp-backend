@@ -7,7 +7,7 @@ const PackageModel = adminSequelize.define('PackageModel', {
         primaryKey: true,
         autoIncrement: true,
     },
-    name: {
+    packageName: {
         type: DataTypes.ENUM('Free', 'Bronze', 'Silver', 'Platinum', 'Gold'),
         allowNull: false,
     },
@@ -34,6 +34,7 @@ const PackageModel = adminSequelize.define('PackageModel', {
         allowNull: false,
         defaultValue: 'days',
     },
+    // inclusion
     companyProfiles: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
@@ -62,15 +63,6 @@ const PackageModel = adminSequelize.define('PackageModel', {
         type: DataTypes.BOOLEAN,
         allowNull: false,
     },
-}, {
-    hooks: {
-        beforeCreate: (package) => {
-            package.discountedPrice = package.originalPrice * (1 - package.discountPercentage / 100);
-        },
-        beforeUpdate: (package) => {
-            package.discountedPrice = package.originalPrice * (1 - package.discountPercentage / 100);
-        }
-    }
 });
 
 module.exports = PackageModel;

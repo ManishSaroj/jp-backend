@@ -10,6 +10,7 @@ const { createResume, updateResume, deleteResume, getAllResumes, getResumeById, 
 const { getAllJobPosts, getJobPostById, applyForJob, getAppliedJobsForCandidate } = require('../controllers/Candidate/getAllJobPosts');
 const { getNotificationsForCandidate, deleteAllNotifications, deleteNotification } = require('../controllers/Candidate/notificationController');
 const sseMiddleware = require('../middlewares/sseMiddleware');
+const { updateJobCategory } = require('../controllers/Admin/AdminProfileController');
 
 const router = express.Router();
 
@@ -52,6 +53,7 @@ router.get('/jobposts/applied', checkAuth, getAppliedJobsForCandidate);
 router.get('/notifications/:profileId', getNotificationsForCandidate);
 router.delete('/notifications/:notificationId', checkAuth, deleteNotification);
 router.delete('/notifications/all/:profileId', checkAuth, deleteAllNotifications);
+
 
 // SSE route for notifications
 router.get('/notifications/sse/:profileId', sseMiddleware, (req, res) => {

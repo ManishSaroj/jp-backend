@@ -31,10 +31,12 @@ router.put('/employers/profile/:profileId', uploadEmployerFiles, updateEmployerA
 // Routes for job category and job type
 router.put('/jobCategory',checkAdminAuth, updateJobCategory);
 router.get('/jobCategory',checkAdminAuth, getJobCategory);
+router.get('/jobCategories', getJobCategory);
 router.put('/jobType',checkAdminAuth, updateJobType);
 router.get('/jobType',checkAdminAuth, getJobType);
 
 router.get('/packages',checkAdminAuth , getAllPackages);
-router.patch('/packages',checkAdminAuth, updatePackageDetails);
+router.put('/packages',checkAdminAuth, updatePackageDetails);
+router.get('/setPackages', getAllPackages);
 
 module.exports = router;
