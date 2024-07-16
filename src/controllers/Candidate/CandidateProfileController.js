@@ -255,7 +255,14 @@ const uploadCandidateResume = async (req, res) => {
             return generateResponse(res, 404, 'Candidate profile not found');
         }
 
+        // Add file size limit check (3MB limit)
+        const maxFileSize = 3 * 1024 * 1024; // 3MB in bytes
         const resumeFile = req.files['candidate_resume'][0];
+
+        if (resumeFile.size > maxFileSize) {
+            return generateResponse(res, 400, 'Resume file size exceeds the maximum allowed size (3MB)');
+        }
+
         await candidateProfile.update({ 
             candidate_resume: resumeFile.buffer,
             resumeFileName: resumeFile.originalname
@@ -267,7 +274,6 @@ const uploadCandidateResume = async (req, res) => {
         return generateResponse(res, 500, 'Server error', null, error.message);
     }
 };
-
 
 // Middleware to handle file uploads for candidate_image and candidate_banner
 const uploadFiles = upload.fields([{ name: 'candidate_image', maxCount: 1 }, { name: 'candidate_banner', maxCount: 1 }, { name: 'candidate_resume', maxCount: 1 }]);
