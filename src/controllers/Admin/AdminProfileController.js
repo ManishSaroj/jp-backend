@@ -97,9 +97,43 @@ const getJobType = async (req, res) => {
   }
 };
 
+const getAllJobCategories = async (req, res) => {
+  try {
+    // Find all admin profiles and retrieve job categories
+    const adminProfiles = await AdminProfile.findAll({
+      attributes: ['jobCategory'], // Specify the attribute to retrieve
+    });
+
+    const jobCategories = adminProfiles.map(profile => profile.jobCategory);
+
+    generateResponse(res, 200, 'All job categories retrieved successfully', jobCategories);
+  } catch (error) {
+    console.error('Error retrieving all job categories:', error);
+    generateResponse(res, 500, 'Server error', null, error.message);
+  }
+};
+
+const getAllJobTypes = async (req, res) => {
+  try {
+    // Find all admin profiles and retrieve job types
+    const adminProfiles = await AdminProfile.findAll({
+      attributes: ['jobType'], // Specify the attribute to retrieve
+    });
+
+    const jobTypes = adminProfiles.map(profile => profile.jobType);
+
+    generateResponse(res, 200, 'All job types retrieved successfully', jobTypes);
+  } catch (error) {
+    console.error('Error retrieving all job types:', error);
+    generateResponse(res, 500, 'Server error', null, error.message);
+  }
+};
+
 module.exports = {
   updateJobCategory,
   getJobCategory,
   updateJobType,
   getJobType,
+  getAllJobCategories,
+  getAllJobTypes,
 };

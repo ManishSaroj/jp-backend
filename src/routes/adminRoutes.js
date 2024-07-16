@@ -6,7 +6,7 @@ const adminlogoutMiddleware = require('../middlewares/adminLogoutMiddleware'); /
 const { requestPasswordReset, resetPassword } = require('../controllers/Admin/resetPassword')
 const { getAllCandidatesWithProfiles, getCandidateProfileById, uploadFiles, updateCandidateAndProfile } = require('../controllers/Admin/adminCandidateController');
 const { getAllEmployersWithProfiles, getEmployerProfileById, updateEmployerAndProfile, uploadEmployerFiles } = require('../controllers/Admin/adminEmployerController');
-const { updateJobCategory, getJobCategory, updateJobType, getJobType } = require('../controllers/Admin/AdminProfileController'); // Import the profile controllers for job category and job type
+const { updateJobCategory, getJobCategory, updateJobType, getJobType, getAllJobCategories, getAllJobTypes } = require('../controllers/Admin/AdminProfileController'); // Import the profile controllers for job category and job type
 const {getAllPackages, updatePackageDetails } = require('../controllers/Admin/PackageController');
 
 // Authentication route
@@ -35,8 +35,10 @@ router.put('/employers/profile/:profileId', uploadEmployerFiles, updateEmployerA
 // Routes for job category and job type
 router.put('/jobCategory',checkAdminAuth, updateJobCategory);
 router.get('/jobCategory',checkAdminAuth, getJobCategory);
+router.get('/jobCategories', getAllJobCategories);
 router.put('/jobType',checkAdminAuth, updateJobType);
 router.get('/jobType',checkAdminAuth, getJobType);
+router.get('/jobTypes', getAllJobTypes);
 
 router.get('/packages',checkAdminAuth , getAllPackages);
 router.put('/packages',checkAdminAuth, updatePackageDetails);
