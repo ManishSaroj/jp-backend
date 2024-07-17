@@ -104,9 +104,18 @@ const getAllJobCategories = async (req, res) => {
       attributes: ['jobCategory'], // Specify the attribute to retrieve
     });
 
-    const jobCategories = adminProfiles.map(profile => profile.jobCategory);
+    // Flatten the array of job categories
+    const jobCategories = adminProfiles.reduce((acc, profile) => {
+      if (Array.isArray(profile.jobCategory)) {
+        return acc.concat(profile.jobCategory);
+      }
+      return acc;
+    }, []);
 
-    generateResponse(res, 200, 'All job categories retrieved successfully', jobCategories);
+    // Remove duplicates if needed
+    const uniqueJobCategories = [...new Set(jobCategories)];
+
+    generateResponse(res, 200, 'All job categories retrieved successfully', uniqueJobCategories);
   } catch (error) {
     console.error('Error retrieving all job categories:', error);
     generateResponse(res, 500, 'Server error', null, error.message);
@@ -120,9 +129,18 @@ const getAllJobTypes = async (req, res) => {
       attributes: ['jobType'], // Specify the attribute to retrieve
     });
 
-    const jobTypes = adminProfiles.map(profile => profile.jobType);
+    // Flatten the array of job types
+    const jobTypes = adminProfiles.reduce((acc, profile) => {
+      if (Array.isArray(profile.jobType)) {
+        return acc.concat(profile.jobType);
+      }
+      return acc;
+    }, []);
 
-    generateResponse(res, 200, 'All job types retrieved successfully', jobTypes);
+    // Remove duplicates if needed
+    const uniqueJobTypes = [...new Set(jobTypes)];
+
+    generateResponse(res, 200, 'All job types retrieved successfully', uniqueJobTypes);
   } catch (error) {
     console.error('Error retrieving all job types:', error);
     generateResponse(res, 500, 'Server error', null, error.message);
