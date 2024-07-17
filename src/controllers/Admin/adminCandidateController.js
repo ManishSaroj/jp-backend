@@ -49,7 +49,7 @@ const getAllCandidatesWithProfiles = async (req, res) => {
         [CandidateProfile, 'cid', sortOrder]
       ],
       limit: limitInt,
-      offset: offset
+      offset: offset,
     });
 
     if (!candidates || candidates.length === 0) {

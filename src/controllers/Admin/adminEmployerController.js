@@ -49,7 +49,7 @@ const getAllEmployersWithProfiles = async (req, res) => {
         [EmployerProfile, 'eid', sortOrder]
       ],
       limit: limitInt,
-      offset: offset
+      offset: offset,
     });
 
     if (!employers || employers.length === 0) {
