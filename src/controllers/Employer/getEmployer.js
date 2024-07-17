@@ -9,7 +9,9 @@ const getEmployer = async (req, res) => {
     const employerId = req.user.id;
 
     // Fetch employer data using employerId
-    const employer = await Employer.findByPk(employerId);
+    const employer = await Employer.findByPk(employerId, {
+      attributes: ['company_name', 'email']
+    });
 
     if (!employer) {
       return generateResponse(res, 404, 'Employer not found');

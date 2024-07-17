@@ -1,4 +1,3 @@
-const multer = require('multer');
 const { generateResponse } = require('../../utils/responseUtils');
 const Candidate = require('../../models/Candidate/CandidateModel');
 const bcrypt = require('bcryptjs');
@@ -9,7 +8,7 @@ const getCandidate = async (req, res) => {
     const candidateId = req.user.id;
 
     const candidate = await Candidate.findByPk(candidateId, {
-      attributes: ['candidate_name', 'email']
+      attributes: ['email']
     });
 
     if (!candidate) {
@@ -18,7 +17,6 @@ const getCandidate = async (req, res) => {
 
     // Prepare the response data
     const responseData = {
-      candidate_name: candidate.candidate_name,
       email: candidate.email,
     };
 
