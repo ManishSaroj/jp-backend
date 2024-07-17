@@ -72,9 +72,24 @@ const getSavedCandidates = async (req, res) => {
     }
 };
 
+const unsaveCandidate = async (req, res) => {
+    try {
+      const { employerProfileId, candidateProfileId } = req.body;
+  
+      await SavedCandidate.destroy({
+        where: { employerProfileId, candidateProfileId },
+      });
+  
+      generateResponse(res, 200, 'Candidate unsaved successfully');
+    } catch (error) {
+      console.error('Error unsaving candidate:', error.message);
+      generateResponse(res, 500, 'Internal server error', null, error.message);
+    }
+  };
 
 
 module.exports = {
     saveCandidate,
     getSavedCandidates,
+    unsaveCandidate,
 };
