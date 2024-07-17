@@ -16,6 +16,10 @@ const AdminProfile = adminSequelize.define('AdminProfile', {
       key: 'aid',
     },
   },
+  profileImage: {
+    type: DataTypes.BLOB('long'),
+    allowNull: true,
+  },
   jobCategory: {
     type: DataTypes.JSON,
     allowNull: true,
