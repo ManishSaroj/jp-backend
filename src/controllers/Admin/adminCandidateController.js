@@ -2,6 +2,7 @@ const Candidate = require('../../models/Candidate/CandidateModel');
 const CandidateProfile = require('../../models/Candidate/CandidateProfile');
 const { generateResponse } = require('../../utils/responseUtils');
 const multer = require('multer');
+const { Op } = require('sequelize');
 
 // Multer storage configuration
 const storage = multer.memoryStorage();
@@ -9,30 +10,60 @@ const upload = multer({ storage: storage });
 
 const getAllCandidatesWithProfiles = async (req, res) => {
   try {
-    const { sortOrder = 'ASC' } = req.query;
+    const { sortOrder = 'ASC', search = '', page = 1, limit = 5 } = req.query;
 
     // Validate sortOrder
     if (sortOrder !== 'ASC' && sortOrder !== 'DESC') {
       return generateResponse(res, 400, 'Invalid sort order');
     }
 
-    const candidates = await Candidate.findAll({
+    // Convert page and limit to integers
+    const pageInt = parseInt(page);
+    const limitInt = parseInt(limit);
+
+    // Calculate offset
+    const offset = (pageInt - 1) * limitInt;
+
+    const whereClause = search
+      ? {
+          [Op.or]: [
+            { '$CandidateProfile.cid$': { [Op.like]: `%${search}%` } },
+            { '$CandidateProfile.email$': { [Op.like]: `%${search}%` } },
+            { '$CandidateProfile.candidate_name$': { [Op.like]: `%${search}%` } },
+            { '$CandidateProfile.phone_number$': { [Op.like]: `%${search}%` } },
+            { '$CandidateProfile.city$': { [Op.like]: `%${search}%` } },
+            { '$CandidateProfile.qualification$': { [Op.like]: `%${search}%` } },
+          ],
+        }
+      : {};
+
+    const { count, rows: candidates } = await Candidate.findAndCountAll({
       attributes: ['email'],
       include: [{
         model: CandidateProfile,
         as: 'CandidateProfile',
         attributes: ['profileId', 'cid', 'candidate_name', 'phone_number', 'city', 'qualification']
       }],
+      where: whereClause,
       order: [
         [CandidateProfile, 'cid', sortOrder]
-      ]
+      ],
+      limit: limitInt,
+      offset: offset
     });
 
     if (!candidates || candidates.length === 0) {
       return generateResponse(res, 404, 'No candidates found');
     }
 
-    generateResponse(res, 200, 'Candidates retrieved successfully', { candidates });
+    const totalPages = Math.ceil(count / limitInt);
+
+    generateResponse(res, 200, 'Candidates retrieved successfully', { 
+      candidates,
+      currentPage: pageInt,
+      totalPages,
+      totalCandidates: count
+    });
   } catch (error) {
     console.error('Error fetching candidates:', error);
     generateResponse(res, 500, 'Server error', null, error.message);

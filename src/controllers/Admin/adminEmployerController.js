@@ -2,6 +2,7 @@ const Employer = require('../../models/Employer/EmployerModel');
 const EmployerProfile = require('../../models/Employer/EmployerProfile');
 const { generateResponse } = require('../../utils/responseUtils');
 const multer = require('multer');
+const { Op } = require('sequelize');
 
 // Multer storage configuration
 const storage = multer.memoryStorage();
@@ -9,19 +10,60 @@ const upload = multer({ storage: storage });
 
 const getAllEmployersWithProfiles = async (req, res) => {
   try {
-    const employers = await Employer.findAll({
+    const { sortOrder = 'ASC', search = '', page = 1, limit = 5 } = req.query;
+
+    // Validate sortOrder
+    if (sortOrder !== 'ASC' && sortOrder !== 'DESC') {
+      return generateResponse(res, 400, 'Invalid sort order');
+    }
+
+    // Convert page and limit to integers
+    const pageInt = parseInt(page);
+    const limitInt = parseInt(limit);
+
+    // Calculate offset
+    const offset = (pageInt - 1) * limitInt;
+
+    const whereClause = search
+      ? {
+          [Op.or]: [
+            { '$EmployerProfile.eid$': { [Op.like]: `%${search}%` } },
+            { '$EmployerProfile.email$': { [Op.like]: `%${search}%` } },
+            { '$EmployerProfile.company_name$': { [Op.like]: `%${search}%` } },
+            { '$EmployerProfile.phone_number$': { [Op.like]: `%${search}%` } },
+            { '$EmployerProfile.city$': { [Op.like]: `%${search}%` } },
+            { '$EmployerProfile.company_website$': { [Op.like]: `%${search}%` } },
+          ],
+        }
+      : {};
+
+    const { count, rows: employers } = await Employer.findAndCountAll({
       attributes: ['email'],
       include: [{
         model: EmployerProfile,
+        as: 'EmployerProfile',
         attributes: ['profileId', 'eid', 'company_name', 'phone_number', 'city', 'company_website']
-      }]
+      }],
+      where: whereClause,
+      order: [
+        [EmployerProfile, 'eid', sortOrder]
+      ],
+      limit: limitInt,
+      offset: offset
     });
 
     if (!employers || employers.length === 0) {
       return generateResponse(res, 404, 'No employers found');
     }
 
-    generateResponse(res, 200, 'Employers retrieved successfully', { employers });
+    const totalPages = Math.ceil(count / limitInt);
+
+    generateResponse(res, 200, 'Employers retrieved successfully', {
+      employers,
+      currentPage: pageInt,
+      totalPages,
+      totalEmployers: count
+    });
   } catch (error) {
     console.error('Error fetching employers:', error);
     generateResponse(res, 500, 'Server error', null, error.message);
