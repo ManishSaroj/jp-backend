@@ -40,6 +40,10 @@ const EmployerProfile = employerSequelize.define('EmployerProfile', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  state: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   city: {
     type: DataTypes.STRING,
     allowNull: true,
@@ -60,7 +64,7 @@ const EmployerProfile = employerSequelize.define('EmployerProfile', {
     type: DataTypes.TEXT,
     allowNull: true,
   },
-  linkedin: {
+  linkedIn: {
     type: DataTypes.STRING,
     allowNull: true,
   },
@@ -68,7 +72,23 @@ const EmployerProfile = employerSequelize.define('EmployerProfile', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  facebook: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  twitter: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   instagram: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  behance: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  dribbble: {
     type: DataTypes.STRING,
     allowNull: true,
   },
