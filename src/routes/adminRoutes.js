@@ -4,7 +4,7 @@ const { loginAdmin } = require('../controllers/Admin/adminAuth');
 const checkAdminAuth = require('../middlewares/adminAuthMiddleware');
 const adminlogoutMiddleware = require('../middlewares/adminLogoutMiddleware'); // Assuming this is the path to your logout middleware
 const { requestPasswordReset, resetPassword } = require('../controllers/Admin/resetPassword')
-const { getAllCandidatesWithProfiles, getCandidateProfileById, uploadFiles, updateCandidateAndProfile } = require('../controllers/Admin/adminCandidateController');
+const { getAllCandidatesWithProfiles, getCandidateProfileById, updateCandidateAndProfile } = require('../controllers/Admin/adminCandidateController');
 const { getAllEmployersWithProfiles, getEmployerProfileById, updateEmployerAndProfile, uploadEmployerFiles } = require('../controllers/Admin/adminEmployerController');
 const { updateJobCategory, getJobCategory, updateJobType, getJobType, getAllJobCategories, getAllJobTypes } = require('../controllers/Admin/AdminProfileController'); // Import the profile controllers for job category and job type
 const {getAllPackages, updatePackageDetails } = require('../controllers/Admin/PackageController');
@@ -26,11 +26,11 @@ router.post('/reset-password', resetPassword);
 
 router.get('/candidates', getAllCandidatesWithProfiles);
 router.get('/candidates/profile/:profileId', getCandidateProfileById);
-router.put('/candidates/profile/:profileId', uploadFiles, updateCandidateAndProfile);
+router.put('/candidates/profile/:profileId', updateCandidateAndProfile);
 
 router.get('/employers', getAllEmployersWithProfiles);
 router.get('/employers/profile/:profileId', getEmployerProfileById);
-router.put('/employers/profile/:profileId', uploadEmployerFiles, updateEmployerAndProfile);
+router.put('/employers/profile/:profileId', updateEmployerAndProfile);
 
 // Routes for job category and job type
 router.put('/jobCategory',checkAdminAuth, updateJobCategory);

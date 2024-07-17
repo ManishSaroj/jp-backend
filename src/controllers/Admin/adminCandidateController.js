@@ -106,6 +106,12 @@ const getCandidateProfileById = async (req, res) => {
 const updateCandidateAndProfile = async (req, res) => {
   const { profileId } = req.params;
   const updateData = req.body;
+  const registeredEmail = updateData.registeredEmail;
+  
+  delete updateData.registeredEmail;
+  delete updateData.candidate_image;
+  delete updateData.candidate_resume;
+  delete updateData. resumeFileName;
 
   try {
     const candidateProfile = await CandidateProfile.findOne({
@@ -123,26 +129,15 @@ const updateCandidateAndProfile = async (req, res) => {
     const t = await candidateProfile.sequelize.transaction();
 
     try {
-      // if (req.files['candidate_image']) {
-      //   updateData.candidate_image = req.files['candidate_image'][0].buffer;
-      // }
-      // if (req.files['candidate_resume']) {
-      //   updateData.candidate_resume = req.files['candidate_resume'][0].buffer;
-      //   updateData.resumeFileName = req.files['candidate_resume'][0].originalname;
-      // }
-
+      // Update CandidateProfile
       await CandidateProfile.update(updateData, {
         where: { profileId },
         transaction: t
       });
 
-      const candidateUpdateData = {};
-      if (updateData.email) {
-        candidateUpdateData.email = updateData.email;
-      }
-
-      if (Object.keys(candidateUpdateData).length > 0) {
-        await Candidate.update(candidateUpdateData, {
+      // Update Candidate's email if it has changed
+      if (registeredEmail && registeredEmail !== candidateProfile.Candidate.email) {
+        await Candidate.update({ email: registeredEmail }, {
           where: { cid: candidateProfile.cid },
           transaction: t
         });
@@ -159,12 +154,6 @@ const updateCandidateAndProfile = async (req, res) => {
       });
 
       const profileData = updatedProfile.toJSON();
-      if (profileData.candidate_image) {
-        profileData.candidate_image = profileData.candidate_image.toString('base64');
-      }
-      if (profileData.candidate_resume) {
-        profileData.candidate_resume = profileData.candidate_resume.toString('base64');
-      }
 
       generateResponse(res, 200, 'Candidate and profile updated successfully', { candidateProfile: profileData });
     } catch (error) {
@@ -178,11 +167,11 @@ const updateCandidateAndProfile = async (req, res) => {
 };
 
 // Middleware to handle file uploads for candidate_image, candidate_banner, and candidate_resume
-const uploadFiles = upload.fields([{ name: 'candidate_image', maxCount: 1 }, { name: 'candidate_resume', maxCount: 1 }]);
+// const uploadFiles = upload.fields([{ name: 'candidate_image', maxCount: 1 }, { name: 'candidate_resume', maxCount: 1 }]);
 
 module.exports = {
   getAllCandidatesWithProfiles,
   getCandidateProfileById,
   updateCandidateAndProfile,
-  uploadFiles
+  // uploadFiles
 };
