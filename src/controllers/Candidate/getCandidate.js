@@ -8,7 +8,7 @@ const getCandidate = async (req, res) => {
     const candidateId = req.user.id;
 
     const candidate = await Candidate.findByPk(candidateId, {
-      attributes: ['email']
+      attributes: ['email', 'candidate_name']
     });
 
     if (!candidate) {
@@ -18,6 +18,7 @@ const getCandidate = async (req, res) => {
     // Prepare the response data
     const responseData = {
       email: candidate.email,
+      candidate_name: candidate.candidate_name,
     };
 
     generateResponse(res, 200, 'Candidate data retrieved successfully', responseData);
