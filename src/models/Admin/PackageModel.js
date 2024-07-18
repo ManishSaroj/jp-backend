@@ -63,6 +63,9 @@ const PackageModel = adminSequelize.define('PackageModel', {
         type: DataTypes.BOOLEAN,
         allowNull: false,
     },
+}, {
+    timestamps: false, 
 });
+
 
 module.exports = PackageModel;
