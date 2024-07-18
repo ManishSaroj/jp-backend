@@ -88,7 +88,7 @@ const resendVerificationEmail = async (req, res) => {
     // Check the rate limit for resending verification emails
     const thirtyMinutesAgo = new Date(new Date() - 30 * 60 * 1000); // 30 minutes ago
     if (employer.verificationAttempts >= 5 && employer.lastVerificationAttempt > thirtyMinutesAgo) {
-      return generateResponse(res, 429, 'Too many requests. Please try again later.');
+      return generateResponse(res, 429, 'Too many requests. Please try again after 30 minutes.');
     }
 
     // Update the employer's verification attempts and last verification attempt
