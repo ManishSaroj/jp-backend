@@ -1,7 +1,14 @@
 // controllers/Admin/AdminProfileController.js
-
 const AdminProfile = require('../../models/Admin/AdminProfile');
 const { generateResponse } = require('../../utils/responseUtils');
+const multer = require('multer');
+
+// Multer storage configuration
+const storage = multer.memoryStorage();
+const upload = multer({ 
+  storage: storage,
+  limits: { fileSize: 1 * 1024 * 1024 } // 1MB limit
+});
 
 const updateJobCategory = async (req, res) => {
   const aid = req.admin.id; // Get aid from the token
@@ -147,6 +154,62 @@ const getAllJobTypes = async (req, res) => {
   }
 };
 
+const uploadAdminImage = upload.single('profileImage');
+
+const uploadAdminImageHandler = async (req, res) => {
+  try {
+    const aid = req.admin.id; // Get aid from the token
+
+    // Check if image file was uploaded
+    if (!req.file) {
+      return generateResponse(res, 400, 'No image file uploaded');
+    }
+
+    // Get admin profile by aid
+    let adminProfile = await AdminProfile.findOne({ where: { aid } });
+
+    if (!adminProfile) {
+      return generateResponse(res, 404, 'Admin profile not found');
+    }
+
+    // Update admin profile with image buffer
+    adminProfile.profileImage = req.file.buffer;
+    adminProfile.updatedAt = new Date();
+    await adminProfile.save();
+
+    return generateResponse(res, 200, 'Admin profile image uploaded successfully');
+  } catch (error) {
+    console.error('Error uploading admin profile image:', error);
+    return generateResponse(res, 500, 'Server error', null, error.message);
+  }
+};
+
+const getAdminProfileImage = async (req, res) => {
+  try {
+    const aid = req.admin.id; // Get aid from the token
+
+    // Get admin profile by aid
+    const adminProfile = await AdminProfile.findOne({
+      where: { aid },
+      attributes: ['profileImage']
+    });
+
+    if (!adminProfile || !adminProfile.profileImage) {
+      return generateResponse(res, 404, 'Admin profile image not found');
+    }
+
+    // Set the appropriate content type for the response
+    res.contentType('image/jpeg'); // Adjust if you support other image types
+    
+    // Send the image data
+    res.send(adminProfile.profileImage);
+  } catch (error) {
+    console.error('Error retrieving admin profile image:', error);
+    return generateResponse(res, 500, 'Server error', null, error.message);
+  }
+};
+
+
 module.exports = {
   updateJobCategory,
   getJobCategory,
@@ -154,4 +217,7 @@ module.exports = {
   getJobType,
   getAllJobCategories,
   getAllJobTypes,
+  uploadAdminImage,
+  uploadAdminImageHandler,
+  getAdminProfileImage
 };

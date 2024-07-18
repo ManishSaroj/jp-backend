@@ -45,11 +45,11 @@ const EmployerJobPost = employerSequelize.define('EmployerJobPost', {
         allowNull: true,
     },
     minSalary: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: true,
     },
     maxSalary: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: true,
     },
     salaryFrequency: {

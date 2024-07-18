@@ -6,7 +6,6 @@ const sendPasswordResetEmail = async (user, userType) => {
    const passwordResetToken = crypto.randomBytes(32).toString('hex');
    const passwordResetExpiration = Date.now() + 3600000; // 1 hour
    const resetLink = `${process.env.FRONTEND_BASE_URL}/reset-password?token=${passwordResetToken}&email=${user.email}&userType=${userType}`;
-   console.log(resetLink);
 
    try {
        let userName;

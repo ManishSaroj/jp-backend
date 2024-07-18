@@ -12,7 +12,8 @@ const { getEmployer, changePassword } = require('../controllers/Employer/getEmpl
 const { requestPasswordReset, resetPassword } = require('../controllers/Employer/resetPasswordController');
 const { createOrUpdateEmployerProfile, getEmployerProfile, uploadImages, getCompanyLogo, uploadEmployerLogo, getCompanyBanner, uploadCompanyBanner } = require('../controllers/Employer/EmployerProfileController');
 const { createJobPost, getEmployerJobPosts, getJobPostById, updateJobPost, getAppliedCandidates, getCandidateDetails, JobPostStatus, deleteJobPost, updateApplicationStatus, getApplicationStatus, getShortlistedCandidates} = require('../controllers/Employer/EmployerJobPost');
-const { saveCandidate, getSavedCandidates } = require('../controllers/Employer/savedCandidateController');
+const { browseCandidates } = require('../controllers/Employer/BrowseCandidates')
+const { saveCandidate, getSavedCandidates, unsaveCandidate } = require('../controllers/Employer/savedCandidateController');
 const { getNotificationsForEmployer, deleteAllNotifications, deleteNotification } = require('../controllers/Employer/notificationController');
 const sseMiddleware = require('../middlewares/sseMiddleware');
 
@@ -46,6 +47,7 @@ router.put('/jobpost/:jobpostId/jobpost-status', checkAuth, JobPostStatus);
 router.delete('/jobpost/:jobpostId/delete-jobpost', checkAuth, deleteJobPost);
 router.get('/jobpost/:jobpostId/applied-candidates', checkAuth, getAppliedCandidates);
 router.get('/candidate-details/:profileId', checkAuth , getCandidateDetails);
+router.get('/getAll-candidates', browseCandidates)
 router.put('/application/:applicationId/status', checkAuth, updateApplicationStatus);
 router.put('/application/:applicationId/review', );
 router.get('/application/:applicationId/status', checkAuth, getApplicationStatus);
@@ -53,6 +55,7 @@ router.get('/jobpost/:jobpostId/shortlisted-candidates', checkAuth, getShortlist
 
 router.post('/save-candidate', checkAuth, saveCandidate);
 router.get('/saved-candidates', checkAuth, getSavedCandidates);
+router.delete('/unsave-candidate', checkAuth, unsaveCandidate)
 
 // Password reset routes
 router.post('/request-password-reset', requestPasswordReset);
