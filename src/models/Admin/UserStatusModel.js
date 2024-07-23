@@ -14,10 +14,10 @@ const AdminCandidateStatus = adminSequelize.define('AdminCandidateStatus', {
     allowNull: false,
     unique: true,
   },
-  isActive: {
+  isDeactive: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
-    defaultValue: false, // Default to inactive
+    defaultValue: true, // Default to deactive
   },
   aid: {
     type: DataTypes.INTEGER,
@@ -43,10 +43,10 @@ const AdminEmployerStatus = adminSequelize.define('AdminEmployerStatus', {
     allowNull: false,
     unique: true,
   },
-  isActive: {
+  isDeactive: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
-    defaultValue: false, // Default to inactive
+    defaultValue: true, // Default to deactive
   },
   aid: {
     type: DataTypes.INTEGER,
