@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const { sendVerificationEmail } = require('../../utils/verifyEmailUtils');
 const { generateResponse } = require('../../utils/responseUtils');
 const { generateToken, setTokenCookie } = require('../../utils/jwtUtils');
+const { AdminEmployerStatus } = require('../../models/Admin/UserStatusModel');
 
 const registerEmployer = async (req, res) => {
   const { company_name, email, password, phone_number, terms_agreed } = req.body;
@@ -51,6 +52,12 @@ const loginEmployer = async (req, res) => {
 
     if (!employer.emailVerified) {
       return generateResponse(res, 403, 'Email not verified. Please verify your email before logging in.');
+    }
+
+     // Check if the employer is deactivated
+     const status = await AdminEmployerStatus.findOne({ where: { employerId: employer.eid } });
+     if (status && status.isDeactive) {
+      return generateResponse(res, 423, 'Your Aplakaam account has been deactivated. Please contact Aplakaam support for assistance in reactivating your account.');
     }
 
     const isMatch = await bcrypt.compare(password, employer.password);
