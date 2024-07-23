@@ -11,7 +11,7 @@ const { getAllEmployersWithProfiles, getEmployerProfileById, updateEmployerAndPr
 const {uploadAdminImage, uploadAdminImageHandler, getAdminProfileImage, updateJobCategory, getJobCategory, updateJobType, getJobType, getAllJobCategories, getAllJobTypes } = require('../controllers/Admin/AdminProfileController'); // Import the profile controllers for job category and job type
 const {getAllPackages, updatePackageDetails } = require('../controllers/Admin/PackageController');
 const { deactivateCandidate, activateCandidate, deactivateEmployer, activateEmployer } = require('../controllers/Admin/UserStatusController');
-
+const { createMessage, getAllMessages, deleteMessageById, deleteAllMessages } = require('../controllers/Admin/ContactMessage');
 // Authentication route
 router.post('/login', loginAdmin);
 
@@ -60,5 +60,10 @@ router.get('/jobTypes', getAllJobTypes);
 router.get('/packages',checkAdminAuth , getAllPackages);
 router.put('/packages',checkAdminAuth, updatePackageDetails);
 router.get('/setPackages', getAllPackages);
+
+router.post('/contact', createMessage);
+router.get('/contact', getAllMessages);
+router.delete('/contact/:id', deleteMessageById);
+router.delete('/contact', deleteAllMessages);
 
 module.exports = router;

@@ -1,3 +1,4 @@
+
 const { DataTypes } = require('sequelize');
 const { adminSequelize } = require('../../config/db.config');
 
@@ -8,64 +9,62 @@ const PackageModel = adminSequelize.define('PackageModel', {
         autoIncrement: true,
     },
     packageName: {
-        type: DataTypes.ENUM('Free', 'Bronze', 'Silver', 'Platinum', 'Gold'),
-        allowNull: false,
+        type: DataTypes.STRING,
+        allowNull: true,
     },
     originalPrice: {
         type: DataTypes.DECIMAL(10, 2),
-        allowNull: false,
+        allowNull: true,
     },
     discountPercentage: {
         type: DataTypes.DECIMAL(5, 2),
-        allowNull: false,
+        allowNull: true,
         defaultValue: 0,
     },
     discountedPrice: {
         type: DataTypes.DECIMAL(10, 2),
-        allowNull: false,
+        allowNull: true,
         defaultValue: 0,
     },
     duration: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
     },
     durationType: {
-        type: DataTypes.ENUM('days', 'months', 'years'),
-        allowNull: false,
-        defaultValue: 'days',
+        type: DataTypes.STRING,
+        allowNull: true,
     },
     // inclusion
     companyProfiles: {
         type: DataTypes.BOOLEAN,
-        allowNull: false,
+        allowNull: true,
     },
     candidateProfileUnlocks: {
         type: DataTypes.BOOLEAN,
-        allowNull: false,
+        allowNull: true,
     },
     resumeDatabaseAccess: {
         type: DataTypes.BOOLEAN,
-        allowNull: false,
+        allowNull: true,
     },
     integrationWithOtherPlatforms: {
         type: DataTypes.BOOLEAN,
-        allowNull: false,
+        allowNull: true,
     },
     jobPosting: {
         type: DataTypes.BOOLEAN,
-        allowNull: false,
+        allowNull: true,
     },
     searchAndFilters: {
         type: DataTypes.BOOLEAN,
-        allowNull: false,
+        allowNull: true,
     },
     analyticsAndReporting: {
         type: DataTypes.BOOLEAN,
-        allowNull: false,
+        allowNull: true,
     },
 }, {
-    timestamps: false, 
+    timestamps: false,
 });
-
 
 module.exports = PackageModel;
