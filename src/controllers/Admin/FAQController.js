@@ -7,14 +7,14 @@ const createOrUpdateFAQ = async (req, res) => {
 
   try {
     const results = await Promise.all(faqs.map(async (faq) => {
-      const { id, question, answer } = faq;
+      const { id, question, answer, forWhom } = faq;
       if (id) {
         const existingFaq = await FAQ.findByPk(id);
         if (!existingFaq) return { id, error: 'FAQ not found' };
-        await existingFaq.update({ question, answer });
+        await existingFaq.update({ question, answer, forWhom });
         return { ...existingFaq.toJSON(), status: 'updated' };
       } else {
-        const newFaq = await FAQ.create({ question, answer });
+        const newFaq = await FAQ.create({ question, answer, forWhom });
         return { ...newFaq.toJSON(), status: 'created' };
       }
     }));
@@ -33,6 +33,7 @@ const createOrUpdateFAQ = async (req, res) => {
     return generateResponse(res, 500, 'Server error', null, error.message);
   }
 };
+
 const getFAQs = async (req, res) => {
   try {
     const faqs = await FAQ.findAll();
