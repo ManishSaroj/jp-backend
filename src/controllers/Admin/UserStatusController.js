@@ -1,5 +1,8 @@
 const { AdminCandidateStatus, AdminEmployerStatus } = require('../../models/Admin/UserStatusModel');
 const { generateResponse } = require('../../utils/responseUtils');
+const { sendStatusChangeEmail } = require('../../utils/statusEmail');
+const  Candidate  = require('../../models/Candidate/CandidateModel');
+const  Employer  = require('../../models/Employer/EmployerModel');
 
 // Generic function to handle user status changes
 const changeUserStatus = async (StatusModel, userId, isDeactivating, userType, req, res) => {
@@ -34,6 +37,20 @@ const changeUserStatus = async (StatusModel, userId, isDeactivating, userType, r
     }
     
     const action = isDeactivating ? 'deactivated' : 'activated';
+
+      // Fetch user details
+      let user;
+      if (userType === 'candidate') {
+        user = await Candidate.findByPk(userId);
+      } else if (userType === 'employer') {
+        user = await Employer.findByPk(userId);
+      }
+      
+      // Send status change email
+      if (user) {
+        await sendStatusChangeEmail(user, userType, action);
+      }
+
     generateResponse(res, 200, `${userType} ${action} successfully`);
   } catch (error) {
     console.error(`Error ${isDeactivating ? 'deactivating' : 'activating'} ${userType}:`, error);

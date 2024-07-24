@@ -13,6 +13,9 @@ const {getAllPackages, updatePackageDetails } = require('../controllers/Admin/Pa
 const { deactivateCandidate, activateCandidate, deactivateEmployer, activateEmployer, getCandidateStatus, getEmployerStatus } = require('../controllers/Admin/UserStatusController');
 const { createMessage, getAllMessages, deleteMessageById, deleteAllMessages } = require('../controllers/Admin/ContactMessage');
 const { addState, getAllStates, updateState, deleteState, addCity, getAllCities, updateCity, deleteCity } = require('../controllers/Admin/Location')
+const { createOrUpdateJobLocation, getJobLocations } = require('../controllers/Admin/JobLocation');
+const { createFAQ, updateFAQ, getFAQs, deleteFAQ } = require('../controllers/Admin/FAQController');
+
 // Authentication route
 router.post('/login', loginAdmin);
 
@@ -77,5 +80,16 @@ router.post('/cities', addCity);
 router.get('/cities', getAllCities);
 router.put('/cities/:CityId', updateCity);
 router.delete('/cities/:CityId', deleteCity);
+
+// Job Location routes
+router.post('/job-locations', checkAdminAuth, createOrUpdateJobLocation);
+router.put('/job-locations', checkAdminAuth, createOrUpdateJobLocation);
+router.get('/job-locations', getJobLocations);
+
+// FAQ routes
+router.post('/faqs', checkAdminAuth, createFAQ);
+router.put('/faqs/:id', checkAdminAuth, updateFAQ);
+router.get('/faqs', getFAQs);
+router.delete('/faqs/:id', checkAdminAuth, deleteFAQ);
 
 module.exports = router;

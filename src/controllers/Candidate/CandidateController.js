@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const { generateResponse } = require('../../utils/responseUtils');
 const { sendVerificationEmail } = require('../../utils/verifyEmailUtils')
 const { generateToken, setTokenCookie } = require('../../utils/jwtUtils');
+const { AdminCandidateStatus } = require('../../models/Admin/UserStatusModel');
 
 // Registers a new candidate.
 const registerCandidate = async (req, res) => {
@@ -57,6 +58,12 @@ const loginCandidate = async (req, res) => {
     // Check if the candidate's email is verified
     if (!candidate.emailVerified) {
       return generateResponse(res, 403, 'Email not verified. Please verify your email before logging in.');
+    }
+
+    // Check if the candidate is deactivated
+    const status = await AdminCandidateStatus.findOne({ where: { candidateId: candidate.cid } });
+    if (status && status.isDeactive) {
+      return generateResponse(res, 423, 'Your Aplakaam account has been deactivated. Please contact Aplakaam support for assistance in reactivating your account.');
     }
 
     // Compare the provided password with the stored hashed password
