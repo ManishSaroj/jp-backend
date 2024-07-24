@@ -1,30 +1,23 @@
+// models/FAQ.js
 const { DataTypes } = require('sequelize');
 const { adminSequelize } = require('../../config/db.config');
 
-const JobLocation = adminSequelize.define('JobLocation', {
+const FAQ = adminSequelize.define('FAQ', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
   },
-  locationImage: {
-    type: DataTypes.BLOB('long'),
-    allowNull: true,
-  },
-  state: {
+  question: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  city: {
-    type: DataTypes.STRING,
+  answer: {
+    type: DataTypes.TEXT,
     allowNull: true,
-  },
-  isHide: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false,
   },
 }, {
   timestamps: false,
 });
 
-module.exports = JobLocation;
+module.exports = FAQ;
