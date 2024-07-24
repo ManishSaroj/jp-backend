@@ -31,6 +31,11 @@ const ContactMessage = adminSequelize.define('ContactMessage', {
     type: DataTypes.BOOLEAN,
     allowNull: true,
   },
+  isRead: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+    allowNull: false,
+  },
   createdAt: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
