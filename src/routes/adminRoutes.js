@@ -15,6 +15,7 @@ const { createMessage, getAllMessages, deleteMessageById, deleteAllMessages } = 
 const { addState, getAllStates, updateState, deleteState, addCity, getAllCities, updateCity, deleteCity } = require('../controllers/Admin/Location')
 const { createOrUpdateJobLocation, getJobLocations } = require('../controllers/Admin/JobLocation');
 const { createFAQ, updateFAQ, getFAQs, deleteFAQ } = require('../controllers/Admin/FAQController');
+const { createOrUpdateAd, getAds } = require('../controllers/Admin/ManageAdsController');
 
 // Authentication route
 router.post('/login', loginAdmin);
@@ -88,8 +89,13 @@ router.get('/job-locations', getJobLocations);
 
 // FAQ routes
 router.post('/faqs', checkAdminAuth, createFAQ);
-router.put('/faqs/:id', checkAdminAuth, updateFAQ);
+router.put('/faqs', checkAdminAuth, updateFAQ);
 router.get('/faqs', getFAQs);
 router.delete('/faqs/:id', checkAdminAuth, deleteFAQ);
+
+// ManageAds routes
+router.post('/ads', checkAdminAuth, createOrUpdateAd);
+router.put('/ads', checkAdminAuth, createOrUpdateAd);
+router.get('/ads', getAds);
 
 module.exports = router;
