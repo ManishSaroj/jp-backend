@@ -2,46 +2,37 @@
 const FAQ = require('../../models/Admin/FAQ');
 const { generateResponse } = require('../../utils/responseUtils');
 
-const createFAQ = async (req, res) => {
-  const { question, answer } = req.body;
-  try {
-    const faq = await FAQ.create({ question, answer });
-    return generateResponse(res, 201, 'FAQ created successfully', faq);
-  } catch (error) {
-    console.error('Error creating FAQ:', error);
-    return generateResponse(res, 500, 'Server error', null, error.message);
-  }
-};
-
-const updateFAQ = async (req, res) => {
-  const faqs = req.body; // Expect an array of FAQ objects
+const createOrUpdateFAQ = async (req, res) => {
+  const faqs = Array.isArray(req.body) ? req.body : [req.body];
 
   try {
-    const updatedFaqs = await Promise.all(faqs.map(async (faq) => {
+    const results = await Promise.all(faqs.map(async (faq) => {
       const { id, question, answer } = faq;
-      const existingFaq = await FAQ.findByPk(id);
-      
-      if (!existingFaq) {
-        return { id, error: 'FAQ not found' };
+      if (id) {
+        const existingFaq = await FAQ.findByPk(id);
+        if (!existingFaq) return { id, error: 'FAQ not found' };
+        await existingFaq.update({ question, answer });
+        return { ...existingFaq.toJSON(), status: 'updated' };
+      } else {
+        const newFaq = await FAQ.create({ question, answer });
+        return { ...newFaq.toJSON(), status: 'created' };
       }
-      
-      await existingFaq.update({ question, answer });
-      return existingFaq;
     }));
 
-    const successfulUpdates = updatedFaqs.filter(faq => !faq.error);
-    const failedUpdates = updatedFaqs.filter(faq => faq.error);
+    const created = results.filter(faq => faq.status === 'created');
+    const updated = results.filter(faq => faq.status === 'updated');
+    const failed = results.filter(faq => faq.error);
 
-    return generateResponse(res, 200, 'FAQs updated successfully', {
-      updatedFaqs: successfulUpdates,
-      failedUpdates: failedUpdates
+    return generateResponse(res, 200, 'FAQs processed successfully', {
+      created,
+      updated,
+      failed
     });
   } catch (error) {
-    console.error('Error updating FAQs:', error);
+    console.error('Error processing FAQs:', error);
     return generateResponse(res, 500, 'Server error', null, error.message);
   }
 };
-
 const getFAQs = async (req, res) => {
   try {
     const faqs = await FAQ.findAll();
@@ -68,8 +59,7 @@ const deleteFAQ = async (req, res) => {
 };
 
 module.exports = {
-  createFAQ,
-  updateFAQ,
+  createOrUpdateFAQ,
   getFAQs,
   deleteFAQ,
 };
