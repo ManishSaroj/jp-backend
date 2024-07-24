@@ -10,8 +10,9 @@ const { getAllCandidatesWithProfiles, getCandidateProfileById, updateCandidateAn
 const { getAllEmployersWithProfiles, getEmployerProfileById, updateEmployerAndProfile } = require('../controllers/Admin/adminEmployerController');
 const {uploadAdminImage, uploadAdminImageHandler, getAdminProfileImage, updateJobCategory, getJobCategory, updateJobType, getJobType, getAllJobCategories, getAllJobTypes } = require('../controllers/Admin/AdminProfileController'); // Import the profile controllers for job category and job type
 const {getAllPackages, updatePackageDetails } = require('../controllers/Admin/PackageController');
-const { deactivateCandidate, activateCandidate, deactivateEmployer, activateEmployer } = require('../controllers/Admin/UserStatusController');
+const { deactivateCandidate, activateCandidate, deactivateEmployer, activateEmployer, getCandidateStatus, getEmployerStatus } = require('../controllers/Admin/UserStatusController');
 const { createMessage, getAllMessages, deleteMessageById, deleteAllMessages } = require('../controllers/Admin/ContactMessage');
+const { addState, getAllStates, updateState, deleteState, addCity, getAllCities, updateCity, deleteCity } = require('../controllers/Admin/Location')
 // Authentication route
 router.post('/login', loginAdmin);
 
@@ -43,11 +44,12 @@ router.put('/employers/profile/:profileId', updateEmployerAndProfile);
 // Candidate routes
 router.put('/candidates/:candidateId/deactivate', checkAdminAuth, deactivateCandidate);
 router.put('/candidates/:candidateId/activate', checkAdminAuth, activateCandidate);
+router.get('/candidates/:candidateId/status', checkAdminAuth, getCandidateStatus); 
 
 // Employer routes
 router.put('/employers/:employerId/deactivate', checkAdminAuth, deactivateEmployer);
 router.put('/employers/:employerId/activate', checkAdminAuth, activateEmployer);
-
+router.get('/employers/:employerId/status', checkAdminAuth, getEmployerStatus);
 
 // Routes for job category and job type
 router.put('/jobCategory',checkAdminAuth, updateJobCategory);
@@ -65,5 +67,15 @@ router.post('/contact', createMessage);
 router.get('/contact', getAllMessages);
 router.delete('/contact/:id', deleteMessageById);
 router.delete('/contact', deleteAllMessages);
+
+router.post('/states', addState);
+router.get('/states', getAllStates);
+router.put('/states/:StateId', updateState);
+router.delete('/states/:StateId', deleteState);
+
+router.post('/cities', addCity);
+router.get('/cities', getAllCities);
+router.put('/cities/:CityId', updateCity);
+router.delete('/cities/:CityId', deleteCity);
 
 module.exports = router;
