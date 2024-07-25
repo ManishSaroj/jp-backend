@@ -94,6 +94,7 @@ router.delete('/faqs/:id', deleteFAQ);
 
 // ManageAds routes
 router.post('/ads', createOrUpdateAd);
+router.put('/ads', createOrUpdateAd);
 router.get('/ads', getAds);
 
 module.exports = router;
