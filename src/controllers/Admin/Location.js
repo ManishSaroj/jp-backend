@@ -96,8 +96,21 @@ const addCity = async (req, res) => {
 // Get all cities
 const getAllCities = async (req, res) => {
   try {
-    const cities = await City.findAll();
-    generateResponse(res, 200, 'Cities retrieved successfully', { cities });
+    const cities = await City.findAll({
+      include: [{
+        model: State,
+        attributes: ['StateName']
+      }]
+    });
+    
+    const formattedCities = cities.map(city => ({
+      CityId: city.CityId,
+      CityName: city.CityName,
+      StateId: city.StateId,
+      StateName: city.State.StateName
+    }));
+
+    generateResponse(res, 200, 'Cities retrieved successfully', { cities: formattedCities });
   } catch (error) {
     console.error('Error getting cities:', error);
     generateResponse(res, 500, 'Server error', null, error.message);
