@@ -107,9 +107,29 @@ const deleteAllMessages = async (req, res) => {
   }
 };
 
+const updateMessageReadStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { isRead } = req.body;
+    
+    const message = await ContactMessage.findByPk(id);
+    
+    if (!message) {
+      return generateResponse(res, 404, 'Contact message not found');
+    }
+    
+    await message.update({ isRead });
+    
+    generateResponse(res, 200, 'Message read status updated successfully', message);
+  } catch (error) {
+    generateResponse(res, 500, 'Error updating message read status', null, error.message);
+  }
+};
+
 module.exports = {
   createMessage,
   getAllMessages,
   deleteMessageById,
-  deleteAllMessages
+  deleteAllMessages,
+  updateMessageReadStatus,
 };

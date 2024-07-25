@@ -111,6 +111,11 @@ const updateLookingForJobStatus = async (req, res) => {
             return generateResponse(res, 404, 'Candidate profile not found');
         }
 
+        // Check if the pincode is present when setting lookingForJobs to true
+        if (lookingForJobs && !candidateProfile.pincode) {
+            return generateResponse(res, 400, 'Please complete your profile to set looking for jobs status to true');
+        }
+
         await candidateProfile.update({ lookingForJobs });
 
         return generateResponse(res, 200, 'Looking for job status updated successfully', { lookingForJobs });
@@ -119,6 +124,8 @@ const updateLookingForJobStatus = async (req, res) => {
         return generateResponse(res, 500, 'Server error', null, error.message);
     }
 };
+
+
 
 const getCandidateProfile = async (req, res) => {
     try {

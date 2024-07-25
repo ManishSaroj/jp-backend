@@ -110,6 +110,13 @@ const applyForJob = async (req, res) => {
         if (!jobPost.isActive) {
             return generateResponse(res, 400, 'This job post is no longer accepting applications');
         }
+
+        // Check if the candidate is looking for jobs
+        const candidateProfile = await CandidateProfile.findByPk(candidateProfileId);
+        if (!candidateProfile || !candidateProfile.lookingForJobs) {
+            return generateResponse(res, 400, 'Your profile is not currently set to "Looking for Jobs". To apply, please go to your "My Profile" section and update your job-seeking status. This helps us show you relevant opportunities and allows employers to find you.');
+        }
+
         const existingApplication = await JobApplication.findOne({
             where: { candidateProfileId, jobpostId }
         });

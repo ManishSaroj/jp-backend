@@ -11,7 +11,7 @@ const { getAllEmployersWithProfiles, getEmployerProfileById, updateEmployerAndPr
 const {uploadAdminImage, uploadAdminImageHandler, getAdminProfileImage, updateJobCategory, getJobCategory, updateJobType, getJobType, getAllJobCategories, getAllJobTypes } = require('../controllers/Admin/AdminProfileController'); // Import the profile controllers for job category and job type
 const {getAllPackages, updatePackageDetails } = require('../controllers/Admin/PackageController');
 const { deactivateCandidate, activateCandidate, deactivateEmployer, activateEmployer, getCandidateStatus, getEmployerStatus } = require('../controllers/Admin/UserStatusController');
-const { createMessage, getAllMessages, deleteMessageById, deleteAllMessages } = require('../controllers/Admin/ContactMessage');
+const { createMessage, getAllMessages, deleteMessageById, deleteAllMessages, updateMessageReadStatus } = require('../controllers/Admin/ContactMessage');
 const { addState, getAllStates, updateState, deleteState, addCity, getAllCities, updateCity, deleteCity } = require('../controllers/Admin/Location')
 const { createOrUpdateJobLocation, getJobLocations } = require('../controllers/Admin/JobLocation');
 const { createOrUpdateFAQ, getFAQs, deleteFAQ } = require('../controllers/Admin/FAQController');
@@ -71,6 +71,7 @@ router.post('/contact', createMessage);
 router.get('/contact', getAllMessages);
 router.delete('/contact/:id', deleteMessageById);
 router.delete('/contact', deleteAllMessages);
+router.patch('/contact/:id', updateMessageReadStatus);
 
 router.post('/states', addState);
 router.get('/states', getAllStates);
@@ -84,7 +85,6 @@ router.delete('/cities/:CityId', deleteCity);
 
 // Job Location routes
 router.post('/job-locations', createOrUpdateJobLocation);
-router.put('/job-locations', createOrUpdateJobLocation);
 router.get('/job-locations', getJobLocations);
 
 // FAQ routes
