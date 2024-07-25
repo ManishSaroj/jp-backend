@@ -85,7 +85,6 @@ router.delete('/cities/:CityId', deleteCity);
 
 // Job Location routes
 router.post('/job-locations', createOrUpdateJobLocation);
-router.put('/job-locations', createOrUpdateJobLocation);
 router.get('/job-locations', getJobLocations);
 
 // FAQ routes
