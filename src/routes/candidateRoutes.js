@@ -8,7 +8,7 @@ const { requestPasswordReset, resetPassword  } = require('../controllers/Candida
 const { createOrUpdateCandidateProfile, updateLookingForJobStatus, getCandidateProfile, uploadFiles, getAllCandidateProfiles, getCandidateImage, uploadCandidateImage, getCandidateResume, uploadCandidateResume } = require('../controllers/Candidate/CandidateProfileController');
 const { createResume, updateResume, deleteResume, getAllResumes, getResumeById, getResumeByCandidateId } = require('../controllers/Candidate/resumeController');
 const { getAllJobPosts, getJobPostById, applyForJob, getAppliedJobsForCandidate } = require('../controllers/Candidate/getAllJobPosts');
-const { getNotificationsForCandidate, deleteAllNotifications, deleteNotification } = require('../controllers/Candidate/notificationController');
+const { getNotificationsForCandidate, deleteAllNotifications, deleteNotification, markNotificationAsRead } = require('../controllers/Candidate/notificationController');
 const sseMiddleware = require('../middlewares/sseMiddleware');
 
 const router = express.Router();
@@ -57,6 +57,7 @@ router.get('/jobposts/applied', checkAuth, getAppliedJobsForCandidate);
 router.get('/notifications/:profileId', getNotificationsForCandidate);
 router.delete('/notifications/:notificationId', checkAuth, deleteNotification);
 router.delete('/notifications/all/:profileId', checkAuth, deleteAllNotifications);
+router.patch('/notifications/read/:notificationId', checkAuth, markNotificationAsRead);
 
 // SSE route for notifications
 router.get('/notifications/sse/:profileId', sseMiddleware, (req, res) => {

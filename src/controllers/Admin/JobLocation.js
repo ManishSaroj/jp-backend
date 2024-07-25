@@ -1,58 +1,63 @@
+const multer = require('multer');
 const JobLocation = require('../../models/Admin/JobLocation');
 const { generateResponse } = require('../../utils/responseUtils');
-const multer = require('multer');
 
 // Multer storage configuration
 const storage = multer.memoryStorage();
-const upload = multer({ 
+const uploadLocationImage = multer({
   storage: storage,
-  limits: { fileSize: 2 * 1024 * 1024 } // 2MB limit
-}).single('locationImage'); // Define single file upload
+  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB limit
+}).array('locationImage');
 
 const createOrUpdateJobLocation = async (req, res) => {
-  upload(req, res, async (err) => {
+  uploadLocationImage(req, res, async (err) => {
     if (err) {
       return generateResponse(res, 400, 'Error uploading file', null, err.message);
     }
 
-    const { id, state, city, isHide } = req.body;
-    const locationImage = req.file ? req.file.buffer : null;
-
     try {
-      let jobLocation;
-      let message;
+      const locations = JSON.parse(req.body.locations);
+      const files = req.files || [];
 
-      if (id) {
-        // Update existing job location
-        jobLocation = await JobLocation.findByPk(id);
+      const updatedLocations = await Promise.all(locations.map(async (location, index) => {
+        const { id, state, city, isHide } = location;
+        const locationImage = files[index] ? files[index].buffer : null;
 
-        if (!jobLocation) {
-          return generateResponse(res, 404, 'Job location not found');
+        let jobLocation;
+        if (id) {
+          // Update existing job location
+          jobLocation = await JobLocation.findByPk(id);
+          if (jobLocation) {
+            await jobLocation.update({
+              locationImage: locationImage || jobLocation.locationImage,
+              state: state || jobLocation.state,
+              city: city || jobLocation.city,
+              isHide: isHide !== undefined ? isHide : jobLocation.isHide,
+            });
+          } else {
+            // If no existing location found with this id, create a new one
+            jobLocation = await JobLocation.create({
+              locationImage,
+              state,
+              city,
+              isHide,
+            });
+          }
+        } else {
+          // Create new job location if no id provided
+          jobLocation = await JobLocation.create({
+            locationImage,
+            state,
+            city,
+            isHide,
+          });
         }
+        return jobLocation;
+      }));
 
-        await jobLocation.update({
-          locationImage: locationImage !== null ? locationImage : jobLocation.locationImage,
-          state: state || jobLocation.state,
-          city: city || jobLocation.city,
-          isHide: isHide !== undefined ? isHide : jobLocation.isHide,
-        });
-
-        message = 'Job location updated successfully';
-      } else {
-        // Create new job location
-        jobLocation = await JobLocation.create({
-          locationImage,
-          state,
-          city,
-          isHide,
-        });
-
-        message = 'Job location created successfully';
-      }
-
-      return generateResponse(res, 200, message, jobLocation);
+      return generateResponse(res, 200, 'Job locations updated successfully', updatedLocations);
     } catch (error) {
-      console.error('Error creating/updating job location:', error);
+      console.error('Error creating/updating job locations:', error);
       return generateResponse(res, 500, 'Server error', null, error.message);
     }
   });
@@ -60,13 +65,18 @@ const createOrUpdateJobLocation = async (req, res) => {
 
 const getJobLocations = async (req, res) => {
   try {
-    const jobLocations = await JobLocation.findAll({
-      where: {
-        isHide: false,
-      },
+    const jobLocations = await JobLocation.findAll();
+    
+    // Convert image buffers to base64 strings
+    const locationsWithBase64Images = jobLocations.map(location => {
+      const locationData = location.toJSON();
+      if (locationData.locationImage) {
+        locationData.locationImage = `data:image/jpeg;base64,${locationData.locationImage.toString('base64')}`;
+      }
+      return locationData;
     });
 
-    return generateResponse(res, 200, 'Job locations retrieved successfully', jobLocations);
+    return generateResponse(res, 200, 'Job locations retrieved successfully', locationsWithBase64Images);
   } catch (error) {
     console.error('Error retrieving job locations:', error);
     return generateResponse(res, 500, 'Server error', null, error.message);
@@ -74,6 +84,7 @@ const getJobLocations = async (req, res) => {
 };
 
 module.exports = {
+  uploadLocationImage,
   createOrUpdateJobLocation,
   getJobLocations,
 };
