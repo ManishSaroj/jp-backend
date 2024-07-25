@@ -9,15 +9,15 @@ const ManageAds = adminSequelize.define('ManageAds', {
   },
   placementName: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: false,  // Changed to false
   },
   price: {
     type: DataTypes.DECIMAL(10, 2),
-    allowNull: false,
+    allowNull: false,  // Changed to false
   },
   durationType: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: false,  // Changed to false
   },
 }, {
   timestamps: false,

@@ -16,6 +16,10 @@ const FAQ = adminSequelize.define('FAQ', {
     type: DataTypes.TEXT,
     allowNull: true,
   },
+  forWhom: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
 }, {
   timestamps: false,
 });

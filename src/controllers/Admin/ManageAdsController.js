@@ -2,7 +2,12 @@ const ManageAds = require('../../models/Admin/ManageAds');
 const { generateResponse } = require('../../utils/responseUtils');
 
 const createOrUpdateAd = async (req, res) => {
-  const { id, placementName, price, durationType } = req.body;
+  let { id, placementName, price, durationType } = req.body;
+
+  placementName = placementName || '';
+  price = price || 0;
+  durationType = durationType || '';
+
   try {
     let ad;
     if (id) {
@@ -16,7 +21,7 @@ const createOrUpdateAd = async (req, res) => {
       // Create new ad
       ad = await ManageAds.create({ placementName, price, durationType });
     }
-    return generateResponse(res, id ? 200 : 201, `Ad ${id ? 'updated' : 'created'} successfully`, ad);
+    return generateResponse(res, 200, `Ad ${id ? 'updated' : 'created'} successfully`, ad);
   } catch (error) {
     console.error(`Error ${id ? 'updating' : 'creating'} ad:`, error);
     return generateResponse(res, 500, 'Server error', null, error.message);
@@ -33,7 +38,23 @@ const getAds = async (req, res) => {
   }
 };
 
+const deleteAd = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const ad = await ManageAds.findByPk(id);
+    if (!ad) {
+      return generateResponse(res, 404, 'Ad not found');
+    }
+    await ad.destroy();
+    return generateResponse(res, 200, 'Ad deleted successfully');
+  } catch (error) {
+    console.error('Error deleting ad:', error);
+    return generateResponse(res, 500, 'Server error', null, error.message);
+  }
+};
+
 module.exports = {
   createOrUpdateAd,
   getAds,
+  deleteAd,
 };
