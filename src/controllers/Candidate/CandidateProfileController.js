@@ -284,6 +284,29 @@ const uploadCandidateResume = async (req, res) => {
     }
 };
 
+const deleteCandidateResume = async (req, res) => {
+    try {
+        const { id: cid } = req.user;
+
+        const candidateProfile = await CandidateProfile.findOne({ where: { cid } });
+
+        if (!candidateProfile) {
+            return generateResponse(res, 404, 'Candidate profile not found');
+        }
+
+        if (!candidateProfile.candidate_resume) {
+            return generateResponse(res, 404, 'No resume to delete');
+        }
+
+        await candidateProfile.update({ candidate_resume: null, resumeFileName: null });
+
+        return generateResponse(res, 200, 'Candidate resume deleted successfully');
+    } catch (error) {
+        console.error('Error deleting candidate resume:', error);
+        return generateResponse(res, 500, 'Server error', null, error.message);
+    }
+};
+
 // Middleware to handle file uploads for candidate_image and candidate_banner
 const uploadFiles = upload.fields([{ name: 'candidate_image', maxCount: 1 }, { name: 'candidate_banner', maxCount: 1 }, { name: 'candidate_resume', maxCount: 1 }]);
 
@@ -296,5 +319,6 @@ module.exports = {
     uploadCandidateImage,
     getCandidateResume,
     uploadCandidateResume,
+    deleteCandidateResume,
     uploadFiles,
 };
