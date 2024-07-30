@@ -25,18 +25,12 @@ const getTopEmployers = async (req, res) => {
         include: [{
           model: Employer,
           attributes: [],
-          where: {
-            emailVerified: true
-          },
           include: [{
             model: EmployerJobPost,
             attributes: [],
           }]
         }],
-        where: {
-          ...where,
-          pincode: { [Op.ne]: null }
-        },
+        where,
         group: [
           'EmployerProfile.eid',
           'EmployerProfile.profileId',
