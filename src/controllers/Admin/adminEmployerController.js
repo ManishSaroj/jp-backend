@@ -56,10 +56,25 @@ const getAllEmployersWithProfiles = async (req, res) => {
       return generateResponse(res, 404, 'No employers found');
     }
 
+    const employersWithProfiles = employers.map(employer => {
+      const profile = employer.EmployerProfile;
+      const profileData = profile.toJSON();
+    
+      if (profileData.company_logo) {
+        profileData.company_logo = profileData.company_logo.toString('base64');
+      }
+    
+      return {
+        email: employer.email,
+        employerProfile: profileData
+      };
+    });
+    
+
     const totalPages = Math.ceil(count / limitInt);
 
     generateResponse(res, 200, 'Employers retrieved successfully', {
-      employers,
+      employers: employersWithProfiles,
       currentPage: pageInt,
       totalPages,
       totalEmployers: count
