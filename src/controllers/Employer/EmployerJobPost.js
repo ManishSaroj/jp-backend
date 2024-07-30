@@ -1,5 +1,6 @@
 const Employer = require('../../models/Employer/EmployerModel');
 const EmployerJobPost = require('../../models/Employer/EmployerJobPost');
+const EmployerProfile = require('../../models/Employer/EmployerProfile');
 const JobApplication = require('../../models/Employer/JobApplication');
 const CandidateProfile = require('../../models/Candidate/CandidateProfile');
 const { employerSequelize } = require('../../config/db.config')
@@ -44,6 +45,12 @@ const createJobPost = async (req, res) => {
         const employer = await Employer.findOne({ where: { eid } });
         if (!employer) {
             return generateResponse(res, 404, 'Employer not found');
+        }
+
+       // Check if the employer profile is complete, specifically for pincode
+        const employerProfile = await EmployerProfile.findOne({ where: { eid } });
+        if (!employerProfile || !employerProfile.pincode) {
+            return generateResponse(res, 400, 'Please complete your profile first');
         }
 
         // Create a new job post
