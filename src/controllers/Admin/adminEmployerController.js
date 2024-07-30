@@ -42,7 +42,7 @@ const getAllEmployersWithProfiles = async (req, res) => {
       include: [{
         model: EmployerProfile,
         as: 'EmployerProfile',
-        attributes: ['profileId', 'eid', 'company_name', 'phone_number', 'city', 'company_website']
+        attributes: ['profileId', 'eid', 'company_name', 'phone_number', 'city', 'company_website', 'pincode', 'company_logo']
       }],
       where: whereClause,
       order: [

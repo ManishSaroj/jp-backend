@@ -49,7 +49,7 @@ router.get('/resumes/:id', checkAuth, getResumeById);
 router.get('/resumes/:id', checkAuth, getResumeByCandidateId);
 
 // Job application routes
-router.get('/getAll-jobposts',checkAuth, getAllJobPosts);
+router.get('/getAll-jobposts', getAllJobPosts);   //removed checkAuth to get data at landing page
 router.get('/get-jobpost/:jobpostId',checkAuth, getJobPostById);
 router.post('/apply-for-job', checkAuth, applyForJob);
 router.get('/jobposts/applied', checkAuth, getAppliedJobsForCandidate); 

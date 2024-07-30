@@ -123,8 +123,29 @@ const deleteAllNotifications = async (req, res) => {
     }
 };
 
+const markNotificationAsRead = async (req, res) => {
+    const { notificationId } = req.params;
+
+    try {
+        const notification = await EmployerNotification.findByPk(notificationId);
+
+        if (!notification) {
+            return generateResponse(res, 404, 'Notification not found');
+        }
+
+        notification.isRead = true;
+        await notification.save();
+
+        return generateResponse(res, 200, 'Notification marked as read successfully');
+    } catch (error) {
+        console.error('Error marking notification as read:', error);
+        return generateResponse(res, 500, 'Server error', null, error.message);
+    }
+};
+
 module.exports = {
     getNotificationsForEmployer,
     deleteNotification,
     deleteAllNotifications,
+    markNotificationAsRead,
 };

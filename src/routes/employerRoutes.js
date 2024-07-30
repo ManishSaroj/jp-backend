@@ -14,7 +14,7 @@ const { createOrUpdateEmployerProfile, getEmployerProfile, uploadImages, getComp
 const { createJobPost, getEmployerJobPosts, getJobPostById, updateJobPost, getAppliedCandidates, getCandidateDetails, JobPostStatus, deleteJobPost, updateApplicationStatus, getApplicationStatus, getShortlistedCandidates} = require('../controllers/Employer/EmployerJobPost');
 const { browseCandidates } = require('../controllers/Employer/BrowseCandidates')
 const { saveCandidate, getSavedCandidates, unsaveCandidate } = require('../controllers/Employer/savedCandidateController');
-const { getNotificationsForEmployer, deleteAllNotifications, deleteNotification } = require('../controllers/Employer/notificationController');
+const { getNotificationsForEmployer, deleteAllNotifications, deleteNotification, markNotificationAsRead } = require('../controllers/Employer/notificationController');
 const sseMiddleware = require('../middlewares/sseMiddleware');
 
 const router = express.Router();
@@ -64,6 +64,7 @@ router.post('/reset-password', resetPassword);
 router.get('/notifications/:profileId', getNotificationsForEmployer);
 router.delete('/notifications/:notificationId', checkAuth, deleteNotification);
 router.delete('/notifications/all/:profileId', checkAuth, deleteAllNotifications);
+router.patch('/notifications/read/:notificationId', checkAuth, markNotificationAsRead);
 
 // SSE route for notifications
 router.get('/notifications/sse/:profileId', sseMiddleware, (req, res) => {
