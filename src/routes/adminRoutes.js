@@ -7,7 +7,7 @@ const { requestPasswordReset, resetPassword } = require('../controllers/Admin/re
 const { changeAdminPassword } = require('../controllers/Admin/changeAdminPassword');
 const { getTotalCounts } = require('../controllers/Admin/totalCountController')
 const { getAllCandidatesWithProfiles, getCandidateProfileById, updateCandidateAndProfile } = require('../controllers/Admin/adminCandidateController');
-const { getAllEmployersWithProfiles, getEmployerProfileById, updateEmployerAndProfile, getTopEmployers } = require('../controllers/Admin/adminEmployerController');
+const { getAllEmployersWithProfiles, getEmployerProfileById, updateEmployerAndProfile,} = require('../controllers/Admin/adminEmployerController');
 const {uploadAdminImage, uploadAdminImageHandler, getAdminProfileImage, updateJobCategory, getJobCategory, updateJobType, getJobType, getAllJobCategories, getAllJobTypes } = require('../controllers/Admin/AdminProfileController'); // Import the profile controllers for job category and job type
 const {getAllPackages, updatePackageDetails } = require('../controllers/Admin/PackageController');
 const { deactivateCandidate, activateCandidate, deactivateEmployer, activateEmployer, getCandidateStatus, getEmployerStatus } = require('../controllers/Admin/UserStatusController');
@@ -16,6 +16,7 @@ const { addState, getAllStates, updateState, deleteState, addCity, getAllCities,
 const { createOrUpdateJobLocation, getJobLocations } = require('../controllers/Admin/JobLocation');
 const { createOrUpdateFAQ, getFAQs, deleteFAQ } = require('../controllers/Admin/FAQController');
 const { createOrUpdateAd, getAds } = require('../controllers/Admin/ManageAdsController');
+const { getTopEmployers }  = require('../controllers/Admin/getTopEmployers');
 
 // Authentication route
 router.post('/login', loginAdmin);
