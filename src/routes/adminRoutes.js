@@ -7,7 +7,7 @@ const { requestPasswordReset, resetPassword } = require('../controllers/Admin/re
 const { changeAdminPassword } = require('../controllers/Admin/changeAdminPassword');
 const { getTotalCounts } = require('../controllers/Admin/totalCountController')
 const { getAllCandidatesWithProfiles, getCandidateProfileById, updateCandidateAndProfile } = require('../controllers/Admin/adminCandidateController');
-const { getAllEmployersWithProfiles, getEmployerProfileById, updateEmployerAndProfile } = require('../controllers/Admin/adminEmployerController');
+const { getAllEmployersWithProfiles, getEmployerProfileById, updateEmployerAndProfile, getTopEmployers } = require('../controllers/Admin/adminEmployerController');
 const {uploadAdminImage, uploadAdminImageHandler, getAdminProfileImage, updateJobCategory, getJobCategory, updateJobType, getJobType, getAllJobCategories, getAllJobTypes } = require('../controllers/Admin/AdminProfileController'); // Import the profile controllers for job category and job type
 const {getAllPackages, updatePackageDetails } = require('../controllers/Admin/PackageController');
 const { deactivateCandidate, activateCandidate, deactivateEmployer, activateEmployer, getCandidateStatus, getEmployerStatus } = require('../controllers/Admin/UserStatusController');
@@ -44,6 +44,7 @@ router.put('/candidates/profile/:profileId', updateCandidateAndProfile);
 router.get('/employers', getAllEmployersWithProfiles);
 router.get('/employers/profile/:profileId', getEmployerProfileById);
 router.put('/employers/profile/:profileId', updateEmployerAndProfile);
+router.get('/top-employers', getTopEmployers);
 
 // Candidate routes
 router.put('/candidates/:candidateId/deactivate', checkAdminAuth, deactivateCandidate);

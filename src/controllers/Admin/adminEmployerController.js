@@ -1,5 +1,6 @@
 const Employer = require('../../models/Employer/EmployerModel');
 const EmployerProfile = require('../../models/Employer/EmployerProfile');
+const EmployerJobPost = require('../../models/Employer/EmployerJobPost');
 const { generateResponse } = require('../../utils/responseUtils');
 const multer = require('multer');
 const { Op } = require('sequelize');
@@ -42,7 +43,7 @@ const getAllEmployersWithProfiles = async (req, res) => {
       include: [{
         model: EmployerProfile,
         as: 'EmployerProfile',
-        attributes: ['profileId', 'eid', 'company_name', 'phone_number', 'city', 'company_website', 'pincode', 'company_logo']
+        attributes: ['profileId', 'eid', 'company_name', 'phone_number', 'city', 'company_website', 'pincode']
       }],
       where: whereClause,
       order: [
@@ -180,10 +181,71 @@ const updateEmployerAndProfile = async (req, res) => {
 //   { name: 'company_banner', maxCount: 1 }
 // ]);
 
+const getTopEmployers = async (req, res) => {
+  try {
+    const { pincode } = req.query;
+
+    // Define the base whereClause
+    let whereClause = {};
+
+    // If pincode is provided, filter by pincode
+    if (pincode) {
+      whereClause = { '$EmployerProfile.pincode$': { [Op.like]: `%${pincode}%` } };
+    }
+
+    // Query to get the top employers based on job post count
+    const employers = await Employer.findAll({
+      attributes: [
+        'email',
+        [Sequelize.fn('COUNT', Sequelize.col('EmployerJobPosts.jobpostId')), 'jobPostCount']
+      ],
+      include: [{
+        model: EmployerProfile,
+        as: 'EmployerProfile',
+        attributes: ['profileId', 'eid', 'company_name', 'phone_number', 'city', 'company_website', 'pincode', 'company_logo']
+      }, {
+        model: EmployerJobPost,
+        as: 'EmployerJobPosts',
+        attributes: []  // We just need to count, so no need to include any attributes
+      }],
+      where: whereClause,
+      group: ['Employer.email', 'EmployerProfile.profileId'],
+      order: [[Sequelize.literal('jobPostCount'), 'DESC']],  // Sort by jobPostCount in descending order
+      limit: 15,  // Limit to top 15 employers
+      raw: true
+    });
+
+    if (!employers || employers.length === 0) {
+      return generateResponse(res, 404, 'No employers found');
+    }
+
+    // Convert company_logo to base64 if it exists
+    const employersWithLogo = employers.map(employer => {
+      const profileData = employer['EmployerProfile.company_logo'] ? { 
+        ...employer['EmployerProfile'], 
+        company_logo: Buffer.from(employer['EmployerProfile.company_logo']).toString('base64') 
+      } : employer['EmployerProfile'];
+      return { 
+        ...employer, 
+        EmployerProfile: profileData, 
+        jobPostCount: parseInt(employer['jobPostCount'], 10) 
+      };
+    });
+
+    generateResponse(res, 200, 'Top employers retrieved successfully', {
+      employers: employersWithLogo,
+      totalEmployers: employers.length
+    });
+  } catch (error) {
+    console.error('Error fetching top employers:', error);
+    generateResponse(res, 500, 'Server error', null, error.message);
+  }
+};
 
 module.exports = {
   getAllEmployersWithProfiles,
   getEmployerProfileById,
   updateEmployerAndProfile,
+  getTopEmployers,
   // uploadEmployerFiles
 };
