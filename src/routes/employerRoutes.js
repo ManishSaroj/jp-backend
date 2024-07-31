@@ -10,7 +10,7 @@ const {
 const  checkAuth = require('../middlewares/authMiddleware');
 const { getEmployer, changePassword } = require('../controllers/Employer/getEmployer');
 const { requestPasswordReset, resetPassword } = require('../controllers/Employer/resetPasswordController');
-const { createOrUpdateEmployerProfile, getEmployerProfile, uploadImages, getCompanyLogo, uploadEmployerLogo, getCompanyBanner, uploadCompanyBanner } = require('../controllers/Employer/EmployerProfileController');
+const { createOrUpdateEmployerProfile, getEmployerProfile, uploadImages, getCompanyLogo, uploadEmployerLogo, getCompanyBanner, uploadCompanyBanner, getEmployerProfileById } = require('../controllers/Employer/EmployerProfileController');
 const { createJobPost, getEmployerJobPosts, getJobPostById, updateJobPost, getAppliedCandidates, getCandidateDetails, JobPostStatus, deleteJobPost, updateApplicationStatus, getApplicationStatus, getShortlistedCandidates} = require('../controllers/Employer/EmployerJobPost');
 const { browseCandidates } = require('../controllers/Employer/BrowseCandidates')
 const { saveCandidate, getSavedCandidates, unsaveCandidate } = require('../controllers/Employer/savedCandidateController');
@@ -38,6 +38,7 @@ router.post('/upload-banner', checkAuth, uploadImages, uploadCompanyBanner);
 
 router.post('/profile',checkAuth, uploadImages , createOrUpdateEmployerProfile);
 router.get('/get-profile', checkAuth, getEmployerProfile);
+router.get('/profile/:eid', getEmployerProfileById);
 
 router.post('/create-jobpost',checkAuth, createJobPost);
 router.get('/get-employer-jobposts', checkAuth, getEmployerJobPosts);

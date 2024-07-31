@@ -223,6 +223,29 @@ const uploadCompanyBanner = async (req, res) => {
     }
 };
 
+const getEmployerProfileById = async (req, res) => {
+    try {
+        const { eid } = req.params; // Assuming the eid is passed as a route parameter
+
+        const employerProfile = await EmployerProfile.findOne({ where: { eid } });
+
+        if (!employerProfile) {
+            return generateResponse(res, 404, 'Employer profile not found');
+        }
+
+        const profileData = {
+            ...employerProfile.toJSON(),
+            company_logo: employerProfile.company_logo ? employerProfile.company_logo.toString('base64') : null,
+            company_banner: employerProfile.company_banner ? employerProfile.company_banner.toString('base64') : null,
+        };
+
+        return generateResponse(res, 200, 'Employer profile fetched successfully', { profile: profileData });
+    } catch (error) {
+        console.error('Error fetching employer profile by ID:', error);
+        return generateResponse(res, 500, 'Server error', null, error.message);
+    }
+};
+
 // Middleware to handle file uploads for company_logo and company_banner
 const uploadImages = upload.fields([{ name: 'company_logo', maxCount: 1 }, { name: 'company_banner', maxCount: 1 }]);
 
@@ -234,4 +257,5 @@ module.exports = {
     getCompanyBanner,
     uploadCompanyBanner,
     uploadImages,
+    getEmployerProfileById,
 };
