@@ -185,8 +185,12 @@ const getCandidateImage = async (req, res) => {
         }
 
         const imageBase64 = candidateProfile.candidate_image.toString('base64');
+        const pincode = candidateProfile.pincode || null;
 
-        return generateResponse(res, 200, 'Candidate image fetched successfully', { candidate_image: imageBase64 });
+        return generateResponse(res, 200, 'Candidate image fetched successfully', { 
+            candidate_image: imageBase64,
+            pincode: pincode
+        });
     } catch (error) {
         console.error('Error fetching candidate image:', error);
         return generateResponse(res, 500, 'Server error', null, error.message);
