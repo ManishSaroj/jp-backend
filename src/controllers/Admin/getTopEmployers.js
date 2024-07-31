@@ -30,7 +30,15 @@ const getTopEmployers = async (req, res) => {
             attributes: [],
           }]
         }],
-        where,
+        where: {
+          ...where,
+          pincode: {
+            [Op.and]: [
+              { [Op.ne]: null },
+              { [Op.ne]: '' }
+            ]
+          }
+        },
         group: [
           'EmployerProfile.eid',
           'EmployerProfile.profileId',
