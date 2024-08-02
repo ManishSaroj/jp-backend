@@ -1,5 +1,7 @@
 const multer = require('multer');
 const JobLocation = require('../../models/Admin/JobLocation');
+const EmployerJobPost = require('../../models/Employer/EmployerJobPost');
+const EmployerProfile = require('../../models/Employer/EmployerProfile');
 const { generateResponse } = require('../../utils/responseUtils');
 
 // Multer storage configuration
@@ -66,17 +68,38 @@ const createOrUpdateJobLocation = async (req, res) => {
 const getJobLocations = async (req, res) => {
   try {
     const jobLocations = await JobLocation.findAll();
-    
-    // Convert image buffers to base64 strings
-    const locationsWithBase64Images = jobLocations.map(location => {
+
+    const locationsWithDetails = await Promise.all(jobLocations.map(async (location) => {
       const locationData = location.toJSON();
+
+      // Convert image buffer to base64 string
       if (locationData.locationImage) {
         locationData.locationImage = `data:image/jpeg;base64,${locationData.locationImage.toString('base64')}`;
       }
-      return locationData;
-    });
 
-    return generateResponse(res, 200, 'Job locations retrieved successfully', locationsWithBase64Images);
+      // Get total active jobs for this city
+      const totalActiveJobs = await EmployerJobPost.count({
+        where: {
+          city: locationData.city,
+          isActive: true
+        }
+      });
+
+      // Get total companies for this city
+      const totalCompanies = await EmployerProfile.count({
+        where: {
+          city: locationData.city
+        }
+      });
+
+      return {
+        ...locationData,
+        totalActiveJobs,
+        totalCompanies
+      };
+    }));
+
+    return generateResponse(res, 200, 'Job locations retrieved successfully', locationsWithDetails);
   } catch (error) {
     console.error('Error retrieving job locations:', error);
     return generateResponse(res, 500, 'Server error', null, error.message);
