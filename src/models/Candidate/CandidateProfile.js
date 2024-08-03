@@ -40,7 +40,6 @@ const CandidateProfile = candidateSequelize.define('CandidateProfile', {
   languages: {
     type: DataTypes.JSON, 
     allowNull: true,
-    defaultValue: "" // Set a default value
   },
   jobrole: {
     type: DataTypes.STRING,
